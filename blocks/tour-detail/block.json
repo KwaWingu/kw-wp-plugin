@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "kwawingu/tour-detail",
+  "title": "KwaWingu Tour Detail",
+  "category": "widgets",
+  "icon": "location",
+  "description": "Full detail for a single tour.",
+  "textdomain": "kwawingu-tours",
+  "attributes": { "postId": { "type": "number", "default": 0 } },
+  "supports": { "html": false },
+  "render": "file:./render.php"
+}

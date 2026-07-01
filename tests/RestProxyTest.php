@@ -58,6 +58,21 @@ namespace KwaWingu\Tours\Tests {
             $out = ( new Rest_Proxy( $api ) )->handle_search( $req );
             $this->assertInstanceOf( \WP_Error::class, $out );
         }
+
+        public function test_generic_throwable_maps_to_proxy_error(): void {
+            Functions\when( '__' )->returnArg();
+
+            $api = Mockery::mock( Api_Client::class );
+            $api->shouldReceive( 'get' )->andThrow( new \RuntimeException( 'boom' ) );
+
+            $req = Mockery::mock();
+            $req->shouldReceive( 'get_param' )->andReturn( 'x' );
+
+            $out = ( new Rest_Proxy( $api ) )->handle_search( $req );
+            $this->assertInstanceOf( \WP_Error::class, $out );
+            $this->assertSame( 'proxy_error', $out->code );
+            $this->assertSame( 502, $out->data['status'] );
+        }
     }
 }
 

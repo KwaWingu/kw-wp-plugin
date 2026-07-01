@@ -126,6 +126,7 @@ class Rest_Proxy {
 
     /**
      * Run an API call, mapping Api_Exception to a WP_Error with the API code/status.
+     * Also catches any other \Throwable to prevent raw 500s leaking internals.
      *
      * @param callable():array<string,mixed> $fn
      * @return array<string,mixed>|\WP_Error
@@ -137,6 +138,10 @@ class Rest_Proxy {
             $status = $e->getCode() >= 400 ? $e->getCode() : 502;
             $code   = '' !== $e->get_code_string() ? $e->get_code_string() : 'api_error';
             return new \WP_Error( $code, $e->getMessage(), array( 'status' => $status ) );
+        } catch ( \Throwable $e ) {
+            // Do NOT surface $e->getMessage() — avoids leaking internals.
+            // Real enforcement is the upstream API's own error handling.
+            return new \WP_Error( 'proxy_error', __( 'The request could not be completed.', 'kwawingu-tours' ), array( 'status' => 502 ) );
         }
     }
 
@@ -145,7 +150,7 @@ class Rest_Proxy {
         if ( ! function_exists( 'get_transient' ) ) {
             return true;
         }
-        $ip  = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'anon';
+        $ip  = $this->client_ip();
         $key = 'kwt_rl_' . $bucket . '_' . md5( $ip );
         $n   = (int) get_transient( $key );
         if ( $n >= 20 ) {
@@ -153,5 +158,41 @@ class Rest_Proxy {
         }
         set_transient( $key, $n + 1, 10 * MINUTE_IN_SECONDS );
         return true;
+    }
+
+    /**
+     * Best-effort client IP for rate-limiting.
+     *
+     * Prefers CF-Connecting-IP (set by Cloudflare), then the first hop of
+     * X-Forwarded-For, then REMOTE_ADDR. Falls back to 'anon' if nothing
+     * is set.
+     *
+     * NOTE: X-Forwarded-For is spoofable unless the host is configured with
+     * a trusted-proxy allowlist. This is best-effort defense-in-depth; the
+     * real enforcement is the upstream API's own rate limit.
+     *
+     * @return string
+     */
+    private function client_ip(): string {
+        // Cloudflare sets this header and it cannot be spoofed by the end client.
+        if ( isset( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
+            return sanitize_text_field( wp_unslash( $_SERVER['HTTP_CF_CONNECTING_IP'] ) );
+        }
+
+        // X-Forwarded-For may contain a comma-separated chain; take only the first hop.
+        if ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+            $forwarded = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
+            $parts     = explode( ',', $forwarded );
+            $first     = trim( $parts[0] );
+            if ( '' !== $first ) {
+                return $first;
+            }
+        }
+
+        if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+            return sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+        }
+
+        return 'anon';
     }
 }

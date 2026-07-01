@@ -35,6 +35,8 @@ final class Plugin {
 
         ( new Blocks() )->register();
 
+        ( new Shortcodes() )->register();
+
         $api        = new Api_Client( $settings );
         $sync       = new Sync( $api );
         $controller = new Sync_Controller( $sync, $settings );

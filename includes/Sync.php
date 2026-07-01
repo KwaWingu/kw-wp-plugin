@@ -16,8 +16,12 @@ class Sync {
     /** @var Api_Client */
     private $api;
 
-    public function __construct( Api_Client $api ) {
-        $this->api = $api;
+    /** @var Media|null */
+    private $media;
+
+    public function __construct( Api_Client $api, ?Media $media = null ) {
+        $this->api   = $api;
+        $this->media = $media;
     }
 
     /**
@@ -142,6 +146,13 @@ class Sync {
         }
         update_post_meta( $post_id, 'kwt_gallery', $gallery );
         update_post_meta( $post_id, 'kwt_synced_at', time() );
+
+        if ( null !== $this->media ) {
+            $cover = (string) ( $tour['coverImageUrl'] ?? '' );
+            if ( '' !== $cover ) {
+                $this->media->ingest_cover( $post_id, $cover );
+            }
+        }
     }
 
     /** esc_url_raw that tolerates empty/non-string input without a WP dependency in unit tests. */

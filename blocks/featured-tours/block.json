@@ -12,5 +12,6 @@
     "limit":   { "type": "number", "default": 3 }
   },
   "supports": { "html": false, "align": ["wide", "full"] },
-  "render": "file:./render.php"
+  "render": "file:./render.php",
+  "editorScript": "file:../../build/featured-tours/index.js"
 }

@@ -12,5 +12,6 @@
     "postId": { "type": "number", "default": 0 }
   },
   "supports": { "html": false },
-  "render": "file:./render.php"
+  "render": "file:./render.php",
+  "editorScript": "file:../../build/book-button/index.js"
 }

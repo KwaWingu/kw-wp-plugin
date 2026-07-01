@@ -10,5 +10,6 @@
   "attributes": {},
   "supports": { "html": false },
   "viewScript": "file:./view.js",
-  "render": "file:./render.php"
+  "render": "file:./render.php",
+  "editorScript": "file:../../build/calculator/index.js"
 }

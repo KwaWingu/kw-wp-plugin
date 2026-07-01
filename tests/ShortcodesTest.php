@@ -40,7 +40,7 @@ namespace KwaWingu\Tours\Tests {
         }
 
         public function test_tours_shortcode_maps_limit_attribute(): void {
-            require_once dirname( __DIR__ ) . '/blocks/tours-grid/render.php';
+            require_once dirname( __DIR__ ) . '/blocks/tours-grid/render-fn.php';
             // Stub the render deps so the callback runs without a real query.
             Functions\when( 'esc_html' )->returnArg();
             Functions\when( 'esc_html__' )->returnArg();

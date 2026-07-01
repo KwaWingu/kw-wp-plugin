@@ -10,7 +10,7 @@ namespace KwaWingu\Tours\Tests\Blocks {
         protected function setUp(): void {
             parent::setUp();
             Monkey\setUp();
-            require_once dirname( __DIR__, 2 ) . '/blocks/tours-grid/render.php';
+            require_once dirname( __DIR__, 2 ) . '/blocks/tours-grid/render-fn.php';
             Functions\when( 'esc_html' )->returnArg();
             Functions\when( 'esc_attr' )->returnArg();
             Functions\when( 'esc_url' )->returnArg();

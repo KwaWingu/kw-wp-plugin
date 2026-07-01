@@ -1,30 +1,11 @@
 <?php
 /**
- * Server render for kwawingu/featured-tours. Delegates to the Tours Grid renderer.
+ * WP block template for kwawingu/featured-tours. Echoes the rendered markup.
+ * $attributes / $content / $block are provided by WordPress.
  *
  * @package KwaWingu\Tours
  */
-
-if ( ! function_exists( 'kwt_render_featured_tours' ) ) {
-    /**
-     * @param array<string,mixed> $attributes
-     */
-    function kwt_render_featured_tours( array $attributes, string $content = '' ): string {
-        require_once __DIR__ . '/../tours-grid/render.php';
-        $heading = isset( $attributes['heading'] ) ? (string) $attributes['heading'] : __( 'Featured tours', 'kwawingu-tours' );
-        $limit   = isset( $attributes['limit'] ) ? (int) $attributes['limit'] : 3;
-
-        $grid_attrs = array( 'limit' => $limit );
-        if ( isset( $attributes['_query'] ) ) {
-            $grid_attrs['_query'] = $attributes['_query'];
-        }
-        $grid = kwt_render_tours_grid( $grid_attrs, '' );
-
-        $out = '<section class="kwt-featured">';
-        if ( '' !== $heading ) {
-            $out .= '<h2 class="kwt-featured__heading">' . esc_html( $heading ) . '</h2>';
-        }
-        $out .= $grid . '</section>';
-        return $out;
-    }
-}
+require_once __DIR__ . '/render-fn.php';
+$kwt_attrs   = isset( $attributes ) && is_array( $attributes ) ? $attributes : array();
+$kwt_content = isset( $content ) ? (string) $content : '';
+echo kwt_render_featured_tours( $kwt_attrs, $kwt_content ); // phpcs:ignore WordPress.Security.EscapeOutput -- render fn returns fully-escaped HTML.

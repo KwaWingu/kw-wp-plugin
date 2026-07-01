@@ -9,8 +9,8 @@ class FeaturedToursRenderTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         Monkey\setUp();
-        require_once dirname( __DIR__, 2 ) . '/blocks/tours-grid/render.php';
-        require_once dirname( __DIR__, 2 ) . '/blocks/featured-tours/render.php';
+        require_once dirname( __DIR__, 2 ) . '/blocks/tours-grid/render-fn.php';
+        require_once dirname( __DIR__, 2 ) . '/blocks/featured-tours/render-fn.php';
         foreach ( array( 'esc_html', 'esc_attr', 'esc_url', 'esc_html__' ) as $f ) {
             Functions\when( $f )->returnArg();
         }

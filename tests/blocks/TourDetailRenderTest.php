@@ -9,7 +9,7 @@ class TourDetailRenderTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         Monkey\setUp();
-        require_once dirname( __DIR__, 2 ) . '/blocks/tour-detail/render.php';
+        require_once dirname( __DIR__, 2 ) . '/blocks/tour-detail/render-fn.php';
         foreach ( array( 'esc_html', 'esc_attr', 'esc_url', 'esc_html__' ) as $f ) {
             Functions\when( $f )->returnArg();
         }
@@ -17,7 +17,8 @@ class TourDetailRenderTest extends TestCase {
         Functions\when( 'get_option' )->justReturn( array() );
         Functions\when( 'get_the_ID' )->justReturn( 7 );
         Functions\when( 'get_the_title' )->justReturn( 'Kilimanjaro Trek' );
-        Functions\when( 'get_the_content' )->justReturn( 'Climb the roof of Africa.' );
+        Functions\when( 'get_post' )->justReturn( (object) array( 'post_content' => 'Climb the roof of Africa.' ) );
+        Functions\when( 'apply_filters' )->alias( static fn( $tag, $val ) => $val );
         Functions\when( 'get_the_post_thumbnail_url' )->justReturn( 'https://img/kili.jpg' );
         Functions\when( 'wp_kses_post' )->returnArg();
         Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {

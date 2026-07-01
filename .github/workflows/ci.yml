@@ -22,3 +22,12 @@ jobs:
         run: vendor/bin/phpunit
       - name: PHPCS
         run: vendor/bin/phpcs -q
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install JS deps
+        run: npm ci
+      - name: Build editor block bundles
+        run: npm run build
+      - name: Verify built bundles are committed + up to date
+        run: git diff --exit-code build/

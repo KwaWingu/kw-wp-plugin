@@ -8,9 +8,22 @@
   "description": "A grid of your tours.",
   "textdomain": "kwawingu-tours",
   "attributes": {
-    "limit": { "type": "number", "default": 12 },
-    "type":  { "type": "string", "default": "" }
+    "limit": {
+      "type": "number",
+      "default": 12
+    },
+    "type": {
+      "type": "string",
+      "default": ""
+    }
   },
-  "supports": { "html": false, "align": ["wide", "full"] },
-  "render": "file:./render.php"
+  "supports": {
+    "html": false,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "render": "file:./render.php",
+  "editorScript": "file:../../build/tours-grid/index.js"
 }

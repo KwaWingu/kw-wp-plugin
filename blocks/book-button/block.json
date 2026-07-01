@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "kwawingu/book-button",
+  "title": "KwaWingu Book Button",
+  "category": "widgets",
+  "icon": "cart",
+  "description": "A booking button for the current tour.",
+  "textdomain": "kwawingu-tours",
+  "attributes": {
+    "label":  { "type": "string", "default": "Book now" },
+    "postId": { "type": "number", "default": 0 }
+  },
+  "supports": { "html": false },
+  "render": "file:./render.php"
+}

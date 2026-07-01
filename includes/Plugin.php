@@ -6,7 +6,7 @@ namespace KwaWingu\Tours;
  */
 final class Plugin {
 
-    const VERSION = '0.1.0';
+    const VERSION = '0.2.0';
 
     /** @var Plugin|null */
     private static $instance = null;
@@ -33,8 +33,21 @@ final class Plugin {
 
         ( new Cpt() )->register();
 
-        $api        = new Api_Client( $settings );
-        $sync       = new Sync( $api );
+        ( new Blocks() )->register();
+
+        ( new Shortcodes() )->register();
+
+        ( new Patterns() )->register();
+
+        $api      = new Api_Client( $settings );
+        $sync     = new Sync( $api );
+
+        $branding = new Branding( $api );
+        $branding->register();
+
+        $importer = new Importer();
+        ( new Setup_Wizard( $settings, $branding, $importer, $sync ) )->register();
+
         $controller = new Sync_Controller( $sync, $settings );
         $controller->register();
 

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "kwawingu/tours-grid",
+  "title": "KwaWingu Tours Grid",
+  "category": "widgets",
+  "icon": "grid-view",
+  "description": "A grid of your tours.",
+  "textdomain": "kwawingu-tours",
+  "attributes": {
+    "limit": { "type": "number", "default": 12 },
+    "type":  { "type": "string", "default": "" }
+  },
+  "supports": { "html": false, "align": ["wide", "full"] },
+  "render": "file:./render.php"
+}

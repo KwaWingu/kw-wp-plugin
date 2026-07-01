@@ -109,4 +109,28 @@ class SyncTest extends TestCase {
         $this->assertSame( 77, $drafted[0]['ID'] );
         $this->assertSame( 'draft', $drafted[0]['post_status'] );
     }
+
+    public function test_empty_tours_response_does_not_unpublish_catalog(): void {
+        // A successful /site with an empty tours[] must NOT draft existing posts.
+        Functions\when( 'get_posts' )->justReturn( array( 999 ) ); // an existing published tour
+        Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {
+            return 'kwt_id' === $key ? 'STILL-HERE' : '';
+        } );
+        $drafted = array();
+        Functions\when( 'wp_update_post' )->alias( static function ( $args ) use ( &$drafted ) {
+            $drafted[] = $args;
+            return $args['ID'] ?? 0;
+        } );
+
+        $api = Mockery::mock( Api_Client::class );
+        $api->shouldReceive( 'get_site' )->once()->andReturn( array( 'tours' => array() ) );
+
+        $out = ( new Sync( $api ) )->run();
+
+        $this->assertSame( 0, $out['created'] );
+        $this->assertSame( 0, $out['updated'] );
+        $this->assertSame( 0, $out['unpublished'] );      // guard engaged
+        $this->assertSame( array(), $drafted );            // nothing drafted
+        $this->assertNotEmpty( $out['errors'] );           // a warning is recorded
+    }
 }

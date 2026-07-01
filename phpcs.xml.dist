@@ -4,9 +4,25 @@
     <file>.</file>
     <exclude-pattern>/vendor/*</exclude-pattern>
     <exclude-pattern>/tests/*</exclude-pattern>
-    <rule ref="WordPress-Core"/>
+    <exclude-pattern>*.js</exclude-pattern>
+    <rule ref="WordPress-Core">
+        <!-- Plugin uses PSR-4 autoloading; file names follow class names, not WP convention. -->
+        <exclude name="WordPress.Files.FileName"/>
+    </rule>
     <rule ref="WordPress-Docs"/>
+    <!-- Block render templates carry a docblock, but the Squiz file-comment sniff
+         doesn't recognize a docblock directly followed by require_once (vs a use/class)
+         as a file comment. These are WordPress block templates, not class files. -->
+    <rule ref="Squiz.Commenting.FileComment.Missing">
+        <exclude-pattern>*/blocks/*/render.php</exclude-pattern>
+    </rule>
     <config name="testVersion" value="7.4-"/>
     <rule ref="PHPCompatibilityWP"/>
-    <config name="text_domain" value="kwawingu-tours"/>
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="kwawingu-tours"/>
+            </property>
+        </properties>
+    </rule>
 </ruleset>

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "kwawingu/search",
+  "title": "KwaWingu Tour Search",
+  "category": "widgets",
+  "icon": "search",
+  "description": "Live search across the operator's tours.",
+  "textdomain": "kwawingu-tours",
+  "attributes": { "placeholder": { "type": "string", "default": "Search tours…" } },
+  "supports": { "html": false },
+  "viewScript": "file:./view.js",
+  "render": "file:./render.php"
+}

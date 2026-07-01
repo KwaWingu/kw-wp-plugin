@@ -8,3 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! defined( 'KWT_API_BASE' ) ) {
     define( 'KWT_API_BASE', 'https://tours.kwawingu.com/api/v1' );
 }
+if ( ! defined( 'KWT_VERSION' ) ) {
+    define( 'KWT_VERSION', '0.4.0' );
+}
+if ( ! defined( 'KWT_PLUGIN_FILE' ) ) {
+    define( 'KWT_PLUGIN_FILE', dirname( __DIR__ ) . '/kwawingu-tours.php' );
+}

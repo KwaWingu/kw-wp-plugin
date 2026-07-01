@@ -39,6 +39,9 @@ namespace KwaWingu\Tours\Tests {
             $this->assertContains( 'kwawingu_featured', $registered );
             $this->assertContains( 'kwawingu_reviews', $registered );
             $this->assertContains( 'kwawingu_destinations', $registered );
+            $this->assertContains( 'kwawingu_search', $registered );
+            $this->assertContains( 'kwawingu_calculator', $registered );
+            $this->assertContains( 'kwawingu_booking_form', $registered );
         }
 
         public function test_tours_shortcode_maps_limit_attribute(): void {

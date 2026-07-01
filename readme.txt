@@ -2,9 +2,9 @@
 Contributors: kwawingu
 Tags: tours, travel, tour operator, booking, safari
 Requires at least: 6.2
-Tested up to: 6.5
+Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 0.3.0
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,6 +28,12 @@ This plugin connects to the KwaWingu Tours developer API using your operator slu
 This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to fetch your tour catalog, availability, and related content, using the operator slug and API key you configure. Data sent: your API key (in a request header) and query parameters for the content requested. No visitor personal data is sent by this plugin during catalog sync. See https://tours.kwawingu.com (Terms) and the KwaWingu privacy policy.
 
 == Changelog ==
+
+= 1.0.0 =
+* On-site booking mode: book + pay (mobile money) without leaving your site.
+* Live blocks: Search, Trip Calculator, On-site Booking (via a secure server-side proxy — your API keys never reach the browser).
+* Internationalization (.pot) + text domain loading.
+* Hardening for WordPress.org: input/output security review, ABSPATH guards, blocking coding-standards check.
 
 = 0.3.0 =
 * SEO: JSON-LD (Product/AggregateRating) + Open Graph on tour pages.

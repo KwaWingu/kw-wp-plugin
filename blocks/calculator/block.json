@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "kwawingu/calculator",
+  "title": "KwaWingu Trip Calculator",
+  "category": "widgets",
+  "icon": "calculator",
+  "description": "Estimate a trip price live.",
+  "textdomain": "kwawingu-tours",
+  "attributes": {},
+  "supports": { "html": false },
+  "viewScript": "file:./view.js",
+  "render": "file:./render.php"
+}

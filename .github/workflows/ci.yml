@@ -20,5 +20,5 @@ jobs:
         run: composer install --no-interaction --prefer-dist
       - name: PHPUnit
         run: vendor/bin/phpunit
-      - name: PHPCS (7.4 runtime compat + WPCS, non-blocking)
-        run: vendor/bin/phpcs -q || true
+      - name: PHPCS
+        run: vendor/bin/phpcs -q

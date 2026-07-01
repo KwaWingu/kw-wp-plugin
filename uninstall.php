@@ -7,7 +7,7 @@
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-    exit;
+	exit;
 }
 
 delete_option( 'kwt_settings' );

@@ -3,9 +3,9 @@
 /node_modules/
 
 # Build output
-/build/
 /dist/
 *.zip
+# NOTE: /build/ is committed — it holds the compiled editor block bundles shipped in the plugin.
 
 # Tooling
 .phpunit.result.cache

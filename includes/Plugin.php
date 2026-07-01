@@ -30,8 +30,14 @@ final class Plugin {
 
         $settings = new Settings();
         $settings->register();
-        ( new Admin_Page( $settings ) )->register();
+
         ( new Cpt() )->register();
-        // Sync registered in a later task.
+
+        $api        = new Api_Client( $settings );
+        $sync       = new Sync( $api );
+        $controller = new Sync_Controller( $sync, $settings );
+        $controller->register();
+
+        ( new Admin_Page( $settings, $controller ) )->register();
     }
 }

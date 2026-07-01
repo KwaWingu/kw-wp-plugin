@@ -6,6 +6,7 @@ use Brain\Monkey\Actions;
 use Brain\Monkey\Functions;
 use KwaWingu\Tours\Admin_Page;
 use KwaWingu\Tours\Settings;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class AdminPageTest extends TestCase {
@@ -17,11 +18,14 @@ class AdminPageTest extends TestCase {
 
     protected function tearDown(): void {
         Monkey\tearDown();
+        Mockery::close();
         parent::tearDown();
     }
 
     public function test_register_hooks_admin_menu(): void {
-        $page = new Admin_Page( new Settings() );
+        $settings   = new Settings();
+        $controller = \Mockery::mock( \KwaWingu\Tours\Sync_Controller::class );
+        $page       = new Admin_Page( $settings, $controller );
         $page->register();
         $this->assertNotFalse( has_action( 'admin_menu' ) );
     }

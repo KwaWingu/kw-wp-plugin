@@ -9,8 +9,12 @@ class Admin_Page {
     /** @var Settings */
     private $settings;
 
-    public function __construct( Settings $settings ) {
-        $this->settings = $settings;
+    /** @var Sync_Controller */
+    private $controller;
+
+    public function __construct( Settings $settings, Sync_Controller $controller ) {
+        $this->settings   = $settings;
+        $this->controller = $controller;
     }
 
     public function register(): void {
@@ -60,10 +64,43 @@ class Admin_Page {
                             </select>
                         </td>
                     </tr>
+                    <tr>
+                        <th scope="row"><label for="kwt_private_key"><?php echo esc_html__( 'Private API key (on-site booking only)', 'kwawingu-tours' ); ?></label></th>
+                        <td>
+                            <input name="<?php echo esc_attr( $opt ); ?>[private_key]" id="kwt_private_key" type="password" class="regular-text" value="<?php echo esc_attr( $this->settings->get_private_key() ); ?>" autocomplete="off" />
+                            <p class="description"><?php echo esc_html__( 'Only needed for on-site booking. Stored server-side, never shown on your website.', 'kwawingu-tours' ); ?></p>
+                        </td>
+                    </tr>
                 </table>
                 <?php submit_button(); ?>
             </form>
         </div>
+        <?php
+        $status = get_option( \KwaWingu\Tours\Sync_Controller::STATUS_OPT, array() );
+        ?>
+        <hr />
+        <h2><?php echo esc_html__( 'Catalog sync', 'kwawingu-tours' ); ?></h2>
+        <?php if ( ! empty( $status['ran_at'] ) ) : ?>
+            <p>
+                <?php
+                echo esc_html( sprintf(
+                    /* translators: 1: created, 2: updated, 3: unpublished */
+                    __( 'Last sync — created %1$d, updated %2$d, unpublished %3$d.', 'kwawingu-tours' ),
+                    (int) ( $status['created'] ?? 0 ),
+                    (int) ( $status['updated'] ?? 0 ),
+                    (int) ( $status['unpublished'] ?? 0 )
+                ) );
+                ?>
+            </p>
+            <?php if ( ! empty( $status['errors'] ) ) : ?>
+                <div class="notice notice-warning inline"><p><?php echo esc_html( implode( ' | ', array_map( 'strval', $status['errors'] ) ) ); ?></p></div>
+            <?php endif; ?>
+        <?php endif; ?>
+        <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+            <input type="hidden" name="action" value="<?php echo esc_attr( \KwaWingu\Tours\Sync_Controller::ACTION ); ?>" />
+            <?php wp_nonce_field( \KwaWingu\Tours\Sync_Controller::ACTION ); ?>
+            <?php submit_button( __( 'Sync now', 'kwawingu-tours' ), 'secondary' ); ?>
+        </form>
         <?php
     }
 }

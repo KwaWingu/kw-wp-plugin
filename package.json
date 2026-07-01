@@ -1,6 +1,6 @@
 {
   "name": "kwawingu-tours",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Editor block scripts for the KwaWingu Tours WordPress plugin.",
   "private": true,
   "license": "GPL-2.0-or-later",
@@ -8,7 +8,8 @@
     "build": "wp-scripts build",
     "start": "wp-scripts start",
     "lint:js": "wp-scripts lint-js blocks",
-    "test:js": "wp-scripts test-unit-js"
+    "test:js": "wp-scripts test-unit-js",
+    "make-pot": "wp i18n make-pot . languages/kwawingu-tours.pot --exclude=build,node_modules,vendor,tests"
   },
   "devDependencies": {
     "@wordpress/scripts": "^30.0.0"

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="KwaWingu Tours">
+  <rect width="256" height="256" rx="48" fill="#0a4a3a"/>
+  <path d="M56 168c40-14 62-58 72-96 10 38 32 82 72 96-30 12-58 6-72-10-14 16-42 22-72 10z" fill="#e8920a"/>
+  <circle cx="128" cy="70" r="14" fill="#e1f5ee"/>
+</svg>

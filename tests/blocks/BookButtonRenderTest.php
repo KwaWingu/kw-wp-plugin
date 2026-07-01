@@ -25,4 +25,11 @@ class BookButtonRenderTest extends TestCase {
         $this->assertStringContainsString( 'Book now', $html );
         $this->assertStringContainsString( 'kwt-book-btn', $html );
     }
+
+    public function test_renders_widget_embed_in_widget_mode(): void {
+        \Brain\Monkey\Functions\when( 'get_option' )->justReturn( array( 'slug' => 'acme', 'booking_mode' => 'widget' ) );
+        $html = kwt_render_book_button( array(), '' );
+        $this->assertStringContainsString( 'widget.js', $html );
+        $this->assertStringContainsString( 'kwt-booking-widget', $html );
+    }
 }

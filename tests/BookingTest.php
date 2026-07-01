@@ -24,4 +24,15 @@ class BookingTest extends TestCase {
         Functions\when( 'get_post_meta' )->justReturn( 'kilimanjaro' );
         $this->assertSame( '', Booking::url_for( 7 ) );
     }
+
+    public function test_widget_embed_contains_operator_and_tour(): void {
+        \Brain\Monkey\Functions\when( 'get_option' )->justReturn( array( 'slug' => 'acme', 'booking_mode' => 'widget' ) );
+        \Brain\Monkey\Functions\when( 'get_post_meta' )->justReturn( 'safari' );
+        \Brain\Monkey\Functions\when( 'esc_url' )->returnArg();
+        \Brain\Monkey\Functions\when( 'esc_attr' )->returnArg();
+        $embed = \KwaWingu\Tours\Booking::widget_embed_for( 7 );
+        $this->assertStringContainsString( 'widget.js', $embed );
+        $this->assertStringContainsString( 'data-operator="acme"', $embed );
+        $this->assertStringContainsString( 'data-tour="safari"', $embed );
+    }
 }

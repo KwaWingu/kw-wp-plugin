@@ -45,6 +45,8 @@ final class Plugin {
         $branding = new Branding( $api );
         $branding->register();
 
+        ( new Seo() )->register();
+
         $importer = new Importer();
         ( new Setup_Wizard( $settings, $branding, $importer, $sync ) )->register();
 

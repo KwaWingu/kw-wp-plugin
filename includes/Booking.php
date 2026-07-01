@@ -2,8 +2,9 @@
 namespace KwaWingu\Tours;
 
 /**
- * Builds booking links. v0.2 implements redirect mode (widget/onsite fall back
- * to redirect until v0.3/v0.4).
+ * Builds booking links. Redirect mode (hosted booking URL) and widget mode
+ * (widget.js embed) are implemented; on-site mode arrives in v0.4 and falls
+ * back to redirect until then.
  */
 class Booking {
 

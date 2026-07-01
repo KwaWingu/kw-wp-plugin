@@ -18,6 +18,7 @@ class SyncTest extends TestCase {
         Functions\when( 'sanitize_title' )->returnArg();
         Functions\when( 'update_post_meta' )->justReturn( true );
         Functions\when( 'wp_update_post' )->justReturn( 1 );
+        Functions\when( 'esc_url_raw' )->returnArg();
     }
 
     protected function tearDown(): void {
@@ -108,6 +109,30 @@ class SyncTest extends TestCase {
         $this->assertSame( 1, $out['unpublished'] );
         $this->assertSame( 77, $drafted[0]['ID'] );
         $this->assertSame( 'draft', $drafted[0]['post_status'] );
+    }
+
+    public function test_write_meta_stores_rating_and_gallery(): void {
+        $saved = array();
+        \Brain\Monkey\Functions\when( 'update_post_meta' )->alias( static function ( $id, $key, $val ) use ( &$saved ) {
+            $saved[ $key ] = $val;
+            return true;
+        } );
+        \Brain\Monkey\Functions\when( 'get_posts' )->justReturn( array() );
+        \Brain\Monkey\Functions\when( 'wp_insert_post' )->justReturn( 101 );
+
+        $api = \Mockery::mock( \KwaWingu\Tours\Api_Client::class );
+        $api->shouldReceive( 'get_site' )->andReturn( array( 'tours' => array(
+            array(
+                'id' => 'T1', 'slug' => 'safari', 'title' => 'Safari', 'price' => 1,
+                'rating' => 4.5, 'reviewCount' => 12,
+                'gallery' => array( 'https://img/a.jpg', 'https://img/b.jpg' ),
+            ),
+        ) ) );
+        ( new \KwaWingu\Tours\Sync( $api ) )->run();
+
+        $this->assertSame( 4.5, $saved['kwt_rating'] );
+        $this->assertSame( 12, $saved['kwt_review_count'] );
+        $this->assertSame( array( 'https://img/a.jpg', 'https://img/b.jpg' ), $saved['kwt_gallery'] );
     }
 
     public function test_empty_tours_response_does_not_unpublish_catalog(): void {

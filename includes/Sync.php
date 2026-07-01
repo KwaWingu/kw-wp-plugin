@@ -129,6 +129,18 @@ class Sync {
         update_post_meta( $post_id, 'kwt_difficulty', sanitize_text_field( (string) ( $tour['difficulty'] ?? '' ) ) );
         update_post_meta( $post_id, 'kwt_type', sanitize_text_field( (string) ( $tour['type'] ?? '' ) ) );
         update_post_meta( $post_id, 'kwt_cover_url', $this->esc_url_raw_or_empty( $tour['coverImageUrl'] ?? '' ) );
+        update_post_meta( $post_id, 'kwt_rating', (float) ( $tour['rating'] ?? 0 ) );
+        update_post_meta( $post_id, 'kwt_review_count', (int) ( $tour['reviewCount'] ?? 0 ) );
+        $gallery = array();
+        if ( isset( $tour['gallery'] ) && is_array( $tour['gallery'] ) ) {
+            foreach ( $tour['gallery'] as $url ) {
+                $clean = $this->esc_url_raw_or_empty( $url );
+                if ( '' !== $clean ) {
+                    $gallery[] = $clean;
+                }
+            }
+        }
+        update_post_meta( $post_id, 'kwt_gallery', $gallery );
         update_post_meta( $post_id, 'kwt_synced_at', time() );
     }
 

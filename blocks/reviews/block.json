@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "kwawingu/reviews",
+  "title": "KwaWingu Reviews",
+  "category": "widgets",
+  "icon": "star-half",
+  "description": "Aggregate rating for a tour.",
+  "textdomain": "kwawingu-tours",
+  "attributes": { "postId": { "type": "number", "default": 0 } },
+  "supports": { "html": false },
+  "render": "file:./render.php"
+}

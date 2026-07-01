@@ -103,6 +103,25 @@ class Rest_Proxy {
 				'permission_callback' => $auth,
 			)
 		);
+		register_rest_route(
+			self::NS,
+			'/departures',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'handle_departures' ),
+				'permission_callback' => $auth,
+				'args'                => array( 'tourSlug' => array( 'sanitize_callback' => 'sanitize_title' ) ),
+			)
+		);
+		register_rest_route(
+			self::NS,
+			'/quote',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'handle_quote' ),
+				'permission_callback' => $auth,
+			)
+		);
 	}
 
 	/**
@@ -215,6 +234,39 @@ class Rest_Proxy {
 			function () use ( $request ) {
 				$ref = (string) $request->get_param( 'ref' );
 				return $this->api->get( '/bookings/' . rawurlencode( $ref ), array( 'email' => (string) $request->get_param( 'email' ) ) );
+			}
+		);
+	}
+
+	/**
+	 * List upcoming departures (optionally for one tour).
+	 *
+	 * @param \WP_REST_Request $request The request.
+	 * @return array<string,mixed>|\WP_Error
+	 */
+	public function handle_departures( $request ) {
+		return $this->guard(
+			function () use ( $request ) {
+				$slug = (string) $request->get_param( 'tourSlug' );
+				if ( '' !== $slug ) {
+					return $this->api->get( '/tours/' . rawurlencode( $slug ) . '/departures', array() );
+				}
+				return $this->api->get( '/departures', array() );
+			}
+		);
+	}
+
+	/**
+	 * Price a trip (public key — no booking created).
+	 *
+	 * @param \WP_REST_Request $request The request.
+	 * @return array<string,mixed>|\WP_Error
+	 */
+	public function handle_quote( $request ) {
+		return $this->guard(
+			function () use ( $request ) {
+				$body = is_array( $request->get_json_params() ) ? $request->get_json_params() : array();
+				return $this->api->post( '/quote', $body, false );
 			}
 		);
 	}

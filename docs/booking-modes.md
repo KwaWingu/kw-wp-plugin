@@ -12,4 +12,6 @@ Embeds the KwaWingu booking widget in a page so guests complete their booking wi
 ## On-site via API (available now — requires private key)
 A fully in-site booking + payment flow using the KwaWingu REST proxy. Requires your **private API key** (stored server-side in Settings, never exposed to visitors). The browser calls a same-origin WordPress REST endpoint (`/wp-json/kwawingu/v1/`) that forwards requests to the KwaWingu API — your key never reaches the browser. Payment is completed through Snippe (mobile money push). No card data touches WordPress.
 
+As of v1.1.0, the on-site booking form loads **real departures** from the live API so guests select an actual available departure date, and a **live price** is fetched from the API before the guest proceeds to payment. This ensures seat counts and pricing are always accurate.
+
 To enable: choose **On-site** in Settings → KwaWingu Tours → Booking mode and enter your **Private API key**.

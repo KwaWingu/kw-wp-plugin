@@ -53,6 +53,8 @@ class Assets {
 					'noResults'       => __( 'No results.', 'kwawingu-tours' ),
 					'checkPhone'      => __( 'Check your phone to approve the payment.', 'kwawingu-tours' ),
 					'paymentReceived' => __( 'Payment received — you are booked!', 'kwawingu-tours' ),
+					'priceFrom'       => __( 'From', 'kwawingu-tours' ),
+					'manageBooking'   => __( 'Manage your booking', 'kwawingu-tours' ),
 				),
 			)
 		);

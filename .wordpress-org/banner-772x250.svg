@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 772 250" width="772" height="250">
+  <rect width="772" height="250" fill="#0a4a3a"/>
+  <path d="M0 210c120-20 200-90 240-170 40 80 120 150 240 170-90 30-170 10-240-30-70 40-150 60-240 30z" fill="#0d5a47"/>
+  <text x="44" y="120" font-family="Georgia, serif" font-size="52" fill="#ffffff" font-weight="bold">KwaWingu Tours</text>
+  <text x="46" y="160" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#e1f5ee">Your tour catalogue, on your WordPress site — fast.</text>
+  <circle cx="700" cy="70" r="10" fill="#e8920a"/>
+</svg>

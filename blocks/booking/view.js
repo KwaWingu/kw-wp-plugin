@@ -103,7 +103,8 @@
 						var msg = document.createElement( 'span' );
 						msg.textContent = window.kwtProxy.i18n.paymentReceived + ' ';
 						status.appendChild( msg );
-						if ( portalUrl ) {
+						// Only link https URLs — never a javascript:/data: URI, even if the API is compromised.
+						if ( portalUrl && /^https:\/\//i.test( portalUrl ) ) {
 							var a = document.createElement( 'a' );
 							a.href = portalUrl;
 							a.textContent = window.kwtProxy.i18n.manageBooking;

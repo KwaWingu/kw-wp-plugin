@@ -25,6 +25,9 @@ class AssetsTest extends TestCase {
         Functions\when( 'wp_register_script' )->alias( static function ( $h ) use ( &$registered ) { $registered['reg'] = $h; return true; } );
         $localized = array();
         Functions\when( 'wp_localize_script' )->alias( static function ( $h, $obj, $data ) use ( &$localized ) { $localized = array( $h, $obj, $data ); return true; } );
+        $styles = array();
+        Functions\when( 'wp_register_style' )->alias( static function ( $h ) use ( &$styles ) { $styles['reg'] = $h; return true; } );
+        Functions\when( 'wp_enqueue_style' )->alias( static function ( $h ) use ( &$styles ) { $styles['enq'] = $h; return true; } );
 
         ( new Assets() )->enqueue();
 
@@ -32,5 +35,7 @@ class AssetsTest extends TestCase {
         $this->assertSame( 'kwtProxy', $localized[1] );
         $this->assertSame( 'abc123', $localized[2]['nonce'] );
         $this->assertSame( 'acme', $localized[2]['slug'] );
+        $this->assertSame( 'kwt-blocks', $styles['reg'] );
+        $this->assertSame( 'kwt-blocks', $styles['enq'] );
     }
 }

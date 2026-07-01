@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ruleset name="KwaWingu Tours">
+    <description>WPCS for the KwaWingu Tours plugin.</description>
+    <file>.</file>
+    <exclude-pattern>/vendor/*</exclude-pattern>
+    <exclude-pattern>/tests/*</exclude-pattern>
+    <rule ref="WordPress-Core"/>
+    <rule ref="WordPress-Docs"/>
+    <config name="testVersion" value="7.4-"/>
+    <rule ref="PHPCompatibilityWP"/>
+    <config name="text_domain" value="kwawingu-tours"/>
+</ruleset>

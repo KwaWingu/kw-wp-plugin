@@ -61,7 +61,15 @@ class Sync {
             }
         }
 
-        $result['unpublished'] = $this->unpublish_missing( $seen_ids );
+        // Guard: never soft-unpublish the whole catalog on a blank/partial upstream
+        // response. Only sweep when this run actually saw tours.
+        if ( $result['created'] + $result['updated'] > 0 ) {
+            $result['unpublished'] = $this->unpublish_missing( $seen_ids );
+        } else {
+            // Nothing created or updated (empty or all-parse-failed response) — skip the
+            // sweep so a blank/partial upstream response can't draft the whole catalog.
+            $result['errors'][] = 'Sync returned no usable tours; skipped unpublish to protect the catalog.';
+        }
 
         return $result;
     }

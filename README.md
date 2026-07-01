@@ -7,9 +7,11 @@ Build a fast, SEO-friendly tour-operator website on your [KwaWingu Tours](https:
 ## Features
 
 - **Native content sync** — your tours become a `Tour` custom post type: real URLs, editable in WordPress, great for SEO.
-- **Blocks** — Tours Grid, Tour Detail, Featured Tours, Book Button (+ classic-theme shortcodes).
+- **SEO** — JSON-LD (Product + AggregateRating) and Open Graph tags are injected automatically on every tour page.
+- **Media** — tour cover images are sideloaded into your WordPress media library so they're served from your own domain.
+- **Blocks** — Tours Grid, Tour Detail, Featured Tours, Book Button, Reviews, Destinations Grid (+ classic-theme shortcodes for all six).
 - **One-click setup** — the wizard pulls your branding, scaffolds Home / Tours / About / Contact pages, and imports your tours.
-- **Booking** — send guests to your hosted KwaWingu booking flow (redirect mode). Widget + on-site modes are on the roadmap.
+- **Booking** — redirect guests to your hosted KwaWingu booking page, or embed the KwaWingu widget so they book without leaving your site. On-site API mode is on the roadmap for v0.4.
 - **Keeps your edits** — once you edit a synced tour, sync stops overwriting your content.
 
 ## Install
@@ -38,7 +40,9 @@ See [docs/getting-started.md](docs/getting-started.md).
 | KwaWingu Tours Grid | `[kwawingu_tours limit="12" type=""]` | Grid of tours |
 | KwaWingu Tour Detail | `[kwawingu_tour id="0"]` | Single tour |
 | KwaWingu Featured Tours | `[kwawingu_featured heading="" limit="3"]` | Highlighted set |
-| KwaWingu Book Button | `[kwawingu_booking id="0" label=""]` | Booking link |
+| KwaWingu Book Button | `[kwawingu_booking id="0" label=""]` | Booking link / widget embed |
+| KwaWingu Reviews | `[kwawingu_reviews id="0"]` | Rating + guest reviews for a tour |
+| KwaWingu Destinations Grid | `[kwawingu_destinations limit="12"]` | Grid of destination cards |
 
 Full reference: [docs/blocks.md](docs/blocks.md).
 

@@ -21,4 +21,12 @@ A booking link/button for a tour.
 - `postId` / `id` (number)
 - `label` (string, default "Book now")
 
+## Reviews — `kwawingu/reviews` / `[kwawingu_reviews]`
+Displays the rating and guest reviews for a tour.
+- `postId` / `id` (number) — the tour to show reviews for; defaults to the current post in a tour template.
+
+## Destinations Grid — `kwawingu/destinations-grid` / `[kwawingu_destinations]`
+A responsive grid of destination cards synced from your KwaWingu catalog.
+- `limit` (number, default 12)
+
 Prices display in TZS. Styling uses the `kwt-*` CSS classes and the `--kwt-primary` / `--kwt-accent` custom properties set from your KwaWingu branding.

@@ -6,7 +6,7 @@ namespace KwaWingu\Tours;
  */
 final class Plugin {
 
-    const VERSION = '0.2.0';
+    const VERSION = '0.3.0';
 
     /** @var Plugin|null */
     private static $instance = null;
@@ -40,7 +40,8 @@ final class Plugin {
         ( new Patterns() )->register();
 
         $api      = new Api_Client( $settings );
-        $sync     = new Sync( $api );
+        $media    = new Media( $settings );
+        $sync     = new Sync( $api, $media );
 
         $branding = new Branding( $api );
         $branding->register();

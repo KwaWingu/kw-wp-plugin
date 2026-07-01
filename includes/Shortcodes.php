@@ -11,6 +11,8 @@ class Shortcodes {
         add_shortcode( 'kwawingu_tour', array( $this, 'render_tour' ) );
         add_shortcode( 'kwawingu_booking', array( $this, 'render_booking' ) );
         add_shortcode( 'kwawingu_featured', array( $this, 'render_featured' ) );
+        add_shortcode( 'kwawingu_reviews', array( $this, 'render_reviews' ) );
+        add_shortcode( 'kwawingu_destinations', array( $this, 'render_destinations' ) );
     }
 
     /** @param array<string,mixed> $atts */
@@ -39,5 +41,19 @@ class Shortcodes {
         require_once Blocks::block_dir() . 'featured-tours/render-fn.php';
         $atts = shortcode_atts( array( 'heading' => '', 'limit' => 3 ), $atts );
         return kwt_render_featured_tours( array( 'heading' => (string) $atts['heading'], 'limit' => (int) $atts['limit'] ), '' );
+    }
+
+    /** @param array<string,mixed> $atts */
+    public function render_reviews( $atts ): string {
+        require_once Blocks::block_dir() . 'reviews/render-fn.php';
+        $atts = shortcode_atts( array( 'id' => 0 ), $atts );
+        return kwt_render_reviews( array( 'postId' => (int) $atts['id'] ), '' );
+    }
+
+    /** @param array<string,mixed> $atts */
+    public function render_destinations( $atts ): string {
+        require_once Blocks::block_dir() . 'destinations-grid/render-fn.php';
+        $atts = shortcode_atts( array( 'limit' => 12 ), $atts );
+        return kwt_render_destinations_grid( array( 'limit' => (int) $atts['limit'] ), '' );
     }
 }

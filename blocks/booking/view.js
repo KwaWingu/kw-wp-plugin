@@ -2,17 +2,54 @@
  * kwawingu/booking view: load departures -> live quote -> create booking
  * (correct payload) -> start payment -> poll status -> link to portal.
  */
+function kwtMoney( n ) {
+	return 'TZS ' + ( Number( n ) || 0 ).toLocaleString();
+}
+
+/** ≤30-char idempotency key. */
+function kwtIdemKey() {
+	return ( 'wp-' + Date.now().toString( 36 ) + Math.random().toString( 36 ).slice( 2, 8 ) ).slice( 0, 30 );
+}
+
+/**
+ * Build the create-booking payload in the EXACT shape the KwaWingu API expects.
+ * @param {Object} v - collected form values (tourSlug, adults, children, infants,
+ *                      firstName, lastName, email, phone, departureId, idempotencyKey?).
+ */
+function kwtBuildBookingPayload( v ) {
+	var payload = {
+		tourSlug: v.tourSlug,
+		adults: Number( v.adults ) || 1,
+		children: Number( v.children ) || 0,
+		infants: Number( v.infants ) || 0,
+		guestFirstName: ( v.firstName || '' ).trim(),
+		guestLastName: ( v.lastName || '' ).trim(),
+		guestEmail: ( v.email || '' ).trim(),
+		guestPhone: ( v.phone || '' ).trim(),
+		idempotencyKey: v.idempotencyKey || kwtIdemKey()
+	};
+	if ( v.departureId ) {
+		payload.departureId = v.departureId;
+	}
+	return payload;
+}
+
+/** Extract the booking ref from the create-booking response (shape varies). */
+function kwtReadBookingRef( res ) {
+	var booking = ( res && ( res.booking || ( res.data && res.data.booking ) ) ) || res || {};
+	return booking.ref || booking.bookingReference || ( res && res.ref ) || '';
+}
+
+/** Extract the guest portal URL from the create-booking response. */
+function kwtReadPortalUrl( res ) {
+	var booking = ( res && ( res.booking || ( res.data && res.data.booking ) ) ) || {};
+	return ( res && ( res.portalUrl || ( res.data && res.data.portalUrl ) ) ) || booking.portalUrl || '';
+}
+
 ( function () {
 	'use strict';
 
-	function money( n ) {
-		return 'TZS ' + ( Number( n ) || 0 ).toLocaleString();
-	}
-
-	/** ≤30-char idempotency key. */
-	function idemKey() {
-		return ( 'wp-' + Date.now().toString( 36 ) + Math.random().toString( 36 ).slice( 2, 8 ) ).slice( 0, 30 );
-	}
+	var money = kwtMoney;
 
 	function init( form ) {
 		var status = form.querySelector( '.kwt-booking__status' );
@@ -67,23 +104,21 @@
 			var email = form.email.value.trim();
 			var phone = form.phone.value.trim();
 			var p = pax();
-			var payload = {
+			var payload = kwtBuildBookingPayload( {
 				tourSlug: tourSlug,
 				adults: p.adults,
 				children: p.children,
 				infants: p.infants,
-				guestFirstName: form.firstName.value.trim(),
-				guestLastName: form.lastName.value.trim(),
-				guestEmail: email,
-				guestPhone: phone,
-				idempotencyKey: idemKey()
-			};
-			if ( select.value ) { payload.departureId = select.value; }
+				firstName: form.firstName.value,
+				lastName: form.lastName.value,
+				email: email,
+				phone: phone,
+				departureId: select.value || ''
+			} );
 
 			window.kwtProxy.post( '/bookings', payload ).then( function ( res ) {
-				var booking = ( res && ( res.booking || ( res.data && res.data.booking ) ) ) || res || {};
-				var ref = booking.ref || booking.bookingReference || res.ref;
-				var portalUrl = ( res && ( res.portalUrl || ( res.data && res.data.portalUrl ) ) ) || ( booking && booking.portalUrl );
+				var ref = kwtReadBookingRef( res );
+				var portalUrl = kwtReadPortalUrl( res );
 				if ( ! ref ) { throw new Error( window.kwtProxy.i18n.error ); }
 				return window.kwtProxy.post( '/payment-intent', { ref: ref, phone: phone } ).then( function () {
 					status.textContent = window.kwtProxy.i18n.checkPhone;
@@ -122,3 +157,14 @@
 		Array.prototype.forEach.call( document.querySelectorAll( '.kwt-booking' ), init );
 	} );
 } )();
+
+/* Testable exports (ignored in the browser). */
+if ( typeof module !== 'undefined' && module.exports ) {
+	module.exports = {
+		buildBookingPayload: kwtBuildBookingPayload,
+		readBookingRef: kwtReadBookingRef,
+		readPortalUrl: kwtReadPortalUrl,
+		idemKey: kwtIdemKey,
+		money: kwtMoney
+	};
+}

@@ -7,10 +7,14 @@
 
 namespace KwaWingu\Tours;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
- * Builds booking links. Redirect mode (hosted booking URL) and widget mode
- * (widget.js embed) are implemented; on-site mode arrives in v0.4 and falls
- * back to redirect until then.
+ * Builds booking links. Redirect (hosted URL), widget (widget.js embed), and
+ * on-site (in-page booking form via the REST proxy) modes are all implemented;
+ * on-site links to the on-site booking form (#kwt-book).
  */
 class Booking {
 

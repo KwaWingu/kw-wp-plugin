@@ -10,6 +10,6 @@ Book buttons link to your hosted KwaWingu booking page:
 Embeds the KwaWingu booking widget in a page so guests complete their booking without leaving your site. The widget is served from KwaWingu's CDN and mounted into a page element by a small inline script. Availability and payment are handled by KwaWingu; no booking state is stored in WordPress. To enable this mode, choose **Widget** in Settings → KwaWingu Tours → Booking mode — the plugin inserts the correct embed code into your tour pages automatically.
 
 ## On-site via API (available now — requires private key)
-A fully in-site booking + payment flow using the KwaWingu REST proxy. Requires your **private API key** (stored server-side in Settings, never exposed to visitors). The browser calls a same-origin WordPress REST endpoint (`/wp-json/kwt/v1/`) that forwards requests to the KwaWingu API — your key never reaches the browser. Payment is completed through Snippe (mobile money push). No card data touches WordPress.
+A fully in-site booking + payment flow using the KwaWingu REST proxy. Requires your **private API key** (stored server-side in Settings, never exposed to visitors). The browser calls a same-origin WordPress REST endpoint (`/wp-json/kwawingu/v1/`) that forwards requests to the KwaWingu API — your key never reaches the browser. Payment is completed through Snippe (mobile money push). No card data touches WordPress.
 
 To enable: choose **On-site** in Settings → KwaWingu Tours → Booking mode and enter your **Private API key**.

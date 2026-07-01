@@ -33,6 +33,8 @@ final class Plugin {
 
         ( new Cpt() )->register();
 
+        ( new Blocks() )->register();
+
         $api        = new Api_Client( $settings );
         $sync       = new Sync( $api );
         $controller = new Sync_Controller( $sync, $settings );

@@ -6,7 +6,7 @@ namespace KwaWingu\Tours;
  */
 final class Plugin {
 
-    const VERSION = '0.1.0';
+    const VERSION = '0.2.0';
 
     /** @var Plugin|null */
     private static $instance = null;

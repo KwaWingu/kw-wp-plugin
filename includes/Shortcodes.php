@@ -13,6 +13,9 @@ class Shortcodes {
         add_shortcode( 'kwawingu_featured', array( $this, 'render_featured' ) );
         add_shortcode( 'kwawingu_reviews', array( $this, 'render_reviews' ) );
         add_shortcode( 'kwawingu_destinations', array( $this, 'render_destinations' ) );
+        add_shortcode( 'kwawingu_search', array( $this, 'render_search' ) );
+        add_shortcode( 'kwawingu_calculator', array( $this, 'render_calculator' ) );
+        add_shortcode( 'kwawingu_booking_form', array( $this, 'render_booking_form' ) );
     }
 
     /** @param array<string,mixed> $atts */
@@ -55,5 +58,23 @@ class Shortcodes {
         require_once Blocks::block_dir() . 'destinations-grid/render-fn.php';
         $atts = shortcode_atts( array( 'limit' => 12 ), $atts );
         return kwt_render_destinations_grid( array( 'limit' => (int) $atts['limit'] ), '' );
+    }
+
+    /** @param array<string,mixed> $atts */
+    public function render_search( $atts ): string {
+        require_once Blocks::block_dir() . 'search/render-fn.php';
+        return kwt_render_search( array(), '' );
+    }
+
+    /** @param array<string,mixed> $atts */
+    public function render_calculator( $atts ): string {
+        require_once Blocks::block_dir() . 'calculator/render-fn.php';
+        return kwt_render_calculator( array(), '' );
+    }
+
+    /** @param array<string,mixed> $atts */
+    public function render_booking_form( $atts ): string {
+        require_once Blocks::block_dir() . 'booking/render-fn.php';
+        return kwt_render_booking_form( array(), '' );
     }
 }

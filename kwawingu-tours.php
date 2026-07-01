@@ -34,6 +34,7 @@ if ( file_exists( $kwt_autoload ) ) {
 }
 
 add_action( 'plugins_loaded', static function () {
+    load_plugin_textdomain( 'kwawingu-tours', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
     \KwaWingu\Tours\Plugin::instance()->boot();
 } );
 

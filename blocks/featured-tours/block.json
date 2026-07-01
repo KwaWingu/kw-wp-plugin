@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "kwawingu/featured-tours",
+  "title": "KwaWingu Featured Tours",
+  "category": "widgets",
+  "icon": "star-filled",
+  "description": "A short, highlighted set of tours with a heading.",
+  "textdomain": "kwawingu-tours",
+  "attributes": {
+    "heading": { "type": "string", "default": "Featured tours" },
+    "limit":   { "type": "number", "default": 3 }
+  },
+  "supports": { "html": false, "align": ["wide", "full"] },
+  "render": "file:./render.php"
+}

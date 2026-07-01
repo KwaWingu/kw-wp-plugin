@@ -59,6 +59,27 @@ namespace KwaWingu\Tours\Tests {
             $this->assertInstanceOf( \WP_Error::class, $out );
         }
 
+	public function test_departures_forwards_to_tour_departures(): void {
+		$api = \Mockery::mock( \KwaWingu\Tours\Api_Client::class );
+		$api->shouldReceive( 'get' )->once()->with( '/tours/safari/departures', array() )
+			->andReturn( array( 'data' => array( array( 'id' => 'D1' ) ) ) );
+		$req = \Mockery::mock();
+		$req->shouldReceive( 'get_param' )->with( 'tourSlug' )->andReturn( 'safari' );
+		$out = ( new \KwaWingu\Tours\Rest_Proxy( $api ) )->handle_departures( $req );
+		$this->assertSame( 'D1', $out['data'][0]['id'] );
+	}
+
+	public function test_quote_forwards_body_with_public_key(): void {
+		$api = \Mockery::mock( \KwaWingu\Tours\Api_Client::class );
+		$api->shouldReceive( 'post' )->once()
+			->with( '/quote', array( 'tourSlug' => 'safari', 'adults' => 2 ), false )
+			->andReturn( array( 'data' => array( 'total' => 900000 ) ) );
+		$req = \Mockery::mock();
+		$req->shouldReceive( 'get_json_params' )->andReturn( array( 'tourSlug' => 'safari', 'adults' => 2 ) );
+		$out = ( new \KwaWingu\Tours\Rest_Proxy( $api ) )->handle_quote( $req );
+		$this->assertSame( 900000, $out['data']['total'] );
+	}
+
         public function test_generic_throwable_maps_to_proxy_error(): void {
             Functions\when( '__' )->returnArg();
 

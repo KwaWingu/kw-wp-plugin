@@ -31,3 +31,5 @@ jobs:
         run: npm run build
       - name: Verify built bundles are committed + up to date
         run: git diff --exit-code build/
+      - name: Jest (JS unit)
+        run: npm run test:js

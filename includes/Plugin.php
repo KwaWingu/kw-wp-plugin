@@ -27,9 +27,10 @@ final class Plugin {
             return;
         }
         $this->booted = true;
-        // Subsystems registered in later tasks:
-        // ( new Cpt() )->register();
-        // ( new Settings() )->register();
-        // ( new Sync( new Api_Client( new Settings() ) ) )->register();
+
+        $settings = new Settings();
+        $settings->register();
+        ( new Admin_Page( $settings ) )->register();
+        // Cpt + Sync registered in later tasks.
     }
 }

@@ -31,6 +31,7 @@ namespace KwaWingu\Tours\Tests {
                 return $url . '?' . http_build_query( $args );
             } );
             Functions\when( 'esc_url_raw' )->returnArg();
+            Functions\when( 'wp_json_encode' )->alias( 'json_encode' );
         }
 
         protected function tearDown(): void {
@@ -71,6 +72,28 @@ namespace KwaWingu\Tours\Tests {
             Functions\when( 'wp_remote_get' )->justReturn( new \WP_Error_Stub() );
             $this->expectException( Api_Exception::class );
             $this->client()->get( '/tours' );
+        }
+
+        public function test_post_sends_private_key_and_body(): void {
+            Functions\when( 'get_option' )->justReturn( array( 'slug' => 'acme', 'public_key' => 'kw_pub', 'private_key' => 'kw_priv' ) );
+            Functions\expect( 'wp_remote_post' )->once()->andReturnUsing( function ( $url, $args ) {
+                $this->assertStringContainsString( '/acme/bookings', $url );
+                $this->assertSame( 'kw_priv', $args['headers']['X-API-Key'] );
+                $this->assertSame( 'application/json', $args['headers']['Content-Type'] );
+                $this->assertSame( '{"ref":"KWG-1"}', $args['body'] );
+                return array( 'code' => 200, 'body' => '{"data":{"ok":true}}' );
+            } );
+            $out = $this->client()->post( '/bookings', array( 'ref' => 'KWG-1' ) );
+            $this->assertTrue( $out['data']['ok'] );
+        }
+
+        public function test_post_uses_public_key_when_requested(): void {
+            Functions\when( 'get_option' )->justReturn( array( 'slug' => 'acme', 'public_key' => 'kw_pub', 'private_key' => 'kw_priv' ) );
+            Functions\expect( 'wp_remote_post' )->once()->andReturnUsing( function ( $url, $args ) {
+                $this->assertSame( 'kw_pub', $args['headers']['X-API-Key'] );
+                return array( 'code' => 200, 'body' => '{"ok":1}' );
+            } );
+            $this->client()->post( '/calculator/estimate', array(), false );
         }
     }
 

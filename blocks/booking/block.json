@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "kwawingu/booking",
+  "title": "KwaWingu Booking",
+  "category": "widgets",
+  "icon": "cart",
+  "description": "On-site booking + payment for the current tour.",
+  "textdomain": "kwawingu-tours",
+  "attributes": { "tourSlug": { "type": "string", "default": "" } },
+  "supports": { "html": false },
+  "viewScript": "file:./view.js",
+  "render": "file:./render.php"
+}

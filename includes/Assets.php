@@ -30,6 +30,7 @@ class Assets {
                 'error'      => __( 'Something went wrong. Please try again.', 'kwawingu-tours' ),
                 'noResults'  => __( 'No results.', 'kwawingu-tours' ),
                 'checkPhone' => __( 'Check your phone to approve the payment.', 'kwawingu-tours' ),
+                'paymentReceived' => __( 'Payment received — you are booked!', 'kwawingu-tours' ),
             ),
         ) );
     }

@@ -11,11 +11,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          # Dev tooling (PHPUnit 9 + doctrine/instantiator ^8.1) requires PHP 8.1+.
+          # The plugin's PHP 7.4 runtime floor is enforced statically by PHPCompatibilityWP
+          # (testVersion 7.4- in phpcs.xml.dist), not by running tests on 7.4.
+          php-version: '8.3'
           coverage: none
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
       - name: PHPUnit
         run: vendor/bin/phpunit
-      - name: PHPCS
+      - name: PHPCS (7.4 runtime compat + WPCS, non-blocking)
         run: vendor/bin/phpcs -q || true

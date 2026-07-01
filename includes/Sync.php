@@ -49,8 +49,12 @@ class Sync {
 
             $existing = $this->find_post_by_kwt_id( $kwt_id );
             if ( 0 === $existing ) {
-                $this->insert_tour( $tour, $kwt_id );
-                $result['created']++;
+                $new_id = $this->insert_tour( $tour, $kwt_id );
+                if ( $new_id > 0 ) {
+                    $result['created']++;
+                } else {
+                    $result['errors'][] = "Failed to create tour {$kwt_id}.";
+                }
             } else {
                 $this->update_tour( $existing, $tour );
                 $result['updated']++;
@@ -75,8 +79,11 @@ class Sync {
         return ! empty( $ids ) ? (int) $ids[0] : 0;
     }
 
-    /** @param array<string,mixed> $tour */
-    private function insert_tour( array $tour, string $kwt_id ): void {
+    /**
+     * @param array<string,mixed> $tour
+     * @return int New post ID on success, 0 on failure.
+     */
+    private function insert_tour( array $tour, string $kwt_id ): int {
         $id = wp_insert_post( array(
             'post_type'    => Cpt::TOUR,
             'post_status'  => 'publish',
@@ -86,7 +93,9 @@ class Sync {
         ) );
         if ( is_int( $id ) && $id > 0 ) {
             $this->write_meta( $id, $tour, $kwt_id );
+            return $id;
         }
+        return 0;
     }
 
     /** @param array<string,mixed> $tour */
@@ -111,8 +120,14 @@ class Sync {
         update_post_meta( $post_id, 'kwt_duration_days', (int) ( $tour['durationDays'] ?? 0 ) );
         update_post_meta( $post_id, 'kwt_difficulty', sanitize_text_field( (string) ( $tour['difficulty'] ?? '' ) ) );
         update_post_meta( $post_id, 'kwt_type', sanitize_text_field( (string) ( $tour['type'] ?? '' ) ) );
-        update_post_meta( $post_id, 'kwt_cover_url', esc_url_raw_or_empty( $tour['coverImageUrl'] ?? '' ) );
+        update_post_meta( $post_id, 'kwt_cover_url', $this->esc_url_raw_or_empty( $tour['coverImageUrl'] ?? '' ) );
         update_post_meta( $post_id, 'kwt_synced_at', time() );
+    }
+
+    /** esc_url_raw that tolerates empty/non-string input without a WP dependency in unit tests. */
+    private function esc_url_raw_or_empty( $url ): string {
+        $url = is_string( $url ) ? $url : '';
+        return '' === $url ? '' : ( function_exists( 'esc_url_raw' ) ? esc_url_raw( $url ) : $url );
     }
 
     /**
@@ -137,10 +152,4 @@ class Sync {
         }
         return $count;
     }
-}
-
-/** esc_url_raw that tolerates empty/non-string input without a WP dependency in unit tests. */
-function esc_url_raw_or_empty( $url ): string {
-    $url = is_string( $url ) ? $url : '';
-    return '' === $url ? '' : ( function_exists( 'esc_url_raw' ) ? esc_url_raw( $url ) : $url );
 }

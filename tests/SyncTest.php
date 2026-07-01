@@ -80,6 +80,8 @@ class SyncTest extends TestCase {
         $this->assertSame( 1, $out['updated'] );
         // Locked: title must NOT be overwritten -> no post_title key in the update payload.
         $this->assertArrayNotHasKey( 'post_title', $updates[0] );
+        $this->assertArrayNotHasKey( 'post_excerpt', $updates[0] );
+        $this->assertArrayNotHasKey( 'post_content', $updates[0] );
     }
 
     public function test_unpublishes_tour_missing_from_response(): void {

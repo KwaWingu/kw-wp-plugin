@@ -31,6 +31,7 @@ final class Plugin {
         $settings = new Settings();
         $settings->register();
         ( new Admin_Page( $settings ) )->register();
-        // Cpt + Sync registered in later tasks.
+        ( new Cpt() )->register();
+        // Sync registered in a later task.
     }
 }

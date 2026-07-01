@@ -107,3 +107,20 @@ Server-rendered blocks (real HTML, no JS-only content); `kwt_tour` public with c
 - Payment/PCI handling in WordPress beyond delegating to Snippe via the KwaWingu API (on-site mode starts a payment intent; it never touches card data).
 - A bundled WordPress theme (the plugin is theme-agnostic; block patterns provide layout).
 - Real-time catalog push (no `tour.updated` webhook exists yet; sync is scheduled polling).
+
+## Completion addendum (2026-07-01, approved)
+
+v0.1 is merged to `main`. The remaining phases are approved for completion with these confirmed decisions:
+
+**All three booking modes ship.** The operator selects the mode in settings (redirect / widget / on-site). Redirect lands in v0.2, widget in v0.3, on-site API in v0.4. On-site booking uses the operator's **private API key stored server-side** (options), used only in server-side calls to `POST /quote` + `POST /bookings/{ref}/payment-intent`; the browser never sees it, and no card data touches WordPress (Snippe hosts payment).
+
+**Documentation is a first-class deliverable**, built alongside each phase (updated within the phase that adds a feature) and polished in v0.4:
+- **`README.md`** (GitHub front page): tagline, what it does, feature list, screenshot/GIF placeholders, install (WP.org + from source/Composer), configuration, the **paid API-access requirement** stated plainly, blocks + shortcodes reference, booking-mode explainer, links to `docs/`, contributing, GPL.
+- **`readme.txt`** (WordPress.org): expanded description, features, installation, FAQ, screenshots section, per-phase changelog, external-services disclosure (kept).
+- **`docs/`**: `getting-started.md`, `blocks.md`, `booking-modes.md`, `sync.md`, `developer.md` (architecture + hooks/filters + extending), `faq.md` — Markdown, cross-linked, referenced from `README.md`.
+
+**v0.2 carries the v0.1 must-fix:** guard `Sync::run()` so a successful-but-empty `/site` response (`tours: []`) does NOT soft-unpublish the whole catalog (skip the unpublish sweep when the response yielded zero created+updated).
+
+**Delivery per phase:** feature branch → subagent-driven TDD tasks → per-task reviews → whole-branch review → merge to `main` → **push to `origin`** → annotated tag (`v0.2.0`, `v0.3.0`, `v0.4.0`). CI (PHPUnit on PHP 8.3; PHPCS/WPCS) stays green; PHPCS is made blocking in v0.4.
+
+**Deferred beyond v0.4 (not in this completion):** a `tour.updated` webhook for real-time sync (needs backend support); wp-env integration tests against a real WP DB; multilingual/WPML content mapping.

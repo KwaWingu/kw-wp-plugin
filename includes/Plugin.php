@@ -50,6 +50,8 @@ final class Plugin {
 
         ( new Rest_Proxy( $api ) )->register();
 
+        ( new Assets() )->register();
+
         $importer = new Importer();
         ( new Setup_Wizard( $settings, $branding, $importer, $sync ) )->register();
 

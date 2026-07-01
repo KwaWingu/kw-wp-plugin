@@ -14,6 +14,7 @@ class TourDetailRenderTest extends TestCase {
             Functions\when( $f )->returnArg();
         }
         Functions\when( '_n' )->alias( static fn( $s, $p, $n ) => 1 === $n ? $s : $p );
+        Functions\when( 'get_option' )->justReturn( array() );
         Functions\when( 'get_the_ID' )->justReturn( 7 );
         Functions\when( 'get_the_title' )->justReturn( 'Kilimanjaro Trek' );
         Functions\when( 'get_the_content' )->justReturn( 'Climb the roof of Africa.' );

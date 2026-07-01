@@ -3,7 +3,7 @@
  * Plugin Name:       KwaWingu Tours
  * Plugin URI:        https://tours.kwawingu.com
  * Description:        Build a tour-operator website fast on your KwaWingu Tours data — sync your catalog into WordPress, add blocks, and go live in minutes.
- * Version:           1.1.0
+ * Version:           1.2.0
  * Requires at least: 6.2
  * Requires PHP:      7.4
  * Author:            KwaWingu Tours
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'KWT_VERSION', '1.1.0' );
+define( 'KWT_VERSION', '1.2.0' );
 define( 'KWT_PLUGIN_FILE', __FILE__ );
 define( 'KWT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'KWT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

@@ -15,7 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Assets {
 
-	const HANDLE = 'kwt-proxy';
+	const HANDLE       = 'kwt-proxy';
+	const STYLE_HANDLE = 'kwt-blocks';
 
 	/**
 	 * Registers the wp_enqueue_scripts action hook.
@@ -58,5 +59,13 @@ class Assets {
 				),
 			)
 		);
+
+		wp_register_style(
+			self::STYLE_HANDLE,
+			plugins_url( 'assets/css/kwt-blocks.css', KWT_PLUGIN_FILE ),
+			array(),
+			KWT_VERSION
+		);
+		wp_enqueue_style( self::STYLE_HANDLE );
 	}
 }

@@ -4,7 +4,7 @@ Tags: tours, travel, tour operator, booking, safari
 Requires at least: 6.2
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,6 +28,9 @@ This plugin connects to the KwaWingu Tours developer API using your operator slu
 This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to fetch your tour catalog, availability, and related content, using the operator slug and API key you configure. Data sent: your API key (in a request header) and query parameters for the content requested. No visitor personal data is sent by this plugin during catalog sync. See https://tours.kwawingu.com (Terms) and the KwaWingu privacy policy.
 
 == Changelog ==
+
+= 1.2.0 =
+* Front-end styles for all blocks (cards, grids, forms, reviews) using your brand colours.
 
 = 1.1.0 =
 * On-site booking now uses the live booking API: pick a real departure, see a live price, and book with correct guest details. Fixes a mismatched request that could prevent on-site bookings.

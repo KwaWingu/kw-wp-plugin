@@ -33,3 +33,21 @@ jobs:
         run: git diff --exit-code build/
       - name: Jest (JS unit)
         run: npm run test:js
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install PHP deps
+        run: composer install --no-interaction --prefer-dist
+      - name: Start WordPress (wp-env / Docker)
+        run: npx @wordpress/env start
+      - name: Integration tests (real WordPress)
+        run: npm run test:integration

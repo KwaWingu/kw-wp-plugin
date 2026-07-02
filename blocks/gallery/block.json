@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "kwawingu/gallery",
+  "title": "KwaWingu Gallery",
+  "category": "widgets",
+  "icon": "format-gallery",
+  "description": "A tour's photo gallery.",
+  "textdomain": "kwawingu-tours",
+  "attributes": {
+    "postId":  { "type": "number", "default": 0 },
+    "columns": { "type": "number", "default": 3 }
+  },
+  "supports": { "html": false, "align": [ "wide", "full" ] },
+  "editorScript": "file:../../build/gallery/index.js",
+  "render": "file:./render.php"
+}

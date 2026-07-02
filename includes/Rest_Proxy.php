@@ -27,12 +27,21 @@ class Rest_Proxy {
 	private $api;
 
 	/**
+	 * Optional operator notifier.
+	 *
+	 * @var Notifications|null
+	 */
+	private $notifications;
+
+	/**
 	 * Stores the API client dependency.
 	 *
-	 * @param Api_Client $api API client instance.
+	 * @param Api_Client         $api           API client instance.
+	 * @param Notifications|null $notifications Optional operator notifier.
 	 */
-	public function __construct( Api_Client $api ) {
-		$this->api = $api;
+	public function __construct( Api_Client $api, ?Notifications $notifications = null ) {
+		$this->api           = $api;
+		$this->notifications = $notifications;
 	}
 
 	/**
@@ -196,12 +205,16 @@ class Rest_Proxy {
 		if ( ! $this->rate_ok( 'book' ) ) {
 			return new \WP_Error( 'rate_limited', __( 'Too many requests. Please wait a moment.', 'kwawingu-tours' ), array( 'status' => 429 ) );
 		}
-		return $this->guard(
-			function () use ( $request ) {
-				$body = is_array( $request->get_json_params() ) ? $request->get_json_params() : array();
+		$body   = is_array( $request->get_json_params() ) ? $request->get_json_params() : array();
+		$result = $this->guard(
+			function () use ( $body ) {
 				return $this->api->post( '/bookings', $body, true );
 			}
 		);
+		if ( ! is_wp_error( $result ) && null !== $this->notifications ) {
+			$this->notifications->on_booking_created( $body, is_array( $result ) ? $result : array() );
+		}
+		return $result;
 	}
 
 	/**

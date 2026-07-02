@@ -74,7 +74,7 @@ final class Plugin {
 
 		( new Seo() )->register();
 
-		( new Rest_Proxy( $api ) )->register();
+		( new Rest_Proxy( $api, new Notifications( $settings ) ) )->register();
 
 		( new Assets() )->register();
 

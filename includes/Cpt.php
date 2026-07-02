@@ -18,6 +18,7 @@ class Cpt {
 	const TOUR        = 'kwt_tour';
 	const DESTINATION = 'kwt_destination';
 	const TYPE_TAX    = 'kwt_tour_type';
+	const LEAD        = 'kwt_lead';
 
 	/**
 	 * Registers the init action hook for post type and taxonomy registration.
@@ -69,6 +70,22 @@ class Cpt {
 				),
 				'supports'     => array( 'title', 'editor', 'thumbnail' ),
 				'show_in_rest' => true,
+			)
+		);
+
+		register_post_type(
+			self::LEAD,
+			array(
+				'labels'          => array(
+					'name'          => __( 'Leads', 'kwawingu-tours' ),
+					'singular_name' => __( 'Lead', 'kwawingu-tours' ),
+				),
+				'public'          => false,
+				'show_ui'         => true,
+				'show_in_menu'    => true,
+				'menu_icon'       => 'dashicons-groups',
+				'supports'        => array( 'title', 'custom-fields' ),
+				'capability_type' => 'post',
 			)
 		);
 

@@ -41,4 +41,16 @@ class CptTest extends TestCase {
         $this->assertContains( 'editor', $captured['kwt_tour']['supports'] );
         $this->assertContains( 'thumbnail', $captured['kwt_tour']['supports'] );
     }
+
+    public function test_init_registers_lead_cpt_private_with_ui(): void {
+        $captured = array();
+        Functions\when( 'register_post_type' )->alias( static function ( $type, $args ) use ( &$captured ) {
+            $captured[ $type ] = $args;
+        } );
+        Functions\when( 'register_taxonomy' )->justReturn( true );
+        ( new Cpt() )->init();
+        $this->assertArrayHasKey( 'kwt_lead', $captured );
+        $this->assertFalse( $captured['kwt_lead']['public'] );
+        $this->assertTrue( $captured['kwt_lead']['show_ui'] );
+    }
 }

@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Plugin {
 
-	const VERSION = '1.7.0';
+	const VERSION = '1.8.0';
 
 	/**
 	 * Singleton instance of this class.
@@ -74,7 +74,7 @@ final class Plugin {
 
 		( new Seo() )->register();
 
-		( new Rest_Proxy( $api ) )->register();
+		( new Rest_Proxy( $api, new Notifications( $settings ) ) )->register();
 
 		( new Assets() )->register();
 

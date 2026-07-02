@@ -11,6 +11,6 @@ class PluginTest extends TestCase {
     }
 
     public function test_version_constant_matches(): void {
-        $this->assertSame( '1.7.0', Plugin::VERSION );
+        $this->assertSame( '1.8.0', Plugin::VERSION );
     }
 }

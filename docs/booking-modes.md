@@ -15,3 +15,12 @@ A fully in-site booking + payment flow using the KwaWingu REST proxy. Requires y
 As of v1.1.0, the on-site booking form loads **real departures** from the live API so guests select an actual available departure date, and a **live price** is fetched from the API before the guest proceeds to payment. This ensures seat counts and pricing are always accurate.
 
 To enable: choose **On-site** in Settings → KwaWingu Tours → Booking mode and enter your **Private API key**.
+
+### Operator notifications and lead capture (v1.8.0+)
+
+When a guest completes an on-site booking you can receive an email notification and have the guest's details saved as a **Lead** (custom post type `kwt_lead`) in your WordPress admin. Both behaviours are optional and controlled by toggles in **Settings → KwaWingu Tours**:
+
+- **Operator notification email** — sent to the address configured in Settings (falls back to the WordPress admin email). Contains the booking reference, tour name, guest name, email, and phone.
+- **Save lead in WordPress** — creates a `kwt_lead` post with the guest email, phone, tour name, and booking reference stored as post meta. Find leads under **Leads** in the WordPress admin.
+
+**Guest confirmations are still sent by KwaWingu** — this plugin never emails the guest directly. The notification and lead capture are operator-only features.

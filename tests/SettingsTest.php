@@ -16,6 +16,7 @@ class SettingsTest extends TestCase {
         Functions\when( 'sanitize_key' )->alias( static function ( $k ) {
             return strtolower( preg_replace( '/[^a-z0-9_\-]/', '', (string) $k ) );
         } );
+        Functions\when( 'sanitize_email' )->returnArg();
         Functions\when( 'esc_url_raw' )->returnArg();
     }
 
@@ -49,5 +50,34 @@ class SettingsTest extends TestCase {
         $this->assertSame( 'acme', $settings->get_slug() );
         $this->assertSame( '', $settings->get_public_key() );      // missing -> ''
         $this->assertSame( 'redirect', $settings->get_booking_mode() ); // missing -> default
+    }
+
+    public function test_notification_and_lead_getters(): void {
+        Functions\when( 'get_option' )->justReturn( array(
+            'notify_enabled' => '1',
+            'notify_email'   => 'ops@example.com',
+            'capture_leads'  => '1',
+        ) );
+        $s = new Settings();
+        $this->assertTrue( $s->notifications_enabled() );
+        $this->assertSame( 'ops@example.com', $s->notification_recipient() );
+        $this->assertTrue( $s->lead_capture_enabled() );
+
+        Functions\when( 'get_option' )->justReturn( array() );
+        $s2 = new Settings();
+        $this->assertFalse( $s2->notifications_enabled() );
+        $this->assertSame( '', $s2->notification_recipient() );
+        $this->assertFalse( $s2->lead_capture_enabled() );
+    }
+
+    public function test_sanitize_notification_fields(): void {
+        $out = ( new Settings() )->sanitize( array(
+            'notify_enabled' => 'on',
+            'notify_email'   => ' ops@example.com ',
+            'capture_leads'  => '',
+        ) );
+        $this->assertSame( '1', $out['notify_enabled'] );
+        $this->assertSame( 'ops@example.com', $out['notify_email'] );
+        $this->assertSame( '', $out['capture_leads'] );
     }
 }

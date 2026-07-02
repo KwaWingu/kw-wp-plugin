@@ -3,13 +3,13 @@
 Three layers, run in CI (`.github/workflows/ci.yml`):
 
 ## 1. PHP unit tests — `vendor/bin/phpunit`
-Pure-PHP, no WordPress/Docker (Brain\Monkey + Mockery mock WP functions). Covers Settings, Api_Client, Rest_Proxy, Sync, CPT registration, block render functions, Seo, Media, Branding, Importer, Setup_Wizard, Assets. **61 tests.** Run anywhere with `composer install`.
+Pure-PHP, no WordPress/Docker (Brain\Monkey + Mockery mock WP functions). Covers Settings, Api_Client, Rest_Proxy, Sync, CPT registration, block render functions, Seo, Media, Branding, Importer, Setup_Wizard, Assets. **62 tests.** Run anywhere with `composer install`.
 
 ## 2. Coding standards — `vendor/bin/phpcs -q`
 WPCS + PHPCompatibilityWP (7.4 floor). Blocking in CI. `build/`, `node_modules/`, `tests/`, and `*.js` are excluded.
 
 ## 3. JS unit tests — `npm run test:js`
-Jest (via `@wordpress/scripts`). Covers the on-site booking payload builder (`blocks/booking/view.test.js`) — a regression guard on the exact field mapping (`guestFirstName`/… + `adults/children/infants`, not `customer`/`pax`) that was broken in 1.0 and fixed in 1.1. Run with `npm ci && npm run test:js`.
+Jest (via `@wordpress/scripts`). Covers the on-site booking payload builder (`blocks/booking/view.test.js`) — a regression guard on the exact field mapping (`guestFirstName`/… + `adults/children/infants`, not `customer`/`pax`) that was broken in 1.0 and fixed in 1.1 — the availability-calendar month grid (`blocks/availability-calendar/grid.test.js`), and the proxy client's stale-nonce recovery (`assets/js/kwt-proxy.test.js`: a `403` triggers exactly one `/nonce` refresh + retry, never a loop). Run with `npm ci && npm run test:js`.
 
 ## Editor block bundles — `npm run build`
 Compiles `blocks/<block>/index.js` (edit components) → `build/<block>/index.js` (+ `.asset.php`). CI rebuilds and asserts the committed bundles are up to date (`git diff --exit-code build/`).

@@ -109,6 +109,29 @@ class Admin_Page {
 							<p class="description"><?php echo esc_html__( 'Only needed for on-site booking. Stored server-side, never shown on your website.', 'kwawingu-tours' ); ?></p>
 						</td>
 					</tr>
+					<tr>
+						<th scope="row"><?php echo esc_html__( 'Email me on new on-site bookings', 'kwawingu-tours' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="<?php echo esc_attr( $opt ); ?>[notify_enabled]" value="1" <?php checked( $this->settings->notifications_enabled() ); ?> />
+								<?php echo esc_html__( 'Send me a notification', 'kwawingu-tours' ); ?>
+							</label>
+							<p class="description"><?php echo esc_html__( 'Guest booking confirmations are sent by KwaWingu; this only notifies you.', 'kwawingu-tours' ); ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="kwt_notify_email"><?php echo esc_html__( 'Notification email', 'kwawingu-tours' ); ?></label></th>
+						<td><input type="email" id="kwt_notify_email" class="regular-text" name="<?php echo esc_attr( $opt ); ?>[notify_email]" value="<?php echo esc_attr( $this->settings->notification_recipient() ); ?>" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" /></td>
+					</tr>
+					<tr>
+						<th scope="row"><?php echo esc_html__( 'Save booking leads', 'kwawingu-tours' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="<?php echo esc_attr( $opt ); ?>[capture_leads]" value="1" <?php checked( $this->settings->lead_capture_enabled() ); ?> />
+								<?php echo esc_html__( 'Store on-site booking guest details under Leads', 'kwawingu-tours' ); ?>
+							</label>
+						</td>
+					</tr>
 				</table>
 				<?php submit_button(); ?>
 			</form>

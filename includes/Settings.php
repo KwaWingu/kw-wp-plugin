@@ -89,6 +89,33 @@ class Settings {
 	}
 
 	/**
+	 * Whether to email the operator on a new on-site booking.
+	 *
+	 * @return bool
+	 */
+	public function notifications_enabled(): bool {
+		return '1' === (string) ( $this->all()['notify_enabled'] ?? '' );
+	}
+
+	/**
+	 * Operator notification recipient (empty → caller falls back to admin_email).
+	 *
+	 * @return string
+	 */
+	public function notification_recipient(): string {
+		return (string) ( $this->all()['notify_email'] ?? '' );
+	}
+
+	/**
+	 * Whether to store on-site booking guest details as leads.
+	 *
+	 * @return bool
+	 */
+	public function lead_capture_enabled(): bool {
+		return '1' === (string) ( $this->all()['capture_leads'] ?? '' );
+	}
+
+	/**
 	 * Sanitize callback for register_setting.
 	 *
 	 * @param array<string,mixed> $input Raw input values from the settings form.
@@ -97,20 +124,26 @@ class Settings {
 	public function sanitize( $input ): array {
 		$input = is_array( $input ) ? $input : array();
 
-		$slug          = sanitize_key( strtolower( trim( (string) ( $input['slug'] ?? '' ) ) ) );
-		$public_key    = sanitize_text_field( trim( (string) ( $input['public_key'] ?? '' ) ) );
-		$private_key   = sanitize_text_field( trim( (string) ( $input['private_key'] ?? '' ) ) );
-		$sync_interval = (string) ( $input['sync_interval'] ?? 'hourly' );
-		$media_mode    = (string) ( $input['media_mode'] ?? 'sideload' );
-		$booking_mode  = (string) ( $input['booking_mode'] ?? 'redirect' );
+		$slug           = sanitize_key( strtolower( trim( (string) ( $input['slug'] ?? '' ) ) ) );
+		$public_key     = sanitize_text_field( trim( (string) ( $input['public_key'] ?? '' ) ) );
+		$private_key    = sanitize_text_field( trim( (string) ( $input['private_key'] ?? '' ) ) );
+		$sync_interval  = (string) ( $input['sync_interval'] ?? 'hourly' );
+		$media_mode     = (string) ( $input['media_mode'] ?? 'sideload' );
+		$booking_mode   = (string) ( $input['booking_mode'] ?? 'redirect' );
+		$notify_enabled = ! empty( $input['notify_enabled'] ) ? '1' : '';
+		$notify_email   = sanitize_email( trim( (string) ( $input['notify_email'] ?? '' ) ) );
+		$capture_leads  = ! empty( $input['capture_leads'] ) ? '1' : '';
 
 		return array(
-			'slug'          => $slug,
-			'public_key'    => $public_key,
-			'private_key'   => $private_key,
-			'sync_interval' => in_array( $sync_interval, self::SYNC_INTERVALS, true ) ? $sync_interval : 'hourly',
-			'media_mode'    => in_array( $media_mode, self::MEDIA_MODES, true ) ? $media_mode : 'sideload',
-			'booking_mode'  => in_array( $booking_mode, self::BOOKING_MODES, true ) ? $booking_mode : 'redirect',
+			'slug'           => $slug,
+			'public_key'     => $public_key,
+			'private_key'    => $private_key,
+			'sync_interval'  => in_array( $sync_interval, self::SYNC_INTERVALS, true ) ? $sync_interval : 'hourly',
+			'media_mode'     => in_array( $media_mode, self::MEDIA_MODES, true ) ? $media_mode : 'sideload',
+			'booking_mode'   => in_array( $booking_mode, self::BOOKING_MODES, true ) ? $booking_mode : 'redirect',
+			'notify_enabled' => $notify_enabled,
+			'notify_email'   => $notify_email,
+			'capture_leads'  => $capture_leads,
 		);
 	}
 

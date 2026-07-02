@@ -210,6 +210,10 @@ class Sync {
 			if ( '' !== $cover ) {
 				$this->media->ingest_cover( $post_id, $cover );
 			}
+			$gallery = get_post_meta( $post_id, 'kwt_gallery', true );
+			if ( is_array( $gallery ) && ! empty( $gallery ) ) {
+				$this->media->ingest_gallery( $post_id, $gallery );
+			}
 		}
 	}
 

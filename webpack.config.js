@@ -20,6 +20,7 @@ const BLOCKS = [
 	'search',
 	'calculator',
 	'booking',
+	'gallery',
 ];
 
 const entry = {};

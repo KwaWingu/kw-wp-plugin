@@ -38,4 +38,38 @@ class MediaTest extends TestCase {
         ( new Media( new Settings() ) )->ingest_cover( 7, 'https://img/x.jpg' );
         $this->assertTrue( true );
     }
+
+    public function test_gallery_hotlink_mode_does_not_sideload(): void {
+        Functions\when( 'get_option' )->justReturn( array( 'media_mode' => 'hotlink' ) );
+        Functions\expect( 'media_sideload_image' )->never();
+        $out = ( new Media( new Settings() ) )->ingest_gallery( 7, array( 'https://img/a.jpg' ) );
+        $this->assertSame( array(), $out );
+    }
+
+    public function test_gallery_sideloads_new_urls_and_dedups(): void {
+        Functions\when( 'get_option' )->justReturn( array( 'media_mode' => 'sideload' ) );
+        // a.jpg already ingested (src list), b.jpg is new.
+        Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {
+            if ( 'kwt_gallery_src' === $key ) { return array( 'https://img/a.jpg' ); }
+            if ( 'kwt_gallery_ids' === $key ) { return array( 11 ); }
+            return '';
+        } );
+        $sideloaded = array();
+        Functions\when( 'media_sideload_image' )->alias( static function ( $url ) use ( &$sideloaded ) {
+            $sideloaded[] = $url;
+            return 22; // new attachment id
+        } );
+        $saved = array();
+        Functions\when( 'update_post_meta' )->alias( static function ( $id, $key, $val ) use ( &$saved ) {
+            $saved[ $key ] = $val;
+            return true;
+        } );
+
+        $out = ( new Media( new Settings() ) )->ingest_gallery( 7, array( 'https://img/a.jpg', 'https://img/b.jpg' ) );
+
+        $this->assertSame( array( 'https://img/b.jpg' ), $sideloaded );      // only the new one
+        $this->assertSame( array( 11, 22 ), $out );                          // existing + new id
+        $this->assertSame( array( 11, 22 ), $saved['kwt_gallery_ids'] );
+        $this->assertSame( array( 'https://img/a.jpg', 'https://img/b.jpg' ), $saved['kwt_gallery_src'] );
+    }
 }

@@ -12,7 +12,8 @@
 .kwt-reviews,
 .kwt-search,
 .kwt-calculator,
-.kwt-booking {
+.kwt-booking,
+.kwt-gallery {
 	--kwt-primary: var( --kwt-primary, #0a4a3a );
 	--kwt-accent: var( --kwt-accent, #e8920a );
 	--kwt-border: #e6e6e6;
@@ -28,7 +29,8 @@
 .kwt-reviews *,
 .kwt-search *,
 .kwt-calculator *,
-.kwt-booking * {
+.kwt-booking *,
+.kwt-gallery * {
 	box-sizing: border-box;
 }
 
@@ -284,4 +286,21 @@
 
 .kwt-booking-widget {
 	margin: 12px 0;
+}
+
+/* ── Gallery ───────────────────────────────────────────────────────────── */
+
+.kwt-gallery {
+	display: grid;
+	grid-template-columns: repeat( var( --kwt-cols, 3 ), 1fr );
+	gap: 10px;
+	margin: 0;
+}
+
+.kwt-gallery__img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 8px;
+	display: block;
 }

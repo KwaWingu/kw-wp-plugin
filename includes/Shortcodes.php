@@ -28,6 +28,7 @@ class Shortcodes {
 		add_shortcode( 'kwawingu_search', array( $this, 'render_search' ) );
 		add_shortcode( 'kwawingu_calculator', array( $this, 'render_calculator' ) );
 		add_shortcode( 'kwawingu_booking_form', array( $this, 'render_booking_form' ) );
+		add_shortcode( 'kwawingu_gallery', array( $this, 'render_gallery' ) );
 	}
 
 	/**
@@ -169,5 +170,29 @@ class Shortcodes {
 	public function render_booking_form( $atts ): string {
 		require_once Blocks::block_dir() . 'booking/render-fn.php';
 		return kwt_render_booking_form( array(), '' );
+	}
+
+	/**
+	 * [kwawingu_gallery] — a tour's photo gallery.
+	 *
+	 * @param array<string,mixed> $atts Shortcode attributes.
+	 * @return string
+	 */
+	public function render_gallery( $atts ): string {
+		require_once Blocks::block_dir() . 'gallery/render-fn.php';
+		$atts = shortcode_atts(
+			array(
+				'id'      => 0,
+				'columns' => 3,
+			),
+			$atts
+		);
+		return kwt_render_gallery(
+			array(
+				'postId'  => (int) $atts['id'],
+				'columns' => (int) $atts['columns'],
+			),
+			''
+		);
 	}
 }

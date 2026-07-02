@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "kwawingu/availability-calendar",
+  "title": "KwaWingu Availability Calendar",
+  "category": "widgets",
+  "icon": "calendar-alt",
+  "description": "A month calendar of a tour's departures.",
+  "textdomain": "kwawingu-tours",
+  "attributes": { "tourSlug": { "type": "string", "default": "" } },
+  "supports": { "html": false, "align": [ "wide" ] },
+  "editorScript": "file:../../build/availability-calendar/index.js",
+  "viewScript": "file:./view.js",
+  "render": "file:./render.php"
+}

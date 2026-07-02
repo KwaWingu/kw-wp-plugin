@@ -40,6 +40,13 @@ class Assets {
 			KWT_VERSION,
 			true
 		);
+		wp_register_script(
+			'kwt-grid',
+			plugins_url( 'blocks/availability-calendar/grid.js', KWT_PLUGIN_FILE ),
+			array(),
+			KWT_VERSION,
+			true
+		);
 		$settings = new Settings();
 		wp_localize_script(
 			self::HANDLE,
@@ -56,6 +63,30 @@ class Assets {
 					'paymentReceived' => __( 'Payment received — you are booked!', 'kwawingu-tours' ),
 					'priceFrom'       => __( 'From', 'kwawingu-tours' ),
 					'manageBooking'   => __( 'Manage your booking', 'kwawingu-tours' ),
+					'soldOut'         => __( 'Sold out', 'kwawingu-tours' ),
+					'months'          => array(
+						__( 'January', 'kwawingu-tours' ),
+						__( 'February', 'kwawingu-tours' ),
+						__( 'March', 'kwawingu-tours' ),
+						__( 'April', 'kwawingu-tours' ),
+						__( 'May', 'kwawingu-tours' ),
+						__( 'June', 'kwawingu-tours' ),
+						__( 'July', 'kwawingu-tours' ),
+						__( 'August', 'kwawingu-tours' ),
+						__( 'September', 'kwawingu-tours' ),
+						__( 'October', 'kwawingu-tours' ),
+						__( 'November', 'kwawingu-tours' ),
+						__( 'December', 'kwawingu-tours' ),
+					),
+					'dow'             => array(
+						__( 'Sun', 'kwawingu-tours' ),
+						__( 'Mon', 'kwawingu-tours' ),
+						__( 'Tue', 'kwawingu-tours' ),
+						__( 'Wed', 'kwawingu-tours' ),
+						__( 'Thu', 'kwawingu-tours' ),
+						__( 'Fri', 'kwawingu-tours' ),
+						__( 'Sat', 'kwawingu-tours' ),
+					),
 				),
 			)
 		);

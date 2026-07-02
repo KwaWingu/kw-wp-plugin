@@ -71,12 +71,12 @@ class Media {
 	 *
 	 * Skips any URL already present in the stored source list (dedup). Each URL
 	 * is attempted individually; failures are swallowed (best-effort). In hotlink
-	 * mode or when $urls is empty, returns the existing attachment-ID array
-	 * unchanged (or an empty array if none were previously stored).
+	 * mode or when $urls is empty, returns an empty array without importing
+	 * anything (the Gallery block falls back to the raw kwt_gallery URLs).
 	 *
 	 * @param int              $post_id Tour post ID.
 	 * @param array<int,mixed> $urls    Remote image URLs to sideload.
-	 * @return array<int,int> Full attachment-ID array (existing + newly ingested).
+	 * @return array<int,int> Attachment-ID array (existing + newly ingested), or empty in hotlink/empty mode.
 	 */
 	public function ingest_gallery( int $post_id, array $urls ): array {
 		if ( empty( $urls ) || 'sideload' !== $this->settings->get_media_mode() ) {

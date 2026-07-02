@@ -29,4 +29,9 @@ Displays the rating and guest reviews for a tour.
 A responsive grid of destination cards synced from your KwaWingu catalog.
 - `limit` (number, default 12)
 
+## Gallery — `kwawingu/gallery` / `[kwawingu_gallery]`
+Displays a tour's photo gallery sourced from images imported into your media library.
+- `postId` / `id` (number) — the tour to show the gallery for; defaults to the current post in a tour template.
+- `columns` (number, default 3) — number of columns in the gallery grid.
+
 Prices display in TZS. Styling uses the `kwt-*` CSS classes and the `--kwt-primary` / `--kwt-accent` custom properties set from your KwaWingu branding.

@@ -14,15 +14,20 @@ Jest (via `@wordpress/scripts`). Covers the on-site booking payload builder (`bl
 ## Editor block bundles — `npm run build`
 Compiles `blocks/<block>/index.js` (edit components) → `build/<block>/index.js` (+ `.asset.php`). CI rebuilds and asserts the committed bundles are up to date (`git diff --exit-code build/`).
 
-## Integration tests (wp-env) — requires Docker
-`.wp-env.json` sets up a real WordPress + this plugin. Intended for tests that need a live WP DB (sync writing real posts, CPT rewrite rules, REST routes end-to-end, **block front-end render** — the layer that would have caught the render.php-echo regression). These need Docker, so they run on CI runners / a local Docker host, not in the constrained dev sandbox. To run locally:
+## Integration tests (wp-env) — requires Docker (CI)
+A real-WordPress suite in `tests-integration/`, bootstrapped via `wp-phpunit` (`tests-integration/bootstrap.php`, config `phpunit-integration.xml.dist`). Covers the layers pure-PHP unit tests can't:
 
+- **Block front-end render** (`BlockRenderTest`) — every `kwawingu/*` block emits real markup via `do_blocks` (the check that catches the "render.php defines a function but never echoes" regression that bit v0.2 and v1.7).
+- **CPT registration + REST routes** (`CptAndRestTest`) — `kwt_tour`/`kwt_destination`/`kwt_lead` registered correctly; the `kwawingu/v1` proxy routes exist and reject a request with no REST nonce.
+
+Run with Docker:
 ```bash
-npx wp-env start
-# then a phpunit config targeting the WP test suite (to be added)
+npm run env:start          # npx @wordpress/env start
+npm run test:integration   # runs phpunit-integration.xml.dist inside wp-env
 ```
+CI runs this as the `integration` job.
 
-Writing the wp-env integration suite is the next testing task; it is tracked separately because it can only be authored+verified against a running WordPress.
+> **Status:** this suite is **authored but has not been executed in the dev sandbox** (no Docker). It follows the standard `@wordpress/env` + `wp-phpunit` pattern; the first CI run may need a small env tweak (e.g. `WP_PHPUNIT__DIR` / test-DB wiring) — treat a first-run failure as harness config, not a plugin bug, and adjust `tests-integration/bootstrap.php` / the CI job accordingly.
 
 ## Manual QA
 The block **editor UI** (React `edit.js`) can't be unit-tested — see [editor-qa.md](editor-qa.md) for the hands-on checklist.

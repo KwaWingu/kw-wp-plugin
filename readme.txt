@@ -4,7 +4,7 @@ Tags: tours, travel, tour operator, booking, safari
 Requires at least: 6.2
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 1.9.0
+Stable tag: 1.10.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,10 @@ This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to f
 
 == Changelog ==
 
+= 1.10.0 =
+* Fix: interactive blocks (Search, Trip Calculator, Booking, Availability Calendar) now recover automatically on full-page-cached sites, where an expired security token previously broke them.
+* Release automation: publishing to the WordPress.org plugin directory on version tags.
+
 = 1.9.0 =
 * Testing: WordPress integration tests (wp-env) verifying block front-end render, CPT registration, and REST routes — run in CI.
 
@@ -120,6 +124,9 @@ This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to f
 * Initial release: settings, API client, Tours/Destinations post types, and scheduled catalog sync.
 
 == Upgrade Notice ==
+
+= 1.10.0 =
+Keeps the booking and search blocks working on sites with full-page caching or a CDN. Recommended for all cached sites.
 
 = 1.1.0 =
 Fixes on-site booking against the live API — upgrade if you use on-site booking mode.

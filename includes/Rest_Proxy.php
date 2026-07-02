@@ -57,6 +57,17 @@ class Rest_Proxy {
 	public function routes(): void {
 		$auth = array( $this, 'check_nonce' );
 
+		// Public: mint a fresh wp_rest nonce so interactive blocks recover on
+		// full-page-cached sites where the page-baked nonce has expired.
+		register_rest_route(
+			self::NS,
+			'/nonce',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'handle_nonce' ),
+				'permission_callback' => '__return_true',
+			)
+		);
 		register_rest_route(
 			self::NS,
 			'/search',
@@ -142,6 +153,17 @@ class Rest_Proxy {
 	public function check_nonce( $request ): bool {
 		$nonce = is_object( $request ) && method_exists( $request, 'get_header' ) ? (string) $request->get_header( 'X-WP-Nonce' ) : '';
 		return (bool) wp_verify_nonce( $nonce, 'wp_rest' );
+	}
+
+	/**
+	 * Returns a fresh wp_rest nonce (public — for cached-page recovery).
+	 *
+	 * @param \WP_REST_Request $request The REST request object.
+	 * @return array<string,string>
+	 */
+	public function handle_nonce( $request ) {
+		unset( $request );
+		return array( 'nonce' => wp_create_nonce( 'wp_rest' ) );
 	}
 
 	/**

@@ -80,6 +80,12 @@ namespace KwaWingu\Tours\Tests {
 		$this->assertSame( 900000, $out['data']['total'] );
 	}
 
+	public function test_nonce_endpoint_returns_fresh_nonce(): void {
+		Functions\when( 'wp_create_nonce' )->justReturn( 'fresh123' );
+		$out = ( new Rest_Proxy( Mockery::mock( Api_Client::class ) ) )->handle_nonce( Mockery::mock() );
+		$this->assertSame( array( 'nonce' => 'fresh123' ), $out );
+	}
+
         public function test_generic_throwable_maps_to_proxy_error(): void {
             Functions\when( '__' )->returnArg();
 

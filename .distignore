@@ -1,0 +1,38 @@
+# Files excluded from the WordPress.org SVN distribution.
+# (build/ and vendor/ are NOT ignored — they ship in the release.)
+
+# Dev config
+/.git
+/.github
+/.gitignore
+/.distignore
+/.wp-env.json
+/.wordpress-org
+/phpcs.xml.dist
+/phpunit.xml.dist
+/phpunit-integration.xml.dist
+/composer.json
+/composer.lock
+/package.json
+/package-lock.json
+/skills-lock.json
+/.editorconfig
+
+# Node / JS toolchain
+/node_modules
+
+# Tests
+/tests
+/tests-integration
+
+# Docs & source that shouldn't ship
+/docs
+/.superpowers
+README.md
+
+# Block source (only the compiled build/ + block.json + render*.php ship)
+*.test.js
+
+# OS cruft
+.DS_Store
+Thumbs.db

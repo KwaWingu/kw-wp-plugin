@@ -39,3 +39,11 @@ A month grid of a tour's upcoming departures showing available seats and sold-ou
 - `tourSlug` (block) / `slug` (shortcode) — the tour whose departures to show; defaults to the current tour's slug in a tour template.
 
 Prices display in TZS. Styling uses the `kwt-*` CSS classes and the `--kwt-primary` / `--kwt-accent` custom properties set from your KwaWingu branding.
+
+## Interactive blocks & full-page caching
+
+The interactive blocks (Search, Trip Calculator, Booking, Availability Calendar) call your data through a same-origin REST proxy (`/wp-json/kwawingu/v1/*`) so the API keys stay on the server and never reach the browser. Each request carries a WordPress REST nonce (`wp_rest`).
+
+On sites with **full-page caching** (a CDN or a page cache plugin), the nonce is baked into the cached HTML and expires after ~12–24h, which would otherwise make these blocks return `403` on cached pages. To stay resilient, the proxy exposes a public `GET /wp-json/kwawingu/v1/nonce` endpoint: the browser client (`kwt-proxy.js`) refreshes the nonce and retries **once** on a `403`.
+
+**Security note:** the `/nonce` endpoint is intentionally public, which slightly weakens the CSRF value of the nonce for these proxy routes. This is an accepted trade-off — the write routes (`/bookings`, `/payment-intent`) are additionally per-visitor rate-limited, and the upstream KwaWingu API independently validates the operator key and every booking payload. No privileged action is reachable through the proxy.

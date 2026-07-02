@@ -22,7 +22,7 @@ class AssetsTest extends TestCase {
         Functions\when( 'get_option' )->justReturn( array( 'slug' => 'acme' ) );
         Functions\when( '__' )->returnArg();
         $registered = array();
-        Functions\when( 'wp_register_script' )->alias( static function ( $h ) use ( &$registered ) { $registered['reg'] = $h; return true; } );
+        Functions\when( 'wp_register_script' )->alias( static function ( $h ) use ( &$registered ) { $registered[] = $h; return true; } );
         $localized = array();
         Functions\when( 'wp_localize_script' )->alias( static function ( $h, $obj, $data ) use ( &$localized ) { $localized = array( $h, $obj, $data ); return true; } );
         $styles = array();
@@ -31,7 +31,7 @@ class AssetsTest extends TestCase {
 
         ( new Assets() )->enqueue();
 
-        $this->assertSame( 'kwt-proxy', $registered['reg'] );
+        $this->assertContains( 'kwt-proxy', $registered );
         $this->assertSame( 'kwtProxy', $localized[1] );
         $this->assertSame( 'abc123', $localized[2]['nonce'] );
         $this->assertSame( 'acme', $localized[2]['slug'] );

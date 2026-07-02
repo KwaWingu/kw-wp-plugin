@@ -21,6 +21,7 @@ const BLOCKS = [
 	'calculator',
 	'booking',
 	'gallery',
+	'availability-calendar',
 ];
 
 const entry = {};

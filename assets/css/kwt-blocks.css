@@ -13,7 +13,8 @@
 .kwt-search,
 .kwt-calculator,
 .kwt-booking,
-.kwt-gallery {
+.kwt-gallery,
+.kwt-availcal {
 	--kwt-primary: var( --kwt-primary, #0a4a3a );
 	--kwt-accent: var( --kwt-accent, #e8920a );
 	--kwt-border: #e6e6e6;
@@ -30,7 +31,8 @@
 .kwt-search *,
 .kwt-calculator *,
 .kwt-booking *,
-.kwt-gallery * {
+.kwt-gallery *,
+.kwt-availcal * {
 	box-sizing: border-box;
 }
 
@@ -304,3 +306,17 @@
 	border-radius: 8px;
 	display: block;
 }
+
+/* ── Availability calendar ─────────────────────────────────────────────── */
+
+.kwt-availcal { --kwt-primary: var( --kwt-primary, #0a4a3a ); --kwt-accent: var( --kwt-accent, #e8920a ); max-width: 520px; }
+.kwt-availcal__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.kwt-availcal__title { font-weight: 700; color: var( --kwt-primary ); }
+.kwt-availcal__nav { background: none; border: 1px solid var( --kwt-primary ); color: var( --kwt-primary ); border-radius: 6px; width: 32px; height: 32px; cursor: pointer; }
+.kwt-availcal__table { width: 100%; border-collapse: collapse; }
+.kwt-availcal__table th { font-size: 0.75rem; color: #667085; padding: 4px; text-align: center; }
+.kwt-availcal__table td { height: 46px; border: 1px solid #eee; vertical-align: top; padding: 2px 4px; text-align: right; }
+.kwt-availcal__cell.is-open { background: #e1f5ee; }
+.kwt-availcal__cell.is-soldout { background: #fbeaea; color: #9b1c1c; }
+.kwt-availcal__day { font-size: 0.8rem; }
+.kwt-availcal__seats { display: block; font-size: 0.7rem; font-weight: 700; color: var( --kwt-primary ); }

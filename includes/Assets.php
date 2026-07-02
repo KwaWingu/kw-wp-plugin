@@ -40,6 +40,13 @@ class Assets {
 			KWT_VERSION,
 			true
 		);
+		wp_register_script(
+			'kwt-grid',
+			plugins_url( 'blocks/availability-calendar/grid.js', KWT_PLUGIN_FILE ),
+			array(),
+			KWT_VERSION,
+			true
+		);
 		$settings = new Settings();
 		wp_localize_script(
 			self::HANDLE,
@@ -56,6 +63,7 @@ class Assets {
 					'paymentReceived' => __( 'Payment received — you are booked!', 'kwawingu-tours' ),
 					'priceFrom'       => __( 'From', 'kwawingu-tours' ),
 					'manageBooking'   => __( 'Manage your booking', 'kwawingu-tours' ),
+					'soldOut'         => __( 'Sold out', 'kwawingu-tours' ),
 				),
 			)
 		);

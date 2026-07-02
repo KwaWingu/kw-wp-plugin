@@ -1,0 +1,42 @@
+name: Deploy to WordPress.org
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    name: Publish to WordPress.org SVN
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Build the distributable exactly as it ships: runtime PHP deps only,
+      # and the compiled editor block bundles under build/.
+      - name: Install runtime PHP deps (no dev)
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Build editor block bundles
+        run: |
+          npm ci
+          npm run build
+
+      # Publishes to the SVN trunk + a tag matching the plugin's Stable tag,
+      # and syncs .wordpress-org/ assets (icon, banners, screenshots).
+      # Files listed in .distignore are excluded from the SVN checkout.
+      - name: WordPress.org deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: kwawingu-tours
+          ASSETS_DIR: .wordpress-org

@@ -36,6 +36,6 @@ Displays a tour's photo gallery sourced from images imported into your media lib
 
 ## Availability Calendar — `kwawingu/availability-calendar` / `[kwawingu_availability]`
 A month grid of a tour's upcoming departures showing available seats and sold-out status.
-- `postId` / `id` (number) — the tour to show departures for; defaults to the current post in a tour template.
+- `tourSlug` (block) / `slug` (shortcode) — the tour whose departures to show; defaults to the current tour's slug in a tour template.
 
 Prices display in TZS. Styling uses the `kwt-*` CSS classes and the `--kwt-primary` / `--kwt-accent` custom properties set from your KwaWingu branding.

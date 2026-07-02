@@ -3,8 +3,18 @@
  */
 ( function () {
 	'use strict';
-	var MONTHS = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
-	var DOW = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
+	// English fallbacks; localized names come from window.kwtProxy.i18n at render time.
+	var MONTHS_EN = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
+	var DOW_EN = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
+
+	function months() {
+		var m = window.kwtProxy && window.kwtProxy.i18n && window.kwtProxy.i18n.months;
+		return ( m && m.length === 12 ) ? m : MONTHS_EN;
+	}
+	function dow() {
+		var d = window.kwtProxy && window.kwtProxy.i18n && window.kwtProxy.i18n.dow;
+		return ( d && d.length === 7 ) ? d : DOW_EN;
+	}
 
 	function init( root ) {
 		var tourSlug = root.getAttribute( 'data-tour' );
@@ -29,7 +39,7 @@
 			prev.addEventListener( 'click', function () { shift( -1 ); } );
 			var title = document.createElement( 'span' );
 			title.className = 'kwt-availcal__title';
-			title.textContent = MONTHS[ month ] + ' ' + year;
+			title.textContent = months()[ month ] + ' ' + year;
 			var next = document.createElement( 'button' );
 			next.type = 'button';
 			next.className = 'kwt-availcal__nav';
@@ -53,13 +63,13 @@
 			var grid = window.kwtBuildMonthGrid( departures, year, month );
 			var table = document.createElement( 'table' );
 			table.className = 'kwt-availcal__table';
-			var thead = document.createElement( 'tr' );
-			DOW.forEach( function ( d ) {
+			var headRow = document.createElement( 'tr' );
+			dow().forEach( function ( d ) {
 				var th = document.createElement( 'th' );
 				th.textContent = d;
-				thead.appendChild( th );
+				headRow.appendChild( th );
 			} );
-			table.appendChild( thead );
+			table.appendChild( headRow );
 			grid.weeks.forEach( function ( week ) {
 				var tr = document.createElement( 'tr' );
 				week.forEach( function ( cell ) {

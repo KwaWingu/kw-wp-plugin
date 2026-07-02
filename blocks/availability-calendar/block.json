@@ -10,5 +10,6 @@
   "attributes": { "tourSlug": { "type": "string", "default": "" } },
   "supports": { "html": false, "align": [ "wide" ] },
   "editorScript": "file:../../build/availability-calendar/index.js",
+  "viewScript": "file:./view.js",
   "render": "file:./render.php"
 }

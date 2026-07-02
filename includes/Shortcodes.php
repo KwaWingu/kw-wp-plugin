@@ -205,6 +205,7 @@ class Shortcodes {
 	 */
 	public function render_availability( $atts ): string {
 		require_once Blocks::block_dir() . 'availability-calendar/render-fn.php';
-		return kwt_render_availability_calendar( array(), '' );
+		$atts = shortcode_atts( array( 'slug' => '' ), $atts );
+		return kwt_render_availability_calendar( array( 'tourSlug' => (string) $atts['slug'] ), '' );
 	}
 }

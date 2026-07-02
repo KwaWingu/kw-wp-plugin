@@ -29,6 +29,7 @@ class Shortcodes {
 		add_shortcode( 'kwawingu_calculator', array( $this, 'render_calculator' ) );
 		add_shortcode( 'kwawingu_booking_form', array( $this, 'render_booking_form' ) );
 		add_shortcode( 'kwawingu_gallery', array( $this, 'render_gallery' ) );
+		add_shortcode( 'kwawingu_availability', array( $this, 'render_availability' ) );
 	}
 
 	/**
@@ -194,5 +195,16 @@ class Shortcodes {
 			),
 			''
 		);
+	}
+
+	/**
+	 * [kwawingu_availability] — a tour's departures calendar.
+	 *
+	 * @param array<string,mixed> $atts Shortcode attributes.
+	 * @return string
+	 */
+	public function render_availability( $atts ): string {
+		require_once Blocks::block_dir() . 'availability-calendar/render-fn.php';
+		return kwt_render_availability_calendar( array(), '' );
 	}
 }

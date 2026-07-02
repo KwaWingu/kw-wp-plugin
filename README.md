@@ -9,7 +9,7 @@ Build a fast, SEO-friendly tour-operator website on your [KwaWingu Tours](https:
 - **Native content sync** — your tours become a `Tour` custom post type: real URLs, editable in WordPress, great for SEO.
 - **SEO** — JSON-LD (Product + AggregateRating) and Open Graph tags are injected automatically on every tour page.
 - **Media** — tour cover images and gallery photos are sideloaded into your WordPress media library so they're served from your own domain.
-- **Blocks** — Tours Grid, Tour Detail, Featured Tours, Book Button, Reviews, Destinations Grid, Tour Search, Trip Calculator, On-site Booking Form, Gallery (+ classic-theme shortcodes for all ten).
+- **Blocks** — Tours Grid, Tour Detail, Featured Tours, Book Button, Reviews, Destinations Grid, Tour Search, Trip Calculator, On-site Booking Form, Gallery, Availability Calendar (+ classic-theme shortcodes for all eleven).
 - **One-click setup** — the wizard pulls your branding, scaffolds Home / Tours / About / Contact pages, and imports your tours.
 - **Booking** — redirect guests to your hosted KwaWingu booking page, embed the KwaWingu widget, or use On-site mode for a fully in-WordPress booking + Snippe payment flow (requires private API key; keys are proxied server-side and never reach the browser).
 - **Internationalization** — ships with a `.pot` template; every user-facing string uses the `kwawingu-tours` text domain. Translate via Loco Translate or GlotPress.
@@ -48,6 +48,7 @@ See [docs/getting-started.md](docs/getting-started.md).
 | KwaWingu Trip Calculator | `[kwawingu_calculator slug=""]` | Multi-step trip price calculator |
 | KwaWingu On-site Booking | `[kwawingu_booking_form id="0"]` | In-WordPress booking + Snippe payment |
 | KwaWingu Gallery | `[kwawingu_gallery id="0" columns="3"]` | Tour photo gallery |
+| KwaWingu Availability Calendar | `[kwawingu_availability id="0"]` | Month grid of departures with seats/sold-out status |
 
 Full reference: [docs/blocks.md](docs/blocks.md).
 

@@ -12,6 +12,7 @@ Build a fast, SEO-friendly tour-operator website on your [KwaWingu Tours](https:
 - **Blocks** — Tours Grid, Tour Detail, Featured Tours, Book Button, Reviews, Destinations Grid, Tour Search, Trip Calculator, On-site Booking Form, Gallery, Availability Calendar (+ classic-theme shortcodes for all eleven).
 - **One-click setup** — the wizard pulls your branding, scaffolds Home / Tours / About / Contact pages, and imports your tours.
 - **Booking** — redirect guests to your hosted KwaWingu booking page, embed the KwaWingu widget, or use On-site mode for a fully in-WordPress booking + Snippe payment flow (requires private API key; keys are proxied server-side and never reach the browser).
+- **Operator notifications + leads** — on-site bookings can trigger an email to the operator and save guest details as a Lead in WordPress admin. Guest confirmations are still sent by KwaWingu.
 - **Internationalization** — ships with a `.pot` template; every user-facing string uses the `kwawingu-tours` text domain. Translate via Loco Translate or GlotPress.
 - **Keeps your edits** — once you edit a synced tour, sync stops overwriting your content.
 

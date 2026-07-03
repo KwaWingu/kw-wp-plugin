@@ -100,6 +100,58 @@ namespace KwaWingu\Tours\Tests {
             $this->assertSame( 'proxy_error', $out->code );
             $this->assertSame( 502, $out->data['status'] );
         }
+
+	public function test_inquiry_forwards_to_inquiries_with_private_key(): void {
+		$api = \Mockery::mock( \KwaWingu\Tours\Api_Client::class );
+		$api->shouldReceive( 'post' )->once()
+			->with( '/inquiries', \Mockery::on( function ( $body ) {
+				return isset( $body['name'] ) && isset( $body['email'] );
+			} ), true )
+			->andReturn( array( 'status' => 'received' ) );
+
+		$req = \Mockery::mock();
+		$req->shouldReceive( 'get_json_params' )->andReturn( array(
+			'name'    => 'Jane Doe',
+			'email'   => 'jane@example.com',
+			'adults'  => 2,
+			'message' => 'Hello',
+		) );
+
+		Functions\when( 'sanitize_text_field' )->returnArg();
+		Functions\when( 'sanitize_email' )->returnArg();
+		Functions\when( 'get_transient' )->justReturn( 0 );
+		Functions\when( 'set_transient' )->justReturn( true );
+		Functions\when( 'is_wp_error' )->justReturn( false );
+
+		$out = ( new \KwaWingu\Tours\Rest_Proxy( $api ) )->handle_inquiry( $req );
+		$this->assertSame( 'received', $out['status'] );
+	}
+
+	public function test_inquiry_rejected_when_rate_limited(): void {
+		$api = \Mockery::mock( \KwaWingu\Tours\Api_Client::class );
+		$api->shouldNotReceive( 'post' );
+
+		$req = \Mockery::mock();
+		$req->shouldReceive( 'get_json_params' )->andReturn( array() );
+
+		Functions\when( 'get_transient' )->justReturn( 20 );
+		Functions\when( 'sanitize_text_field' )->returnArg();
+		Functions\when( 'sanitize_email' )->returnArg();
+		Functions\when( '__' )->returnArg();
+
+		$out = ( new \KwaWingu\Tours\Rest_Proxy( $api ) )->handle_inquiry( $req );
+		$this->assertInstanceOf( \WP_Error::class, $out );
+		$this->assertSame( 429, $out->data['status'] );
+	}
+
+	public function test_inquiry_nonce_rejection_via_check_nonce(): void {
+		Functions\when( 'wp_verify_nonce' )->justReturn( false );
+		$req = \Mockery::mock();
+		$req->shouldReceive( 'get_header' )->with( 'X-WP-Nonce' )->andReturn( 'bad' );
+
+		$result = ( new \KwaWingu\Tours\Rest_Proxy( \Mockery::mock( \KwaWingu\Tours\Api_Client::class ) ) )->check_nonce( $req );
+		$this->assertFalse( $result );
+	}
     }
 }
 

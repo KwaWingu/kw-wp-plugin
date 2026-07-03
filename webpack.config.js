@@ -22,6 +22,7 @@ const BLOCKS = [
 	'booking',
 	'gallery',
 	'availability-calendar',
+	'inquiry-form',
 ];
 
 const entry = {};

@@ -4,7 +4,7 @@ Tags: tours, travel, tour operator, booking, safari
 Requires at least: 6.2
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 1.10.0
+Stable tag: 1.11.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,6 +70,11 @@ Tours re-sync automatically (hourly by default; configurable) and via a "Sync no
 This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to fetch your tour catalog, availability, pricing, and related content, and — in on-site booking mode — to create bookings and start payments on your behalf. It uses the operator slug and API keys you configure. Data sent: your API key (in a request header) and the parameters for the content or booking requested (including guest details a visitor enters in the on-site booking form). No visitor personal data is sent during catalog sync. See https://tours.kwawingu.com for the Terms and the KwaWingu privacy policy.
 
 == Changelog ==
+
+= 1.11.0 =
+* Inquiry Form block (`kwawingu/inquiry-form`) and `[kwawingu_inquiry]` shortcode: visitors submit inquiries directly from your WordPress site; the operator gets an email notification and a Lead is captured in WordPress.
+* Contact page starter pattern updated to embed the Inquiry Form block.
+* Server-side proxy route `POST /wp-json/kwawingu/v1/inquiry` — nonce-guarded, rate-limited, forwards via private API key to your KwaWingu inbox.
 
 = 1.10.0 =
 * Fix: interactive blocks (Search, Trip Calculator, Booking, Availability Calendar) now recover automatically on full-page-cached sites, where an expired security token previously broke them.

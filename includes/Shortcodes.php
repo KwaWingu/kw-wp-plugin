@@ -30,6 +30,7 @@ class Shortcodes {
 		add_shortcode( 'kwawingu_booking_form', array( $this, 'render_booking_form' ) );
 		add_shortcode( 'kwawingu_gallery', array( $this, 'render_gallery' ) );
 		add_shortcode( 'kwawingu_availability', array( $this, 'render_availability' ) );
+		add_shortcode( 'kwawingu_inquiry', array( $this, 'render_inquiry' ) );
 	}
 
 	/**
@@ -207,5 +208,29 @@ class Shortcodes {
 		require_once Blocks::block_dir() . 'availability-calendar/render-fn.php';
 		$atts = shortcode_atts( array( 'slug' => '' ), $atts );
 		return kwt_render_availability_calendar( array( 'tourSlug' => (string) $atts['slug'] ), '' );
+	}
+
+	/**
+	 * Renders the inquiry form shortcode.
+	 *
+	 * @param array<string,mixed> $atts Shortcode attributes.
+	 * @return string
+	 */
+	public function render_inquiry( $atts ): string {
+		require_once Blocks::block_dir() . 'inquiry-form/render-fn.php';
+		$atts = shortcode_atts(
+			array(
+				'heading'   => '',
+				'tour_slug' => '',
+			),
+			$atts
+		);
+		return kwt_render_inquiry_form(
+			array(
+				'heading'  => (string) $atts['heading'],
+				'tourSlug' => (string) $atts['tour_slug'],
+			),
+			''
+		);
 	}
 }

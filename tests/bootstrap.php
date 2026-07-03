@@ -14,3 +14,6 @@ if ( ! defined( 'KWT_VERSION' ) ) {
 if ( ! defined( 'KWT_PLUGIN_FILE' ) ) {
     define( 'KWT_PLUGIN_FILE', dirname( __DIR__ ) . '/kwawingu-tours.php' );
 }
+if ( ! defined( 'MINUTE_IN_SECONDS' ) ) {
+    define( 'MINUTE_IN_SECONDS', 60 );
+}

@@ -12,6 +12,7 @@ class PatternsTest extends TestCase {
         Monkey\setUp();
         Functions\when( '__' )->returnArg();
         Functions\when( 'esc_html__' )->returnArg();
+        Functions\when( 'esc_attr__' )->returnArg();
     }
     protected function tearDown(): void { Monkey\tearDown(); parent::tearDown(); }
 

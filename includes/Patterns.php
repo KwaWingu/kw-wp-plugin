@@ -68,8 +68,9 @@ class Patterns {
 		$this->add(
 			'kwawingu/contact',
 			__( 'Contact', 'kwawingu-tours' ),
-			'<!-- wp:heading --><h2>' . esc_html__( 'Contact us', 'kwawingu-tours' ) . '</h2><!-- /wp:heading -->'
-			. '<!-- wp:paragraph --><p>' . esc_html__( 'Add your contact details or a form here.', 'kwawingu-tours' ) . '</p><!-- /wp:paragraph -->'
+			'<!-- wp:heading --><h2>' . esc_html__( 'Get in touch', 'kwawingu-tours' ) . '</h2><!-- /wp:heading -->'
+			. '<!-- wp:paragraph --><p>' . esc_html__( 'Have a question about one of our tours? Fill in the form below and we\'ll get back to you shortly.', 'kwawingu-tours' ) . '</p><!-- /wp:paragraph -->'
+			. '<!-- wp:kwawingu/inquiry-form {"heading":"' . esc_attr__( 'Send us an inquiry', 'kwawingu-tours' ) . '"} /-->'
 		);
 	}
 

@@ -142,6 +142,15 @@ class Rest_Proxy {
 				'permission_callback' => $auth,
 			)
 		);
+		register_rest_route(
+			self::NS,
+			'/inquiry',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'handle_inquiry' ),
+				'permission_callback' => $auth,
+			)
+		);
 	}
 
 	/**
@@ -304,6 +313,48 @@ class Rest_Proxy {
 				return $this->api->post( '/quote', $body, false );
 			}
 		);
+	}
+
+	/**
+	 * Submit a website inquiry to the KwaWingu API.
+	 *
+	 * @param \WP_REST_Request $request The request.
+	 * @return array<string,mixed>|\WP_Error
+	 */
+	public function handle_inquiry( $request ) {
+		if ( ! $this->rate_ok( 'inquiry' ) ) {
+			return new \WP_Error( 'rate_limited', __( 'Too many requests. Please wait a moment.', 'kwawingu-tours' ), array( 'status' => 429 ) );
+		}
+		$params = is_array( $request->get_json_params() ) ? $request->get_json_params() : array();
+
+		$body = array(
+			'name'   => sanitize_text_field( (string) ( $params['name'] ?? '' ) ),
+			'email'  => sanitize_email( (string) ( $params['email'] ?? '' ) ),
+			'adults' => max( 1, (int) ( $params['adults'] ?? 2 ) ),
+		);
+
+		$children = (int) ( $params['children'] ?? 0 );
+		if ( $children > 0 ) {
+			$body['children'] = $children;
+		}
+
+		foreach ( array( 'phone', 'message', 'tourSlug', 'date' ) as $field ) {
+			if ( ! empty( $params[ $field ] ) ) {
+				$body[ $field ] = sanitize_text_field( (string) $params[ $field ] );
+			}
+		}
+
+		$result = $this->guard(
+			function () use ( $body ) {
+				return $this->api->post( '/inquiries', $body, true );
+			}
+		);
+
+		if ( ! is_wp_error( $result ) && null !== $this->notifications ) {
+			$this->notifications->on_inquiry_created( $body );
+		}
+
+		return $result;
 	}
 
 	/**

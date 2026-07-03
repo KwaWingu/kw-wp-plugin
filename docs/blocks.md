@@ -40,6 +40,13 @@ A month grid of a tour's upcoming departures showing available seats and sold-ou
 
 Prices display in TZS. Styling uses the `kwt-*` CSS classes and the `--kwt-primary` / `--kwt-accent` custom properties set from your KwaWingu branding.
 
+## Inquiry Form — `kwawingu/inquiry-form` / `[kwawingu_inquiry]`
+Captures a visitor inquiry and forwards it to your KwaWingu booking inbox. The operator receives an email notification; no guest-facing email is sent from WordPress (the KwaWingu platform handles that).
+- `heading` (string, default "Send us an inquiry")
+- `tourSlug` / `tour_slug` (shortcode) (string, optional) — pre-fill the tour of interest
+
+Includes a honeypot field that silently blocks bot submissions without a CAPTCHA. Submissions are rate-limited (20 per 10 minutes per visitor IP).
+
 ## Interactive blocks & full-page caching
 
 The interactive blocks (Search, Trip Calculator, Booking, Availability Calendar) call your data through a same-origin REST proxy (`/wp-json/kwawingu/v1/*`) so the API keys stay on the server and never reach the browser. Each request carries a WordPress REST nonce (`wp_rest`).

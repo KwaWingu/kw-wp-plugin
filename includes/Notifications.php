@@ -61,6 +61,31 @@ class Notifications {
 	}
 
 	/**
+	 * Handle a successful website inquiry: capture a lead + notify the operator.
+	 * Best-effort — never throws into the REST flow.
+	 *
+	 * @param array<string,mixed> $payload The inquiry request body.
+	 * @return void
+	 */
+	public function on_inquiry_created( array $payload ): void {
+		try {
+			$name  = sanitize_text_field( (string) ( $payload['name'] ?? '' ) );
+			$email = sanitize_email( (string) ( $payload['email'] ?? '' ) );
+			$phone = sanitize_text_field( (string) ( $payload['phone'] ?? '' ) );
+			$tour  = sanitize_text_field( (string) ( $payload['tourSlug'] ?? '' ) );
+
+			if ( $this->settings->lead_capture_enabled() ) {
+				$this->capture_lead( $name, $email, $phone, $tour, '' );
+			}
+			if ( $this->settings->notifications_enabled() ) {
+				$this->notify_inquiry_operator( $name, $email, $phone, $tour, (string) ( $payload['message'] ?? '' ) );
+			}
+		} catch ( \Throwable $e ) {
+			// Best-effort — swallow.
+		}
+	}
+
+	/**
 	 * Store a kwt_lead post.
 	 *
 	 * @param string $name  Guest name.
@@ -113,6 +138,41 @@ class Notifications {
 			. __( 'Phone:', 'kwawingu-tours' ) . ' ' . $phone . "\n"
 			. __( 'Tour:', 'kwawingu-tours' ) . ' ' . $tour . "\n"
 			. __( 'Reference:', 'kwawingu-tours' ) . ' ' . $ref . "\n"
+		);
+		wp_mail( $to, $subject, $body );
+	}
+
+	/**
+	 * Email the operator a new-inquiry notice.
+	 *
+	 * @param string $name    Enquirer name.
+	 * @param string $email   Enquirer email.
+	 * @param string $phone   Enquirer phone.
+	 * @param string $tour    Tour slug.
+	 * @param string $message Enquirer message.
+	 * @return void
+	 */
+	private function notify_inquiry_operator( string $name, string $email, string $phone, string $tour, string $message ): void {
+		$to = $this->settings->notification_recipient();
+		if ( '' === $to ) {
+			$to = (string) get_option( 'admin_email' );
+		}
+		if ( '' === $to ) {
+			return;
+		}
+		if ( '' !== $tour ) {
+			/* translators: %s: tour slug */
+			$subject = sprintf( __( 'New inquiry via your website — %s', 'kwawingu-tours' ), $tour );
+		} else {
+			$subject = __( 'New inquiry via your website', 'kwawingu-tours' );
+		}
+		$body = wp_strip_all_tags(
+			__( 'A visitor submitted an inquiry on your website:', 'kwawingu-tours' ) . "\n\n"
+			. __( 'Name:', 'kwawingu-tours' ) . ' ' . $name . "\n"
+			. __( 'Email:', 'kwawingu-tours' ) . ' ' . $email . "\n"
+			. ( '' !== $phone ? __( 'Phone:', 'kwawingu-tours' ) . ' ' . $phone . "\n" : '' )
+			. ( '' !== $tour ? __( 'Tour:', 'kwawingu-tours' ) . ' ' . $tour . "\n" : '' )
+			. ( '' !== $message ? "\n" . __( 'Message:', 'kwawingu-tours' ) . "\n" . $message . "\n" : '' )
 		);
 		wp_mail( $to, $subject, $body );
 	}

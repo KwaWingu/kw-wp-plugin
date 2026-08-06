@@ -116,6 +116,56 @@ class Settings {
 	}
 
 	/**
+	 * Shared secret used to sign push (resync) requests from KwaWingu.
+	 *
+	 * Never rendered into the front end and never accepted from the settings form —
+	 * it is generated on activation and only replaced by an explicit regenerate action.
+	 *
+	 * @return string
+	 */
+	public function get_push_secret(): string {
+		return (string) ( $this->all()['push_secret'] ?? '' );
+	}
+
+	/**
+	 * Generates the push secret if it is missing, and returns the current one.
+	 *
+	 * @return string
+	 */
+	public function ensure_push_secret(): string {
+		$secret = $this->get_push_secret();
+		if ( '' !== $secret ) {
+			return $secret;
+		}
+		return $this->regenerate_push_secret();
+	}
+
+	/**
+	 * Generates and stores a fresh push secret, invalidating the previous one.
+	 *
+	 * @return string The new secret.
+	 */
+	public function regenerate_push_secret(): string {
+		$secret             = $this->new_secret();
+		$all                = $this->all();
+		$all['push_secret'] = $secret;
+		update_option( self::OPTION, $all );
+		return $secret;
+	}
+
+	/**
+	 * Builds a new random secret using WordPress' CSPRNG-backed generator.
+	 *
+	 * @return string
+	 */
+	private function new_secret(): string {
+		if ( function_exists( 'wp_generate_password' ) ) {
+			return wp_generate_password( 64, false, false );
+		}
+		return bin2hex( random_bytes( 32 ) );
+	}
+
+	/**
 	 * Sanitize callback for register_setting.
 	 *
 	 * @param array<string,mixed> $input Raw input values from the settings form.
@@ -134,7 +184,12 @@ class Settings {
 		$notify_email   = sanitize_email( trim( (string) ( $input['notify_email'] ?? '' ) ) );
 		$capture_leads  = ! empty( $input['capture_leads'] ) ? '1' : '';
 
+		// The push secret is never posted by the settings form. Carry the stored value
+		// through so saving settings can never silently break the push endpoint.
+		$push_secret = $this->get_push_secret();
+
 		return array(
+			'push_secret'    => $push_secret,
 			'slug'           => $slug,
 			'public_key'     => $public_key,
 			'private_key'    => $private_key,

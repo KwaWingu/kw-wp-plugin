@@ -34,6 +34,11 @@ namespace KwaWingu\Tours\Tests {
         }
 
         public function test_payment_intent_uses_ref_and_phone(): void {
+            // Rate limiting runs when get_transient exists; another test file may have
+            // defined it already, so stub it here rather than depend on test order.
+            Functions\when( 'get_transient' )->justReturn( 0 );
+            Functions\when( 'set_transient' )->justReturn( true );
+
             $api = Mockery::mock( Api_Client::class );
             $api->shouldReceive( 'post' )->once()
                 ->with( '/bookings/KWG-1/payment-intent', array( 'phone' => '255700' ), true )

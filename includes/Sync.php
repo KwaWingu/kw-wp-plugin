@@ -146,7 +146,7 @@ class Sync {
 				'post_status'  => 'publish',
 				'post_title'   => sanitize_text_field( (string) ( $tour['title'] ?? '' ) ),
 				'post_excerpt' => sanitize_text_field( (string) ( $tour['descriptionShort'] ?? '' ) ),
-				'post_content' => wp_strip_all_tags( (string) ( $tour['description'] ?? $tour['descriptionShort'] ?? '' ) ),
+				'post_content' => wp_strip_all_tags( (string) ( $tour['description'] ?? $tour['descriptionFull'] ?? $tour['descriptionShort'] ?? '' ) ),
 			)
 		);
 		if ( is_int( $id ) && $id > 0 ) {
@@ -169,7 +169,7 @@ class Sync {
 		if ( ! $locked ) {
 			$payload['post_title']   = sanitize_text_field( (string) ( $tour['title'] ?? '' ) );
 			$payload['post_excerpt'] = sanitize_text_field( (string) ( $tour['descriptionShort'] ?? '' ) );
-			$payload['post_content'] = wp_strip_all_tags( (string) ( $tour['description'] ?? $tour['descriptionShort'] ?? '' ) );
+			$payload['post_content'] = wp_strip_all_tags( (string) ( $tour['description'] ?? $tour['descriptionFull'] ?? $tour['descriptionShort'] ?? '' ) );
 		}
 		wp_update_post( $payload );
 		$existing_kwt_id = (string) get_post_meta( $post_id, self::META_ID, true );
@@ -186,16 +186,20 @@ class Sync {
 	private function write_meta( int $post_id, array $tour, string $kwt_id ): void {
 		update_post_meta( $post_id, self::META_ID, $kwt_id );
 		update_post_meta( $post_id, 'kwt_slug', sanitize_title( (string) ( $tour['slug'] ?? '' ) ) );
-		update_post_meta( $post_id, 'kwt_price', (int) ( $tour['price'] ?? 0 ) );
+		// The API's public "from" price is basePriceAdult; 'price' is kept as a fallback
+		// so an older/summary payload shape still populates the meta.
+		update_post_meta( $post_id, 'kwt_price', (int) round( (float) ( $tour['basePriceAdult'] ?? $tour['price'] ?? 0 ) ) );
+		update_post_meta( $post_id, 'kwt_currency', sanitize_text_field( (string) ( $tour['currency'] ?? '' ) ) );
 		update_post_meta( $post_id, 'kwt_duration_days', (int) ( $tour['durationDays'] ?? 0 ) );
 		update_post_meta( $post_id, 'kwt_difficulty', sanitize_text_field( (string) ( $tour['difficulty'] ?? '' ) ) );
-		update_post_meta( $post_id, 'kwt_type', sanitize_text_field( (string) ( $tour['type'] ?? '' ) ) );
+		update_post_meta( $post_id, 'kwt_type', sanitize_text_field( (string) ( $tour['type'] ?? $tour['productType'] ?? $tour['category'] ?? '' ) ) );
 		update_post_meta( $post_id, 'kwt_cover_url', $this->esc_url_raw_or_empty( $tour['coverImageUrl'] ?? '' ) );
-		update_post_meta( $post_id, 'kwt_rating', (float) ( $tour['rating'] ?? 0 ) );
+		update_post_meta( $post_id, 'kwt_rating', (float) ( $tour['rating'] ?? $tour['averageRating'] ?? 0 ) );
 		update_post_meta( $post_id, 'kwt_review_count', (int) ( $tour['reviewCount'] ?? 0 ) );
-		$gallery = array();
-		if ( isset( $tour['gallery'] ) && is_array( $tour['gallery'] ) ) {
-			foreach ( $tour['gallery'] as $url ) {
+		$gallery     = array();
+		$gallery_src = $tour['gallery'] ?? ( $tour['galleryImageUrls'] ?? null );
+		if ( is_array( $gallery_src ) ) {
+			foreach ( $gallery_src as $url ) {
 				$clean = $this->esc_url_raw_or_empty( $url );
 				if ( '' !== $clean ) {
 					$gallery[] = $clean;

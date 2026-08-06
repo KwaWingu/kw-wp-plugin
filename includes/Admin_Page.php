@@ -15,6 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Admin_Page {
 
+	const REGEN_ACTION = 'kwt_regen_push_secret';
+
 	/**
 	 * Plugin settings instance.
 	 *
@@ -47,6 +49,30 @@ class Admin_Page {
 	 */
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'add_menu' ) );
+		add_action( 'admin_post_' . self::REGEN_ACTION, array( $this, 'handle_regenerate_secret' ) );
+	}
+
+	/**
+	 * Handles the "Regenerate secret" admin POST action.
+	 *
+	 * @return void
+	 */
+	public function handle_regenerate_secret(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You are not allowed to do this.', 'kwawingu-tours' ) );
+		}
+		check_admin_referer( self::REGEN_ACTION );
+		$this->settings->regenerate_push_secret();
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'           => 'kwawingu-tours',
+					'kwt_new_secret' => '1',
+				),
+				admin_url( 'options-general.php' )
+			)
+		);
+		exit;
 	}
 
 	/**
@@ -163,6 +189,43 @@ class Admin_Page {
 			<input type="hidden" name="action" value="<?php echo esc_attr( \KwaWingu\Tours\Sync_Controller::ACTION ); ?>" />
 			<?php wp_nonce_field( \KwaWingu\Tours\Sync_Controller::ACTION ); ?>
 			<?php submit_button( __( 'Sync now', 'kwawingu-tours' ), 'secondary' ); ?>
+		</form>
+		<?php
+		$this->render_push_section();
+	}
+
+	/**
+	 * Renders the instant-resync (push) section: endpoint URL, shared secret, regenerate.
+	 *
+	 * @return void
+	 */
+	private function render_push_section(): void {
+		// Generated on activation; generated here too so sites upgrading from an older
+		// version get a secret without having to deactivate and reactivate.
+		$secret = $this->settings->ensure_push_secret();
+		?>
+		<hr />
+		<h2><?php echo esc_html__( 'Instant resync', 'kwawingu-tours' ); ?></h2>
+		<p><?php echo esc_html__( 'Paste these into your KwaWingu dashboard so edits to a tour reach this site in seconds instead of waiting for the next scheduled sync.', 'kwawingu-tours' ); ?></p>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><label for="kwt_push_url"><?php echo esc_html__( 'Endpoint URL', 'kwawingu-tours' ); ?></label></th>
+				<td>
+					<input type="text" id="kwt_push_url" class="large-text code" readonly value="<?php echo esc_attr( \KwaWingu\Tours\Push_Endpoint::endpoint_url() ); ?>" onfocus="this.select();" />
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="kwt_push_secret"><?php echo esc_html__( 'Signing secret', 'kwawingu-tours' ); ?></label></th>
+				<td>
+					<input type="text" id="kwt_push_secret" class="large-text code" readonly value="<?php echo esc_attr( $secret ); ?>" onfocus="this.select();" />
+					<p class="description"><?php echo esc_html__( 'Requests must send X-KW-Timestamp (unix seconds) and X-KW-Signature — the hex HMAC-SHA256 of "{timestamp}.{body}" using this secret. Requests older than 5 minutes are rejected.', 'kwawingu-tours' ); ?></p>
+				</td>
+			</tr>
+		</table>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<input type="hidden" name="action" value="<?php echo esc_attr( self::REGEN_ACTION ); ?>" />
+			<?php wp_nonce_field( self::REGEN_ACTION ); ?>
+			<?php submit_button( __( 'Regenerate secret', 'kwawingu-tours' ), 'secondary', 'submit', true, array( 'onclick' => 'return confirm("' . esc_attr__( 'Regenerating invalidates the old secret. Update it in KwaWingu afterwards.', 'kwawingu-tours' ) . '");' ) ); ?>
 		</form>
 		<?php
 	}

@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Plugin {
 
-	const VERSION = '1.9.0';
+	const VERSION = '1.12.0';
 
 	/**
 	 * Singleton instance of this class.
@@ -69,6 +69,9 @@ final class Plugin {
 		$media = new Media( $settings );
 		$sync  = new Sync( $api, $media );
 
+		// Shared by the block render functions for live price/availability reads.
+		Live_Catalog::set_instance( new Live_Catalog( $api ) );
+
 		$branding = new Branding( $api );
 		$branding->register();
 
@@ -83,6 +86,8 @@ final class Plugin {
 
 		$controller = new Sync_Controller( $sync, $settings );
 		$controller->register();
+
+		( new Push_Endpoint( $settings, $controller ) )->register();
 
 		( new Admin_Page( $settings, $controller ) )->register();
 	}

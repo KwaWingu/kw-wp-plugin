@@ -5,6 +5,7 @@
  * @package KwaWingu\Tours
  */
 
+use KwaWingu\Tours\Live_Catalog;
 use KwaWingu\Tours\View;
 
 if ( ! function_exists( 'kwt_render_tours_grid' ) ) {
@@ -39,11 +40,20 @@ if ( ! function_exists( 'kwt_render_tours_grid' ) ) {
 		$out = '<div class="kwt-tours-grid">';
 		while ( $query->have_posts() ) {
 			$query->the_post();
-			$id    = (int) get_the_ID();
-			$price = (int) get_post_meta( $id, 'kwt_price', true );
-			$days  = (int) get_post_meta( $id, 'kwt_duration_days', true );
-			$img   = (string) get_the_post_thumbnail_url( $id, 'medium' );
-			$out  .= '<article class="kwt-tour-card">';
+			$id = (int) get_the_ID();
+			// Price and availability are read live; the stored meta is the fallback when
+			// the API call fails, so a card never renders an error or a blank price.
+			$live     = Live_Catalog::for_post( $id );
+			$price    = isset( $live['price'] ) && null !== $live['price']
+				? (int) $live['price']
+				: (int) get_post_meta( $id, 'kwt_price', true );
+			$currency = ! empty( $live['currency'] )
+				? (string) $live['currency']
+				: (string) get_post_meta( $id, 'kwt_currency', true );
+			$sold_out = ! empty( $live['soldOut'] );
+			$days     = (int) get_post_meta( $id, 'kwt_duration_days', true );
+			$img      = (string) get_the_post_thumbnail_url( $id, 'medium' );
+			$out     .= '<article class="kwt-tour-card">';
 			if ( $img ) {
 				$out .= '<img class="kwt-tour-card__img" src="' . esc_url( $img ) . '" alt="' . esc_attr( get_the_title() ) . '" loading="lazy" />';
 			}
@@ -53,7 +63,10 @@ if ( ! function_exists( 'kwt_render_tours_grid' ) ) {
 				$out .= '<p class="kwt-tour-card__meta">' . esc_html( sprintf( _n( '%d day', '%d days', $days, 'kwawingu-tours' ), $days ) ) . '</p>';
 			}
 			if ( $price > 0 ) {
-				$out .= '<p class="kwt-tour-card__price">' . esc_html( View::money( $price ) ) . '</p>';
+				$out .= '<p class="kwt-tour-card__price">' . esc_html( View::money( $price, '' !== $currency ? $currency : 'TZS' ) ) . '</p>';
+			}
+			if ( $sold_out ) {
+				$out .= '<p class="kwt-tour-card__soldout">' . esc_html__( 'Sold out', 'kwawingu-tours' ) . '</p>';
 			}
 			$out .= '</article>';
 		}

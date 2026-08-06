@@ -21,13 +21,19 @@ final class View {
 	private function __construct() {}
 
 	/**
-	 * Format an integer TZS amount, e.g. 450000 => "TZS 450,000".
+	 * Format an integer amount, e.g. 450000 => "TZS 450,000".
 	 *
-	 * @param int $tzs Amount in TZS smallest unit (integer).
+	 * The currency belongs to the operator being paid, so it is passed in when known;
+	 * TZS remains the default for stored values written before currency was synced.
+	 *
+	 * @param int    $amount   Amount in the currency's whole units (integer).
+	 * @param string $currency ISO currency code. Defaults to TZS.
 	 * @return string Formatted currency string.
 	 */
-	public static function money( int $tzs ): string {
-		return 'TZS ' . number_format( $tzs, 0, '.', ',' );
+	public static function money( int $amount, string $currency = 'TZS' ): string {
+		$currency = preg_replace( '/[^A-Za-z]/', '', $currency );
+		$currency = '' === (string) $currency ? 'TZS' : strtoupper( (string) $currency );
+		return $currency . ' ' . number_format( $amount, 0, '.', ',' );
 	}
 
 	/**

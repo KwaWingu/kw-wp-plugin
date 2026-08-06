@@ -5,6 +5,7 @@
  * @package KwaWingu\Tours
  */
 
+use KwaWingu\Tours\Live_Catalog;
 use KwaWingu\Tours\View;
 
 if ( ! function_exists( 'kwt_render_tour_detail' ) ) {
@@ -19,7 +20,18 @@ if ( ! function_exists( 'kwt_render_tour_detail' ) ) {
 		if ( $id <= 0 ) {
 			return '';
 		}
-		$price      = (int) get_post_meta( $id, 'kwt_price', true );
+		// Live price + availability, falling back to the synced meta when the API is
+		// unreachable. Title, body and images keep coming from the post — that is the
+		// SEO-bearing content and it does not go stale in a way that misleads a guest.
+		$live       = Live_Catalog::for_post( $id );
+		$price      = isset( $live['price'] ) && null !== $live['price']
+			? (int) $live['price']
+			: (int) get_post_meta( $id, 'kwt_price', true );
+		$currency   = ! empty( $live['currency'] )
+			? (string) $live['currency']
+			: (string) get_post_meta( $id, 'kwt_currency', true );
+		$sold_out   = ! empty( $live['soldOut'] );
+		$next_dep   = isset( $live['nextDeparture'] ) ? (string) $live['nextDeparture'] : '';
 		$days       = (int) get_post_meta( $id, 'kwt_duration_days', true );
 		$difficulty = (string) get_post_meta( $id, 'kwt_difficulty', true );
 		$img        = (string) get_the_post_thumbnail_url( $id, 'large' );
@@ -38,7 +50,18 @@ if ( ! function_exists( 'kwt_render_tour_detail' ) ) {
 			$out .= '<li>' . esc_html( $difficulty ) . '</li>';
 		}
 		if ( $price > 0 ) {
-			$out .= '<li class="kwt-price">' . esc_html( View::money( $price ) ) . '</li>';
+			$out .= '<li class="kwt-price">' . esc_html( View::money( $price, '' !== $currency ? $currency : 'TZS' ) ) . '</li>';
+		}
+		if ( $sold_out ) {
+			$out .= '<li class="kwt-soldout">' . esc_html__( 'Sold out', 'kwawingu-tours' ) . '</li>';
+		} elseif ( '' !== $next_dep ) {
+			$out .= '<li class="kwt-next-departure">' . esc_html(
+				sprintf(
+					/* translators: %s: date of the next departure, e.g. 2026-09-14 */
+					__( 'Next departure: %s', 'kwawingu-tours' ),
+					$next_dep
+				)
+			) . '</li>';
 		}
 		$out     .= '</ul>';
 		$kwt_post = get_post( $id );

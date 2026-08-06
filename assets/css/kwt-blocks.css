@@ -115,6 +115,21 @@
 	color: var( --kwt-primary );
 }
 
+.kwt-tour-card__soldout,
+.kwt-soldout {
+	padding: 0 16px 16px;
+	margin: 0;
+	font-size: 0.85rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #b32d2e;
+}
+
+.kwt-next-departure {
+	color: var( --kwt-muted );
+}
+
 /* ── Featured ──────────────────────────────────────────────────────────── */
 
 .kwt-featured__heading {

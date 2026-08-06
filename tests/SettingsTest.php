@@ -18,6 +18,8 @@ class SettingsTest extends TestCase {
         } );
         Functions\when( 'sanitize_email' )->returnArg();
         Functions\when( 'esc_url_raw' )->returnArg();
+        // sanitize() reads the stored option to carry the push secret through.
+        Functions\when( 'get_option' )->justReturn( array() );
     }
 
     protected function tearDown(): void {
@@ -68,6 +70,37 @@ class SettingsTest extends TestCase {
         $this->assertFalse( $s2->notifications_enabled() );
         $this->assertSame( '', $s2->notification_recipient() );
         $this->assertFalse( $s2->lead_capture_enabled() );
+    }
+
+    public function test_saving_settings_never_wipes_the_push_secret(): void {
+        Functions\when( 'get_option' )->justReturn( array( 'push_secret' => 'keep-me' ) );
+
+        // The form does not post the secret; sanitize must carry the stored one through
+        // or every settings save would silently break the push endpoint.
+        $out = ( new Settings() )->sanitize( array( 'slug' => 'acme' ) );
+
+        $this->assertSame( 'keep-me', $out['push_secret'] );
+    }
+
+    public function test_ensure_push_secret_generates_once_and_is_stable(): void {
+        $stored = array();
+        Functions\when( 'get_option' )->alias( static function () use ( &$stored ) {
+            return $stored;
+        } );
+        Functions\when( 'update_option' )->alias( static function ( $key, $value ) use ( &$stored ) {
+            $stored = $value;
+            return true;
+        } );
+        Functions\when( 'wp_generate_password' )->alias( static function () {
+            return bin2hex( random_bytes( 16 ) );
+        } );
+
+        $settings = new Settings();
+        $first    = $settings->ensure_push_secret();
+
+        $this->assertNotSame( '', $first );
+        $this->assertSame( $first, $settings->ensure_push_secret() );
+        $this->assertNotSame( $first, $settings->regenerate_push_secret() );
     }
 
     public function test_sanitize_notification_fields(): void {

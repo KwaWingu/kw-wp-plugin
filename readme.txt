@@ -4,7 +4,7 @@ Tags: tours, travel, tour operator, booking, safari
 Requires at least: 6.2
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 1.11.0
+Stable tag: 1.12.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,7 +52,7 @@ Start with **Redirect** — zero setup, always-correct availability, payment han
 Yes. Blocks are theme-agnostic and server-rendered; classic themes can use the `[kwawingu_*]` shortcodes.
 
 = How do tours stay up to date? =
-Tours re-sync automatically (hourly by default; configurable) and via a "Sync now" button. Your manual edits to a tour are preserved on future syncs.
+Tour content re-syncs automatically (hourly by default; configurable), via a "Sync now" button, and instantly when KwaWingu pushes a change to the Instant resync endpoint. Price, currency and sold-out state are not synced at all — they are read live from your account on every page view, with the last synced values as a fallback if the API is unreachable. Your manual edits to a tour are preserved on future syncs.
 
 == Screenshots ==
 
@@ -67,9 +67,16 @@ Tours re-sync automatically (hourly by default; configurable) and via a "Sync no
 
 == External services ==
 
-This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to fetch your tour catalog, availability, pricing, and related content, and — in on-site booking mode — to create bookings and start payments on your behalf. It uses the operator slug and API keys you configure. Data sent: your API key (in a request header) and the parameters for the content or booking requested (including guest details a visitor enters in the on-site booking form). No visitor personal data is sent during catalog sync. See https://tours.kwawingu.com for the Terms and the KwaWingu privacy policy.
+This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to fetch your tour catalog, availability, pricing, and related content, and — in on-site booking mode — to create bookings and start payments on your behalf. It uses the operator slug and API keys you configure. Data sent: your API key (in a request header) and the parameters for the content or booking requested (including guest details a visitor enters in the on-site booking form). No visitor personal data is sent during catalog sync. Current prices and availability are requested from the same API when a tour is displayed (the response is reused for 60 seconds), and KwaWingu can call back to this site's signed `kwt/v1/resync` endpoint to trigger a catalog sync; neither carries visitor data. See https://tours.kwawingu.com for the Terms and the KwaWingu privacy policy.
 
 == Changelog ==
+
+= 1.12.0 =
+* **Prices and availability are now read live.** Tour cards, tour pages and their structured data show the current price, currency and sold-out state on every page view instead of whatever the last scheduled sync stored. If the API cannot be reached, the last synced values are shown — never an error or a blank price.
+* **Instant resync.** A new signed endpoint (`POST /wp-json/kwt/v1/resync`) lets KwaWingu tell your site to re-sync within seconds of you editing a tour. Copy the endpoint URL and signing secret from **Settings → KwaWingu Tours → Instant resync** into your KwaWingu dashboard.
+* Fix: changing the sync interval in settings now takes effect immediately. Previously the new interval was ignored until the plugin was deactivated and reactivated.
+* Fix: tour prices are read from the API's `basePriceAdult` field, so synced prices are no longer always zero. Tour currency, category, gallery and rating fields are now mapped correctly too.
+* Prices render in the operator's own currency rather than always TZS.
 
 = 1.11.0 =
 * Inquiry Form block (`kwawingu/inquiry-form`) and `[kwawingu_inquiry]` shortcode: visitors submit inquiries directly from your WordPress site; the operator gets an email notification and a Lead is captured in WordPress.
@@ -129,6 +136,9 @@ This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to f
 * Initial release: settings, API client, Tours/Destinations post types, and scheduled catalog sync.
 
 == Upgrade Notice ==
+
+= 1.12.0 =
+Prices and availability now come from your account live instead of going stale between syncs, and the sync interval setting finally takes effect when you change it. Recommended for everyone.
 
 = 1.10.0 =
 Keeps the booking and search blocks working on sites with full-page caching or a CDN. Recommended for all cached sites.

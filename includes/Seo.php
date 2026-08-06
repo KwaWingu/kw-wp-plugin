@@ -54,9 +54,17 @@ class Seo {
 	 * @return array<string,mixed> JSON-LD structured data array.
 	 */
 	public function json_ld( int $post_id ): array {
-		$price  = (int) get_post_meta( $post_id, 'kwt_price', true );
-		$rating = (float) get_post_meta( $post_id, 'kwt_rating', true );
-		$count  = (int) get_post_meta( $post_id, 'kwt_review_count', true );
+		// Structured data that disagrees with the rendered page is worse than none, so
+		// the offer uses the same live price the visitor sees, with the same fallback.
+		$live     = Live_Catalog::for_post( $post_id );
+		$price    = isset( $live['price'] ) && null !== $live['price']
+			? (int) $live['price']
+			: (int) get_post_meta( $post_id, 'kwt_price', true );
+		$currency = ! empty( $live['currency'] )
+			? (string) $live['currency']
+			: (string) get_post_meta( $post_id, 'kwt_currency', true );
+		$rating   = (float) get_post_meta( $post_id, 'kwt_rating', true );
+		$count    = (int) get_post_meta( $post_id, 'kwt_review_count', true );
 
 		$data = array(
 			'@context'    => 'https://schema.org',
@@ -73,8 +81,10 @@ class Seo {
 			$data['offers'] = array(
 				'@type'         => 'Offer',
 				'price'         => $price,
-				'priceCurrency' => 'TZS',
-				'availability'  => 'https://schema.org/InStock',
+				'priceCurrency' => '' !== $currency ? strtoupper( $currency ) : 'TZS',
+				'availability'  => ! empty( $live['soldOut'] )
+					? 'https://schema.org/SoldOut'
+					: 'https://schema.org/InStock',
 			);
 		}
 		if ( $rating > 0 && $count > 0 ) {

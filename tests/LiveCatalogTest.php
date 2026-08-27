@@ -17,6 +17,10 @@ class LiveCatalogTest extends TestCase {
         Functions\when( 'get_transient' )->justReturn( false );
         Functions\when( 'set_transient' )->justReturn( true );
         Functions\when( 'delete_transient' )->justReturn( true );
+        Functions\when( 'get_option' )->justReturn( false );
+        Functions\when( 'update_option' )->justReturn( true );
+        Functions\when( 'delete_option' )->justReturn( true );
+        Functions\when( '__' )->returnArg();
         Live_Catalog::set_instance( null );
     }
 
@@ -145,5 +149,77 @@ class LiveCatalogTest extends TestCase {
         $catalog->tours();
 
         $this->assertSame( array( 'kwt_live_catalog' ), $deleted );
+    }
+
+    /** get_transient stub that answers the last-good key and nothing else. */
+    private function with_last_good( array $snapshot ): void {
+        Functions\when( 'get_transient' )->alias(
+            static function ( $key ) use ( $snapshot ) {
+                return Live_Catalog::LAST_GOOD_KEY === $key ? $snapshot : false;
+            }
+        );
+    }
+
+    public function test_success_keeps_a_last_good_snapshot_for_a_day(): void {
+        $stored = array();
+        Functions\when( 'set_transient' )->alias(
+            static function ( $key, $value, $ttl ) use ( &$stored ) {
+                $stored[ $key ] = array( $value, $ttl );
+                return true;
+            }
+        );
+        $api = Mockery::mock( Api_Client::class );
+        $api->shouldReceive( 'get' )->once()->andReturn( array( 'data' => $this->rows() ) );
+
+        ( new Live_Catalog( $api ) )->tours();
+
+        $this->assertSame( 86400, $stored[ Live_Catalog::LAST_GOOD_KEY ][1] );
+        $this->assertSame( 1250000, $stored[ Live_Catalog::LAST_GOOD_KEY ][0]['serengeti']['price'] );
+        $this->assertSame( 60, $stored[ Live_Catalog::CACHE_KEY ][1] );
+    }
+
+    public function test_rate_limit_serves_the_last_good_prices_and_retries_after_ttl(): void {
+        $this->with_last_good( array( 'serengeti' => array( 'price' => 1250000, 'currency' => 'USD' ) ) );
+        $stored = array();
+        Functions\when( 'set_transient' )->alias(
+            static function ( $key, $value, $ttl ) use ( &$stored ) {
+                $stored[ $key ] = array( $value, $ttl );
+                return true;
+            }
+        );
+        $api = Mockery::mock( Api_Client::class );
+        $api->shouldReceive( 'get' )->once()->andThrow( new Api_Exception( 'slow down', 429, 'rate_limited' ) );
+
+        $this->assertSame( 1250000, ( new Live_Catalog( $api ) )->tour( 'serengeti' )['price'] );
+        // The stale copy is cached for one TTL only, so the API is retried a minute later.
+        $this->assertSame( 60, $stored[ Live_Catalog::CACHE_KEY ][1] );
+        $this->assertArrayNotHasKey( Live_Catalog::LAST_GOOD_KEY, $stored, 'a failure must not refresh the last-good stamp' );
+    }
+
+    public function test_outage_serves_the_last_good_prices(): void {
+        $this->with_last_good( array( 'serengeti' => array( 'price' => 1250000, 'currency' => 'USD' ) ) );
+        $api = Mockery::mock( Api_Client::class );
+        $api->shouldReceive( 'get' )->andThrow( new Api_Exception( 'KwaWingu API returned status 503.', 503 ) );
+
+        $this->assertSame( 1250000, ( new Live_Catalog( $api ) )->tour( 'serengeti' )['price'] );
+    }
+
+    public function test_entitlement_refusal_does_not_serve_stale_live_prices(): void {
+        // The operator is no longer served live data: fall back to the synced meta
+        // (empty here), and tell the owner why in wp-admin.
+        $this->with_last_good( array( 'serengeti' => array( 'price' => 1250000, 'currency' => 'USD' ) ) );
+        $recorded = null;
+        Functions\when( 'update_option' )->alias(
+            static function ( $key, $value ) use ( &$recorded ) {
+                $recorded = array( $key, $value );
+                return true;
+            }
+        );
+        $api = Mockery::mock( Api_Client::class );
+        $api->shouldReceive( 'get' )->andThrow( new Api_Exception( 'api_access_required', 403, 'api_access_required' ) );
+
+        $this->assertSame( array(), ( new Live_Catalog( $api ) )->tour( 'serengeti' ) );
+        $this->assertSame( 'kwt_api_status', $recorded[0] );
+        $this->assertSame( 'entitlement', $recorded[1]['kind'] );
     }
 }

@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Plugin {
 
-	const VERSION = '1.12.0';
+	const VERSION = '1.13.0';
 
 	/**
 	 * Singleton instance of this class.
@@ -90,5 +90,7 @@ final class Plugin {
 		( new Push_Endpoint( $settings, $controller ) )->register();
 
 		( new Admin_Page( $settings, $controller ) )->register();
+
+		( new Api_Status() )->register();
 	}
 }

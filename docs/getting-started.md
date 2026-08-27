@@ -21,3 +21,8 @@ Everything is normal WordPress content afterwards — edit freely. Once you edit
 ## 4. Keep it in sync
 
 Tours re-sync automatically (hourly by default; change the interval in Settings). Removed tours are set to Draft, never deleted.
+
+## 5. If something stops working
+
+Open any wp-admin screen. If the KwaWingu API is refusing this site, a red **KwaWingu Tours** notice says exactly what to fix — enable the paid API add-on, correct the public key, or correct the operator slug. Visitors are never shown that; they keep seeing your synced tours, and the interactive blocks fall back to a quiet "not available at the moment". Rate limits and outages are handled for you: the last live prices stay on the page and the request is retried a minute later (see [blocks.md](blocks.md#when-the-api-refuses-a-request)).
+

@@ -64,9 +64,12 @@ class Sync {
 			$site  = $this->api->get_site();
 			$tours = isset( $site['tours'] ) && is_array( $site['tours'] ) ? $site['tours'] : array();
 		} catch ( Api_Exception $e ) {
-			$result['errors'][] = $e->getMessage();
+			// The owner reads this on the settings page: name the fix, not the status.
+			Api_Status::record_failure( $e );
+			$result['errors'][] = Api_Status::owner_message( $e );
 			return $result;
 		}
+		Api_Status::record_success();
 
 		$seen_ids = array();
 

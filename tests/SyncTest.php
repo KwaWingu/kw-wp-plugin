@@ -13,6 +13,10 @@ class SyncTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         Monkey\setUp();
+        Functions\when( 'get_option' )->justReturn( false );
+        Functions\when( 'update_option' )->justReturn( true );
+        Functions\when( 'delete_option' )->justReturn( true );
+        Functions\when( '__' )->returnArg();
         Functions\when( 'sanitize_text_field' )->returnArg();
         Functions\when( 'wp_strip_all_tags' )->returnArg();
         Functions\when( 'sanitize_title' )->returnArg();
@@ -157,5 +161,19 @@ class SyncTest extends TestCase {
         $this->assertSame( 0, $out['unpublished'] );      // guard engaged
         $this->assertSame( array(), $drafted );            // nothing drafted
         $this->assertNotEmpty( $out['errors'] );           // a warning is recorded
+    }
+
+    public function test_api_refusal_reports_the_owner_fix_not_the_status(): void {
+        Functions\when( 'get_posts' )->justReturn( array() );
+        $api = Mockery::mock( Api_Client::class );
+        $api->shouldReceive( 'get_site' )->once()->andThrow(
+            new \KwaWingu\Tours\Api_Exception( 'Enable API access in your dashboard to use the API.', 403, 'api_access_required' )
+        );
+
+        $out = ( new Sync( $api ) )->run();
+
+        $this->assertCount( 1, $out['errors'] );
+        $this->assertStringContainsString( 'plan does not include API access', $out['errors'][0] );
+        $this->assertStringNotContainsString( '403', $out['errors'][0] );
     }
 }

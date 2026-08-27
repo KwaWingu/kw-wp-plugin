@@ -16,6 +16,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Shortcodes {
 
 	/**
+	 * Every shortcode and the block directory (under blocks/) whose render function
+	 * it bridges to. This is the contract BlockManifestTest enforces: each entry
+	 * must have a block.json, a server render and a committed editor bundle, so a
+	 * shortcode can never exist without its block appearing in the inserter.
+	 *
+	 * @var array<string,string>
+	 */
+	const BLOCKS = array(
+		'kwawingu_tours'        => 'tours-grid',
+		'kwawingu_tour'         => 'tour-detail',
+		'kwawingu_booking'      => 'book-button',
+		'kwawingu_featured'     => 'featured-tours',
+		'kwawingu_reviews'      => 'reviews',
+		'kwawingu_destinations' => 'destinations-grid',
+		'kwawingu_search'       => 'search',
+		'kwawingu_calculator'   => 'calculator',
+		'kwawingu_booking_form' => 'booking',
+		'kwawingu_gallery'      => 'gallery',
+		'kwawingu_availability' => 'availability-calendar',
+		'kwawingu_inquiry'      => 'inquiry-form',
+	);
+
+	/**
 	 * Registers all shortcodes with WordPress.
 	 */
 	public function register(): void {

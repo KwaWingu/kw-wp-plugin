@@ -366,11 +366,22 @@ class Rest_Proxy {
 	 */
 	private function guard( callable $callback ) {
 		try {
-			return $callback();
+			$out = $callback();
+			Api_Status::record_success();
+			return $out;
 		} catch ( Api_Exception $e ) {
-			$status = $e->getCode() >= 400 ? $e->getCode() : 502;
+			Api_Status::record_failure( $e );
+			$status = $e->get_status() >= 400 ? $e->get_status() : 502;
 			$code   = '' !== $e->get_code_string() ? $e->get_code_string() : 'api_error';
-			return new \WP_Error( $code, $e->getMessage(), array( 'status' => $status ) );
+			// The body reaches the visitor's browser: it carries the visitor-safe
+			// sentence. The owner's sentence (plan, key, slug) is added only when the
+			// caller is an administrator, so a logged-in owner testing the site
+			// sees the fix rather than a generic "unavailable".
+			$data = array( 'status' => $status );
+			if ( function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) ) {
+				$data['owner_message'] = Api_Status::owner_message( $e );
+			}
+			return new \WP_Error( $code, Api_Status::visitor_message( $e ), $data );
 		} catch ( \Throwable $e ) {
 			// Do NOT surface $e->getMessage() — avoids leaking internals.
 			// Real enforcement is the upstream API's own error handling.

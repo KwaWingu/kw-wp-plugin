@@ -13,6 +13,11 @@ namespace KwaWingu\Tours\Tests {
             parent::setUp();
             Monkey\setUp();
             Functions\when( 'rest_ensure_response' )->returnArg();
+            Functions\when( 'get_option' )->justReturn( false );
+            Functions\when( 'update_option' )->justReturn( true );
+            Functions\when( 'delete_option' )->justReturn( true );
+            Functions\when( '__' )->returnArg();
+            Functions\when( 'current_user_can' )->justReturn( false );
         }
         protected function tearDown(): void { Monkey\tearDown(); Mockery::close(); parent::tearDown(); }
 
@@ -62,6 +67,60 @@ namespace KwaWingu\Tours\Tests {
             $req->shouldReceive( 'get_param' )->andReturn( 'x' );
             $out = ( new Rest_Proxy( $api ) )->handle_search( $req );
             $this->assertInstanceOf( \WP_Error::class, $out );
+        }
+
+        public function test_entitlement_refusal_is_hidden_from_visitors(): void {
+            $api = Mockery::mock( Api_Client::class );
+            $api->shouldReceive( 'get' )->andThrow( new \KwaWingu\Tours\Api_Exception( 'Enable API access in your dashboard to use the API.', 403, 'api_access_required' ) );
+            $req = Mockery::mock();
+            $req->shouldReceive( 'get_param' )->andReturn( 'x' );
+
+            $out = ( new Rest_Proxy( $api ) )->handle_search( $req );
+
+            $this->assertSame( 'api_access_required', $out->code );
+            $this->assertSame( 403, $out->data['status'] );
+            $this->assertStringNotContainsString( 'API', $out->message );
+            $this->assertStringContainsString( 'not available at the moment', $out->message );
+            $this->assertArrayNotHasKey( 'owner_message', $out->data );
+        }
+
+        public function test_entitlement_refusal_tells_a_logged_in_admin_the_fix(): void {
+            Functions\when( 'current_user_can' )->justReturn( true );
+            $recorded = null;
+            Functions\when( 'update_option' )->alias( static function ( $k, $v ) use ( &$recorded ) { $recorded = $v; return true; } );
+            $api = Mockery::mock( Api_Client::class );
+            $api->shouldReceive( 'get' )->andThrow( new \KwaWingu\Tours\Api_Exception( 'nope', 403, 'api_access_required' ) );
+            $req = Mockery::mock();
+            $req->shouldReceive( 'get_param' )->andReturn( 'x' );
+
+            $out = ( new Rest_Proxy( $api ) )->handle_search( $req );
+
+            $this->assertStringContainsString( 'plan does not include API access', $out->data['owner_message'] );
+            $this->assertSame( 'entitlement', $recorded['kind'] );
+        }
+
+        public function test_rate_limit_asks_the_visitor_to_retry_and_keeps_429(): void {
+            $api = Mockery::mock( Api_Client::class );
+            $api->shouldReceive( 'get' )->andThrow( new \KwaWingu\Tours\Api_Exception( 'Too many requests', 429, 'rate_limited' ) );
+            $req = Mockery::mock();
+            $req->shouldReceive( 'get_param' )->andReturn( 'x' );
+
+            $out = ( new Rest_Proxy( $api ) )->handle_search( $req );
+
+            $this->assertSame( 429, $out->data['status'] );
+            $this->assertStringContainsString( 'try again in a moment', $out->message );
+        }
+
+        public function test_business_refusal_reaches_the_visitor_verbatim(): void {
+            $api = Mockery::mock( Api_Client::class );
+            $api->shouldReceive( 'get' )->andThrow( new \KwaWingu\Tours\Api_Exception( 'That departure is sold out.', 409, 'hold_unavailable' ) );
+            $req = Mockery::mock();
+            $req->shouldReceive( 'get_param' )->andReturn( 'x' );
+
+            $out = ( new Rest_Proxy( $api ) )->handle_search( $req );
+
+            $this->assertSame( 'hold_unavailable', $out->code );
+            $this->assertSame( 'That departure is sold out.', $out->message );
         }
 
 	public function test_departures_forwards_to_tour_departures(): void {

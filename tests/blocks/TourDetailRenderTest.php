@@ -37,6 +37,9 @@ class TourDetailRenderTest extends TestCase {
         Functions\when( 'get_transient' )->justReturn( false );
         Functions\when( 'set_transient' )->justReturn( true );
         Functions\when( '__' )->returnArg();
+        Functions\when( 'get_option' )->justReturn( false );
+        Functions\when( 'update_option' )->justReturn( true );
+        Functions\when( 'delete_option' )->justReturn( true );
     }
     protected function tearDown(): void {
         Live_Catalog::set_instance( null );

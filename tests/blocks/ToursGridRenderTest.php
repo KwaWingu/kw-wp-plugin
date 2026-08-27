@@ -14,6 +14,10 @@ namespace KwaWingu\Tours\Tests\Blocks {
         protected function setUp(): void {
             parent::setUp();
             Monkey\setUp();
+            Functions\when( 'get_option' )->justReturn( false );
+            Functions\when( 'update_option' )->justReturn( true );
+            Functions\when( 'delete_option' )->justReturn( true );
+            Functions\when( '__' )->returnArg();
             Live_Catalog::set_instance( null );
             require_once dirname( __DIR__, 2 ) . '/blocks/tours-grid/render-fn.php';
             Functions\when( 'esc_html' )->returnArg();

@@ -2,9 +2,9 @@
 Contributors: kwawingu
 Tags: tours, travel, tour operator, booking, safari
 Requires at least: 6.2
-Tested up to: 6.6
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.12.0
+Stable tag: 1.13.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,6 +70,13 @@ Tour content re-syncs automatically (hourly by default; configurable), via a "Sy
 This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to fetch your tour catalog, availability, pricing, and related content, and — in on-site booking mode — to create bookings and start payments on your behalf. It uses the operator slug and API keys you configure. Data sent: your API key (in a request header) and the parameters for the content or booking requested (including guest details a visitor enters in the on-site booking form). No visitor personal data is sent during catalog sync. Current prices and availability are requested from the same API when a tour is displayed (the response is reused for 60 seconds), and KwaWingu can call back to this site's signed `kwt/v1/resync` endpoint to trigger a catalog sync; neither carries visitor data. See https://tours.kwawingu.com for the Terms and the KwaWingu privacy policy.
 
 == Changelog ==
+
+= 1.13.0 =
+* **API refusals now say what to do — to the right person.** When the KwaWingu Developer API refuses a request, wp-admin shows the site owner a notice naming the fix: enable the paid API add-on, correct the public key, or correct the operator slug. Visitors never see a status code or anything about plans and keys — interactive blocks show a quiet "not available at the moment" instead. The notice clears itself on the next successful call.
+* **Rate limits and outages keep showing your prices.** If KwaWingu answers 429 or 5xx (or cannot be reached), tour cards and tour pages keep the last live prices and availability the API returned (for up to a day) and retry a minute later, instead of dropping to the last synced values.
+* **Catalog sync errors** on the settings page use the same plain-language messages.
+* **Blocks are verified in CI**: a test now asserts every shortcode has a matching Gutenberg block with a `block.json` (API v3, editor script, server render) and a committed editor bundle, so a block can no longer silently vanish from the inserter.
+* Tested up to WordPress 7.1.
 
 = 1.12.0 =
 * **Prices and availability are now read live.** Tour cards, tour pages and their structured data show the current price, currency and sold-out state on every page view instead of whatever the last scheduled sync stored. If the API cannot be reached, the last synced values are shown — never an error or a blank price.

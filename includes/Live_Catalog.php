@@ -25,11 +25,24 @@ class Live_Catalog {
 	const CACHE_KEY = 'kwt_live_catalog';
 
 	/**
+	 * The last snapshot the API actually returned, kept well beyond TTL. When the
+	 * API is rate-limiting us or is down, this is what the page shows — a price a
+	 * few minutes old rather than a blank one — and it is retried on the next TTL.
+	 */
+	const LAST_GOOD_KEY = 'kwt_live_catalog_last_good';
+
+	/**
 	 * Seconds a fetched catalog snapshot is reused for. Bounds the upstream load to
 	 * one call per minute per site while keeping the displayed price a minute old at
 	 * worst, instead of up to 24 hours.
 	 */
 	const TTL = 60;
+
+	/**
+	 * Seconds the last good snapshot is kept for. A day is long enough to ride out
+	 * an outage and short enough that a price cannot go stale for a week unnoticed.
+	 */
+	const LAST_GOOD_TTL = 86400;
 
 	/**
 	 * Tours fetched per request. Matches the API's page size ceiling for the listing.
@@ -138,6 +151,7 @@ class Live_Catalog {
 		}
 
 		$map = array();
+		$ok  = false;
 		try {
 			$response = $this->api->get( '/tours', array( 'size' => self::PAGE_SIZE ), self::TIMEOUT );
 			$rows     = array();
@@ -156,17 +170,43 @@ class Live_Catalog {
 				}
 				$map[ $slug ] = self::normalise( $row );
 			}
+			$ok = true;
+			if ( function_exists( 'set_transient' ) ) {
+				set_transient( self::LAST_GOOD_KEY, $map, self::LAST_GOOD_TTL );
+			}
+		} catch ( Api_Exception $e ) {
+			// A refused or slow API must never break a page. Cache the outcome for the
+			// same short window so one outage is not one upstream call per page view.
+			Api_Status::record_failure( $e );
+			$map = $e->is_retryable() ? $this->last_good() : array();
 		} catch ( \Throwable $e ) {
-			// A dead or slow API must never break a page. Cache the miss for the same
-			// short window so one outage is not one upstream call per page view.
-			$map = array();
+			$map = $this->last_good();
 		}
 
+		if ( $ok ) {
+			// Outside the try: bookkeeping must never be mistaken for an API failure.
+			Api_Status::record_success();
+		}
 		if ( function_exists( 'set_transient' ) ) {
 			set_transient( self::CACHE_KEY, $map, self::TTL );
 		}
 		$this->memo = $map;
 		return $this->memo;
+	}
+
+	/**
+	 * The last snapshot the API returned, or an empty array when there is none.
+	 *
+	 * Only served for retryable failures (rate limit, 5xx, transport). An
+	 * entitlement or key refusal is not a reason to keep quoting live prices the
+	 * operator is no longer being served — the synced post meta is the honest
+	 * fallback there, and the owner is told why in wp-admin.
+	 *
+	 * @return array<string,array<string,mixed>>
+	 */
+	private function last_good(): array {
+		$v = function_exists( 'get_transient' ) ? get_transient( self::LAST_GOOD_KEY ) : false;
+		return is_array( $v ) ? $v : array();
 	}
 
 	/**

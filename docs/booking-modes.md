@@ -14,6 +14,8 @@ A fully in-site booking + payment flow using the KwaWingu REST proxy. Requires y
 
 As of v1.1.0, the on-site booking form loads **real departures** from the live API so guests select an actual available departure date, and a **live price** is fetched from the API before the guest proceeds to payment. This ensures seat counts and pricing are always accurate.
 
+After "Book & pay" the form polls the booking until a payment lands. Since v1.14.1 it identifies the guest with the **portal token** the API returns when the booking is created (`BookingResult.portalToken`), sent as the `X-Portal-Token` header through the proxy (`GET /wp-json/kwawingu/v1/booking?ref=…`) — never in a query string, so it stays out of access logs and Referer headers. The deprecated `?email=` lookup (API Sunset 2027-07-01) is used only when a response carried no token. "Payment received" means the balance has dropped below the total (`balanceAmountMinor` < `totalAmountMinor`); the booking `status` alone is not used, because a booking is `CONFIRMED` before any money arrives.
+
 To enable: choose **On-site** in Settings → KwaWingu Tours → Booking mode and enter your **Private API key**.
 
 ### Operator notifications and lead capture (v1.8.0+)

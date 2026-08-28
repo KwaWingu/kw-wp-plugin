@@ -66,3 +66,27 @@ test( 'does not retry a second time (no infinite loop)', async () => {
 	// original + nonce + one retry = 3; the retry's 403 is NOT retried again.
 	expect( global.fetch.mock.calls.length ).toBe( 3 );
 } );
+
+test( 'forwards caller headers (X-Portal-Token) on GET, keeps them on the nonce retry, and never lets them replace the nonce', async () => {
+	const calls = [];
+	global.fetch = jest.fn( ( url, opts ) => {
+		calls.push( { url, headers: ( opts && opts.headers ) || {} } );
+		if ( url.indexOf( '/nonce' ) !== -1 ) {
+			return jsonResponse( true, 200, { nonce: 'fresh' } );
+		}
+		if ( calls.length === 1 ) {
+			return jsonResponse( false, 403, { message: 'bad nonce' } );
+		}
+		return jsonResponse( true, 200, { data: { status: 'paid' } } );
+	} );
+
+	const proxy = loadProxy( 'stale' );
+	const out = await proxy.get( '/booking', { ref: 'KWG-1' }, { 'X-Portal-Token': 'tok-1', 'X-WP-Nonce': 'forged' } );
+
+	expect( out ).toEqual( { data: { status: 'paid' } } );
+	expect( calls[ 0 ].headers[ 'X-Portal-Token' ] ).toBe( 'tok-1' );
+	expect( calls[ 0 ].headers[ 'X-WP-Nonce' ] ).toBe( 'stale' );
+	expect( calls[ 2 ].headers[ 'X-Portal-Token' ] ).toBe( 'tok-1' );
+	expect( calls[ 2 ].headers[ 'X-WP-Nonce' ] ).toBe( 'fresh' );
+	expect( calls[ 0 ].url ).not.toMatch( /tok-1/ );
+} );

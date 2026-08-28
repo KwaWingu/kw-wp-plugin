@@ -54,6 +54,19 @@ namespace KwaWingu\Tours\Tests {
             $this->assertSame( array( 1, 2 ), $body['data'] );
         }
 
+        public function test_get_forwards_extra_headers_but_never_lets_them_replace_the_api_key(): void {
+            Functions\expect( 'wp_remote_get' )->once()->andReturnUsing( function ( $url, $args ) {
+                $this->assertStringContainsString( '/acme/bookings/KWG-1', $url );
+                $this->assertStringNotContainsString( '?', $url );
+                $this->assertSame( 'tok-1', $args['headers']['X-Portal-Token'] );
+                $this->assertSame( 'kw_live_x', $args['headers']['X-API-Key'] );
+                return array( 'code' => 200, 'body' => wp_json_encode_stub( array( 'status' => 'paid' ) ) );
+            } );
+
+            $body = $this->client()->get( '/bookings/KWG-1', array(), 15, array( 'X-Portal-Token' => 'tok-1', 'X-API-Key' => 'forged' ) );
+            $this->assertSame( 'paid', $body['status'] );
+        }
+
         public function test_get_throws_with_error_code_on_403(): void {
             Functions\when( 'wp_remote_get' )->justReturn(
                 array( 'code' => 403, 'body' => '{"error":{"code":"api_access_required","message":"Enable API access."}}' )

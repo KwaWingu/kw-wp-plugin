@@ -4,7 +4,7 @@ Tags: tours, travel, tour operator, booking, safari
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.14.0
+Stable tag: 1.14.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,20 +61,32 @@ Tour content re-syncs automatically (hourly by default; configurable), via a "Sy
 
 == Screenshots ==
 
-1. Settings → connect your KwaWingu account (slug + API key, booking mode).
-2. The one-click setup wizard building your starter site.
-3. A tour catalog page (Tours Grid block).
-4. A single tour page with the Book Button.
-5. The block editor showing a tour block's sidebar controls + live preview.
-6. The on-site booking form (departure, guest details, live price).
-
-(Screenshot images are added from a live install; see `.wordpress-org/README.md`.)
+1. Settings → KwaWingu Tours: operator slug, public API key, booking mode, private key for on-site booking, operator notifications and lead capture, and the catalog sync status.
+2. The one-click setup wizard after "Build my site": branding pulled from your account, Home / Tours / About / Contact scaffolded, tours imported.
+3. The block inserter: all twelve KwaWingu blocks (Tours Grid, Tour Detail, Featured Tours, Book Button, Reviews, Destinations Grid, Tour Search, Trip Calculator, On-site Booking, Gallery, Availability Calendar, Inquiry Form).
+4. Tours Grid block on the front end — synced tours with their cover photos from your own media library and live prices.
+5. Tour Detail block — cover, duration, difficulty, live price, next departure and description, with the Book button.
+6. Availability Calendar block — a month grid of a tour's departures with seats left.
+7. On-site Booking block — a real departure picked, guest details, and the live quote from your account before "Book & pay".
+8. Trip Calculator block — the party and nights entered, with the estimate computed by KwaWingu.
+9. Tour Search block — live results linking to the synced tour pages on your site.
+10. Inquiry Form block — an inquiry that lands in your KwaWingu inbox and is kept as a Lead in WordPress.
 
 == External services ==
 
 This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to fetch your tour catalog, availability, pricing, and related content, and — in on-site booking mode — to create bookings and start payments on your behalf. It uses the operator slug and API keys you configure. Data sent: your API key (in a request header) and the parameters for the content or booking requested (including guest details a visitor enters in the on-site booking form). No visitor personal data is sent during catalog sync. Current prices and availability are requested from the same API when a tour is displayed (the response is reused for 60 seconds), and KwaWingu can call back to this site's signed `kwt/v1/resync` endpoint to trigger a catalog sync; neither carries visitor data. See https://tours.kwawingu.com for the Terms and the KwaWingu privacy policy.
 
 == Changelog ==
+
+= 1.14.1 =
+Release follow-ups, found while capturing the WordPress.org screenshots from a live install.
+
+* **Fix: every block button was invisible** (white text on a transparent background) and the brand colour never reached a block. The stylesheet set `--kwt-primary: var( --kwt-primary, … )` on the block roots — a custom property referencing itself is a cycle, which the browser treats as invalid — so "Book & pay", "Estimate", "Send inquiry" and the Book button had no background. Brand defaults are now plain values that your Branding colours override.
+* **Fix: the Inquiry Form had no styles and its spam-trap field was visible.** A visitor who filled the stray box in had their inquiry silently dropped as a bot. The form is now styled like the booking form and the honeypot is off-screen.
+* **On-site booking polls with the guest's portal token.** After "Book & pay" the form checks payment status with the `X-Portal-Token` the API returns when the booking is created — sent as a header, so it never lands in access logs — instead of the `?email=` lookup the API retires on 2027-07-01. The email lookup remains only as a fallback when no token was issued.
+* **Fix: the payment poll could never finish.** It compared the booking status against `paid`/`confirmed`/`completed`, but the API's status is upper-case and a booking is `CONFIRMED` the moment it is created, before any money. The poll now reads the balance against the total (exact minor units) and stops once a payment has landed.
+* Translation template regenerated: 181 strings (it was empty), including the compiled block editor strings WordPress.org's language packs are keyed on.
+* WordPress.org assets: ten screenshots, banners and icons.
 
 = 1.14.0 =
 Found by running the plugin end-to-end against a real KwaWingu backend (WordPress in Docker, every shortcode and block, the editor, the proxy, the paid gate). Nine things did not work:
@@ -165,6 +177,9 @@ Found by running the plugin end-to-end against a real KwaWingu backend (WordPres
 * Initial release: settings, API client, Tours/Destinations post types, and scheduled catalog sync.
 
 == Upgrade Notice ==
+
+= 1.14.1 =
+Buttons in every block were invisible and the inquiry form was unstyled with a visible spam-trap field. Recommended for everyone.
 
 = 1.14.0 =
 Images, destinations, search, the calculator, the live price and every interactive shortcode were broken against the real API. Upgrade and run Sync now once to import your photos and destinations.

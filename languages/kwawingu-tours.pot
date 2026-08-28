@@ -1,11 +1,844 @@
 # Copyright (C) 2026 KwaWingu Tours
-# This file is distributed under the GPL-2.0-or-later license.
+# This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: KwaWingu Tours 1.0.0\n"
+"Project-Id-Version: KwaWingu Tours 1.14.1\n"
 "Report-Msgid-Bugs-To: https://tours.kwawingu.com\n"
-"Language: \n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-08-28T14:37:16+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: kwawingu-tours\n"
+
+#. Plugin Name of the plugin
+#. Author of the plugin
+#: kwawingu-tours.php
+#: includes/Admin_Page.php:85
+#: includes/Admin_Page.php:86
+#: includes/Admin_Page.php:108
+#: includes/Patterns.php:43
+msgid "KwaWingu Tours"
+msgstr ""
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+#: kwawingu-tours.php
+msgid "https://tours.kwawingu.com"
+msgstr ""
+
+#. Description of the plugin
+#: kwawingu-tours.php
+msgid "Build a tour-operator website fast on your KwaWingu Tours data — sync your catalog into WordPress, add blocks, and go live in minutes."
+msgstr ""
+
+#: blocks/book-button/render-fn.php:33
+#: blocks/book-button/render-fn.php:39
+msgid "Book now"
+msgstr ""
+
+#: blocks/booking/render-fn.php:22
+msgid "First name"
+msgstr ""
+
+#: blocks/booking/render-fn.php:23
+msgid "Last name"
+msgstr ""
+
+#: blocks/booking/render-fn.php:24
+msgid "Email"
+msgstr ""
+
+#: blocks/booking/render-fn.php:25
+msgid "Mobile money number"
+msgstr ""
+
+#: blocks/booking/render-fn.php:26
+msgid "Departure"
+msgstr ""
+
+#: blocks/booking/render-fn.php:27
+msgid "Select a departure…"
+msgstr ""
+
+#: blocks/booking/render-fn.php:28
+#: blocks/calculator/render-fn.php:19
+#: blocks/inquiry-form/render-fn.php:27
+msgid "Adults"
+msgstr ""
+
+#: blocks/booking/render-fn.php:29
+#: blocks/calculator/render-fn.php:20
+#: blocks/inquiry-form/render-fn.php:28
+msgid "Children"
+msgstr ""
+
+#: blocks/booking/render-fn.php:30
+msgid "Infants"
+msgstr ""
+
+#: blocks/booking/render-fn.php:31
+msgid "Book & pay"
+msgstr ""
+
+#: blocks/calculator/render-fn.php:21
+msgid "Nights"
+msgstr ""
+
+#: blocks/calculator/render-fn.php:22
+msgid "Estimate"
+msgstr ""
+
+#: blocks/destinations-grid/render-fn.php:30
+msgid "No destinations yet."
+msgstr ""
+
+#: blocks/featured-tours/render-fn.php:17
+msgid "Featured tours"
+msgstr ""
+
+#: blocks/inquiry-form/render-fn.php:20
+#: includes/Patterns.php:73
+msgid "Send us an inquiry"
+msgstr ""
+
+#: blocks/inquiry-form/render-fn.php:23
+msgid "Full name"
+msgstr ""
+
+#: blocks/inquiry-form/render-fn.php:24
+msgid "Email address"
+msgstr ""
+
+#: blocks/inquiry-form/render-fn.php:25
+msgid "Phone (optional)"
+msgstr ""
+
+#: blocks/inquiry-form/render-fn.php:26
+msgid "Preferred date"
+msgstr ""
+
+#: blocks/inquiry-form/render-fn.php:29
+msgid "Message (optional)"
+msgstr ""
+
+#: blocks/inquiry-form/render-fn.php:30
+msgid "Send inquiry"
+msgstr ""
+
+#. translators: %s: number of reviews
+#: blocks/reviews/render-fn.php:28
+#, php-format
+msgid "%s review"
+msgid_plural "%s reviews"
+msgstr[0] ""
+msgstr[1] ""
+
+#: blocks/search/render-fn.php:21
+msgid "Search tours…"
+msgstr ""
+
+#: blocks/search/render-fn.php:23
+msgid "Search tours"
+msgstr ""
+
+#. translators: %d: number of days
+#: blocks/tour-detail/render-fn.php:47
+#: blocks/tours-grid/render-fn.php:63
+#, php-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: blocks/tour-detail/render-fn.php:56
+#: blocks/tours-grid/render-fn.php:69
+#: includes/Assets.php:66
+msgid "Sold out"
+msgstr ""
+
+#. translators: %s: date of the next departure, e.g. 2026-09-14
+#: blocks/tour-detail/render-fn.php:61
+#, php-format
+msgid "Next departure: %s"
+msgstr ""
+
+#: blocks/tour-detail/render-fn.php:72
+msgid "Book this tour"
+msgstr ""
+
+#: blocks/tours-grid/render-fn.php:37
+msgid "No tours yet."
+msgstr ""
+
+#: includes/Admin_Page.php:62
+#: includes/Setup_Wizard.php:115
+#: includes/Sync_Controller.php:139
+msgid "You are not allowed to do this."
+msgstr ""
+
+#: includes/Admin_Page.php:109
+msgid "Connect your KwaWingu Tours account. The Developer API is a paid add-on — enable it in your KwaWingu dashboard."
+msgstr ""
+
+#: includes/Admin_Page.php:114
+msgid "Operator slug"
+msgstr ""
+
+#: includes/Admin_Page.php:118
+msgid "Public API key"
+msgstr ""
+
+#: includes/Admin_Page.php:122
+msgid "Booking mode"
+msgstr ""
+
+#: includes/Admin_Page.php:132
+msgid "Private API key (on-site booking only)"
+msgstr ""
+
+#: includes/Admin_Page.php:135
+msgid "Only needed for on-site booking. Stored server-side, never shown on your website."
+msgstr ""
+
+#: includes/Admin_Page.php:139
+msgid "Email me on new on-site bookings"
+msgstr ""
+
+#: includes/Admin_Page.php:143
+msgid "Send me a notification"
+msgstr ""
+
+#: includes/Admin_Page.php:145
+msgid "Guest booking confirmations are sent by KwaWingu; this only notifies you."
+msgstr ""
+
+#: includes/Admin_Page.php:149
+msgid "Notification email"
+msgstr ""
+
+#: includes/Admin_Page.php:153
+msgid "Save booking leads"
+msgstr ""
+
+#: includes/Admin_Page.php:157
+msgid "Store on-site booking guest details under Leads"
+msgstr ""
+
+#: includes/Admin_Page.php:168
+msgid "Catalog sync"
+msgstr ""
+
+#. translators: 1: created, 2: updated, 3: unpublished
+#: includes/Admin_Page.php:175
+#, php-format
+msgid "Last sync — created %1$d, updated %2$d, unpublished %3$d."
+msgstr ""
+
+#. translators: 1: created, 2: updated, 3: unpublished
+#: includes/Admin_Page.php:189
+#, php-format
+msgid "Destinations — created %1$d, updated %2$d, unpublished %3$d."
+msgstr ""
+
+#: includes/Admin_Page.php:205
+msgid "Sync now"
+msgstr ""
+
+#: includes/Admin_Page.php:225
+msgid "Instant resync"
+msgstr ""
+
+#: includes/Admin_Page.php:226
+msgid "Paste these into your KwaWingu dashboard so edits to a tour reach this site in seconds instead of waiting for the next scheduled sync."
+msgstr ""
+
+#: includes/Admin_Page.php:229
+msgid "Endpoint URL"
+msgstr ""
+
+#: includes/Admin_Page.php:235
+msgid "Signing secret"
+msgstr ""
+
+#: includes/Admin_Page.php:238
+msgid "Requests must send X-KW-Timestamp (unix seconds) and X-KW-Signature — the hex HMAC-SHA256 of \"{timestamp}.{body}\" using this secret. Requests older than 5 minutes are rejected."
+msgstr ""
+
+#: includes/Admin_Page.php:245
+msgid "Regenerate secret"
+msgstr ""
+
+#: includes/Admin_Page.php:245
+msgid "Regenerating invalidates the old secret. Update it in KwaWingu afterwards."
+msgstr ""
+
+#: includes/Api_Status.php:51
+msgid "This operator's KwaWingu plan does not include API access — enable the Developer API add-on in your KwaWingu dashboard (Booking engine → Developer API). Until then your synced tours still show, but live prices, availability, search and on-site booking are paused."
+msgstr ""
+
+#: includes/Api_Status.php:53
+msgid "KwaWingu rejected the API key. Check that the public API key in Settings → KwaWingu Tours matches the one in your KwaWingu dashboard — keys can be rotated or revoked there."
+msgstr ""
+
+#: includes/Api_Status.php:55
+msgid "The configured API key is not allowed to do this. On-site booking needs a private key with the booking scope; check the keys in Settings → KwaWingu Tours."
+msgstr ""
+
+#: includes/Api_Status.php:57
+msgid "KwaWingu does not recognise the operator slug in Settings → KwaWingu Tours. It is the last part of your booking page address, e.g. tours.kwawingu.com/your-slug."
+msgstr ""
+
+#: includes/Api_Status.php:59
+msgid "KwaWingu is rate-limiting this site (1000 requests per hour). The last copy of your prices and availability is being shown and the request will be retried automatically — nothing to do."
+msgstr ""
+
+#. translators: %s: the HTTP status or transport error
+#: includes/Api_Status.php:63
+#, php-format
+msgid "KwaWingu could not be reached (%s). The last copy of your prices and availability is being shown and the request will be retried automatically."
+msgstr ""
+
+#: includes/Api_Status.php:84
+msgid "Live availability is busy right now — please try again in a moment."
+msgstr ""
+
+#: includes/Api_Status.php:89
+msgid "Online booking is not available at the moment. Please contact us directly."
+msgstr ""
+
+#: includes/Api_Status.php:209
+msgid "KwaWingu Tours:"
+msgstr ""
+
+#: includes/Api_Status.php:212
+msgid "Open KwaWingu dashboard"
+msgstr ""
+
+#: includes/Assets.php:59
+msgid "Loading…"
+msgstr ""
+
+#: includes/Assets.php:60
+msgid "Something went wrong. Please try again."
+msgstr ""
+
+#: includes/Assets.php:61
+msgid "No results."
+msgstr ""
+
+#: includes/Assets.php:62
+msgid "Check your phone to approve the payment."
+msgstr ""
+
+#: includes/Assets.php:63
+msgid "Payment received — you are booked!"
+msgstr ""
+
+#: includes/Assets.php:64
+msgid "From"
+msgstr ""
+
+#: includes/Assets.php:65
+msgid "Manage your booking"
+msgstr ""
+
+#: includes/Assets.php:68
+msgid "January"
+msgstr ""
+
+#: includes/Assets.php:69
+msgid "February"
+msgstr ""
+
+#: includes/Assets.php:70
+msgid "March"
+msgstr ""
+
+#: includes/Assets.php:71
+msgid "April"
+msgstr ""
+
+#: includes/Assets.php:72
+msgid "May"
+msgstr ""
+
+#: includes/Assets.php:73
+msgid "June"
+msgstr ""
+
+#: includes/Assets.php:74
+msgid "July"
+msgstr ""
+
+#: includes/Assets.php:75
+msgid "August"
+msgstr ""
+
+#: includes/Assets.php:76
+msgid "September"
+msgstr ""
+
+#: includes/Assets.php:77
+msgid "October"
+msgstr ""
+
+#: includes/Assets.php:78
+msgid "November"
+msgstr ""
+
+#: includes/Assets.php:79
+msgid "December"
+msgstr ""
+
+#: includes/Assets.php:82
+msgid "Sun"
+msgstr ""
+
+#: includes/Assets.php:83
+msgid "Mon"
+msgstr ""
+
+#: includes/Assets.php:84
+msgid "Tue"
+msgstr ""
+
+#: includes/Assets.php:85
+msgid "Wed"
+msgstr ""
+
+#: includes/Assets.php:86
+msgid "Thu"
+msgstr ""
+
+#: includes/Assets.php:87
+msgid "Fri"
+msgstr ""
+
+#: includes/Assets.php:88
+msgid "Sat"
+msgstr ""
+
+#: includes/Cpt.php:42
+#: includes/Patterns.php:53
+msgid "Tours"
+msgstr ""
+
+#: includes/Cpt.php:43
+msgid "Tour"
+msgstr ""
+
+#: includes/Cpt.php:61
+#: blocks/destinations-grid/edit.js:16
+#: build/destinations-grid/index.js:1
+msgid "Destinations"
+msgstr ""
+
+#: includes/Cpt.php:62
+msgid "Destination"
+msgstr ""
+
+#: includes/Cpt.php:80
+msgid "Leads"
+msgstr ""
+
+#: includes/Cpt.php:81
+msgid "Lead"
+msgstr ""
+
+#: includes/Cpt.php:97
+msgid "Tour Types"
+msgstr ""
+
+#: includes/Cpt.php:98
+msgid "Tour Type"
+msgstr ""
+
+#. translators: %s: tour slug
+#: includes/Notifications.php:133
+#, php-format
+msgid "New booking via your website — %s"
+msgstr ""
+
+#: includes/Notifications.php:135
+msgid "A guest booked on your website:"
+msgstr ""
+
+#: includes/Notifications.php:136
+#: includes/Notifications.php:171
+msgid "Name:"
+msgstr ""
+
+#: includes/Notifications.php:137
+#: includes/Notifications.php:172
+msgid "Email:"
+msgstr ""
+
+#: includes/Notifications.php:138
+#: includes/Notifications.php:173
+msgid "Phone:"
+msgstr ""
+
+#: includes/Notifications.php:139
+#: includes/Notifications.php:174
+msgid "Tour:"
+msgstr ""
+
+#: includes/Notifications.php:140
+msgid "Reference:"
+msgstr ""
+
+#. translators: %s: tour slug
+#: includes/Notifications.php:165
+#, php-format
+msgid "New inquiry via your website — %s"
+msgstr ""
+
+#: includes/Notifications.php:167
+msgid "New inquiry via your website"
+msgstr ""
+
+#: includes/Notifications.php:170
+msgid "A visitor submitted an inquiry on your website:"
+msgstr ""
+
+#: includes/Notifications.php:175
+msgid "Message:"
+msgstr ""
+
+#: includes/Patterns.php:47
+msgid "Home"
+msgstr ""
+
+#: includes/Patterns.php:48
+msgid "Explore our tours"
+msgstr ""
+
+#: includes/Patterns.php:54
+msgid "All tours"
+msgstr ""
+
+#: includes/Patterns.php:59
+msgid "Tour detail"
+msgstr ""
+
+#: includes/Patterns.php:64
+msgid "About"
+msgstr ""
+
+#: includes/Patterns.php:65
+msgid "About us"
+msgstr ""
+
+#: includes/Patterns.php:66
+msgid "Tell your story here."
+msgstr ""
+
+#: includes/Patterns.php:70
+msgid "Contact"
+msgstr ""
+
+#: includes/Patterns.php:71
+msgid "Get in touch"
+msgstr ""
+
+#: includes/Patterns.php:72
+msgid "Have a question about one of our tours? Fill in the form below and we'll get back to you shortly."
+msgstr ""
+
+#: includes/Push_Endpoint.php:110
+msgid "Push resync is not configured on this site."
+msgstr ""
+
+#: includes/Push_Endpoint.php:153
+msgid "This site is connected to a different operator."
+msgstr ""
+
+#: includes/Push_Endpoint.php:199
+msgid "Invalid signature."
+msgstr ""
+
+#: includes/Rest_Proxy.php:338
+#: includes/Rest_Proxy.php:360
+#: includes/Rest_Proxy.php:443
+msgid "Too many requests. Please wait a moment."
+msgstr ""
+
+#: includes/Rest_Proxy.php:514
+msgid "The request could not be completed."
+msgstr ""
+
+#: includes/Setup_Wizard.php:77
+#: includes/Setup_Wizard.php:95
+msgid "Set up your tour site"
+msgstr ""
+
+#: includes/Setup_Wizard.php:78
+msgid "KwaWingu Setup"
+msgstr ""
+
+#: includes/Setup_Wizard.php:97
+msgid "First connect your KwaWingu account under Settings → KwaWingu Tours (operator slug + public API key). API access is a paid add-on on your KwaWingu dashboard."
+msgstr ""
+
+#: includes/Setup_Wizard.php:99
+msgid "This will pull your branding, create your starter pages (Home, Tours, About, Contact), set your home page, and import your tours. You can edit everything afterwards."
+msgstr ""
+
+#: includes/Setup_Wizard.php:103
+msgid "Build my site"
+msgstr ""
+
+#: blocks/book-button/edit.js:16
+#: build/book-button/index.js:1
+msgid "Book Button"
+msgstr ""
+
+#: blocks/book-button/edit.js:18
+#: build/book-button/index.js:1
+msgid "Label"
+msgstr ""
+
+#: blocks/book-button/edit.js:23
+#: blocks/gallery/edit.js:17
+#: blocks/reviews/edit.js:18
+#: blocks/tour-detail/edit.js:18
+#: build/book-button/index.js:1
+#: build/gallery/index.js:1
+#: build/reviews/index.js:1
+#: build/tour-detail/index.js:1
+msgid "Tour Post ID"
+msgstr ""
+
+#: blocks/book-button/edit.js:27
+#: blocks/gallery/edit.js:21
+#: blocks/reviews/edit.js:22
+#: blocks/tour-detail/edit.js:22
+#: build/book-button/index.js:1
+#: build/gallery/index.js:1
+#: build/reviews/index.js:1
+#: build/tour-detail/index.js:1
+msgid "0 = current tour"
+msgstr ""
+
+#: blocks/booking/edit.js:16
+#: build/booking/index.js:1
+msgid "Booking"
+msgstr ""
+
+#: blocks/booking/edit.js:18
+#: build/booking/index.js:1
+msgid "Tour slug"
+msgstr ""
+
+#: blocks/booking/edit.js:21
+#: build/booking/index.js:1
+msgid "Leave blank to use the current tour"
+msgstr ""
+
+#: blocks/destinations-grid/edit.js:18
+#: build/destinations-grid/index.js:1
+msgid "Number of destinations"
+msgstr ""
+
+#: blocks/featured-tours/edit.js:16
+#: build/featured-tours/index.js:1
+msgid "Featured Tours"
+msgstr ""
+
+#: blocks/featured-tours/edit.js:18
+#: blocks/inquiry-form/index.js:20
+#: build/featured-tours/index.js:1
+#: build/inquiry-form/index.js:1
+msgid "Heading"
+msgstr ""
+
+#: blocks/featured-tours/edit.js:23
+#: blocks/tours-grid/edit.js:18
+#: build/featured-tours/index.js:1
+#: build/tours-grid/index.js:1
+msgid "Number of tours"
+msgstr ""
+
+#: blocks/gallery/edit.js:15
+#: build/gallery/index.js:1
+msgid "Gallery"
+msgstr ""
+
+#: blocks/gallery/edit.js:24
+#: build/gallery/index.js:1
+msgid "Columns"
+msgstr ""
+
+#: blocks/inquiry-form/index.js:18
+#: build/inquiry-form/index.js:1
+msgid "Inquiry Form"
+msgstr ""
+
+#: blocks/inquiry-form/index.js:25
+#: build/inquiry-form/index.js:1
+msgid "Tour slug (optional)"
+msgstr ""
+
+#: blocks/inquiry-form/index.js:28
+#: build/inquiry-form/index.js:1
+msgid "Pre-fill the tour for this inquiry. Leave blank to let the visitor indicate their interest."
+msgstr ""
+
+#: blocks/reviews/edit.js:16
+#: build/reviews/index.js:1
+msgid "Reviews"
+msgstr ""
+
+#: blocks/search/edit.js:16
+#: build/search/index.js:1
+msgid "Search"
+msgstr ""
+
+#: blocks/search/edit.js:18
+#: build/search/index.js:1
+msgid "Placeholder text"
+msgstr ""
+
+#: blocks/tour-detail/edit.js:16
+#: build/tour-detail/index.js:1
+msgid "Tour Detail"
+msgstr ""
+
+#: blocks/tours-grid/edit.js:16
+#: build/tours-grid/index.js:1
+msgid "Tours Grid"
+msgstr ""
+
+#: blocks/tours-grid/edit.js:25
+#: build/tours-grid/index.js:1
+msgid "Filter by type (slug)"
+msgstr ""
+
+#: blocks/tours-grid/edit.js:28
+#: build/tours-grid/index.js:1
+msgid "e.g. safari, trekking — leave blank for all."
+msgstr ""
+
+#: blocks/availability-calendar/block.json
+msgctxt "block title"
+msgid "KwaWingu Availability Calendar"
+msgstr ""
+
+#: blocks/availability-calendar/block.json
+msgctxt "block description"
+msgid "A month calendar of a tour's departures."
+msgstr ""
+
+#: blocks/book-button/block.json
+msgctxt "block title"
+msgid "KwaWingu Book Button"
+msgstr ""
+
+#: blocks/book-button/block.json
+msgctxt "block description"
+msgid "A booking button for the current tour."
+msgstr ""
+
+#: blocks/booking/block.json
+msgctxt "block title"
+msgid "KwaWingu On-site Booking"
+msgstr ""
+
+#: blocks/booking/block.json
+msgctxt "block description"
+msgid "On-site booking + payment for the current tour."
+msgstr ""
+
+#: blocks/calculator/block.json
+msgctxt "block title"
+msgid "KwaWingu Trip Calculator"
+msgstr ""
+
+#: blocks/calculator/block.json
+msgctxt "block description"
+msgid "Estimate a trip price live."
+msgstr ""
+
+#: blocks/destinations-grid/block.json
+msgctxt "block title"
+msgid "KwaWingu Destinations Grid"
+msgstr ""
+
+#: blocks/destinations-grid/block.json
+msgctxt "block description"
+msgid "A grid of destinations."
+msgstr ""
+
+#: blocks/featured-tours/block.json
+msgctxt "block title"
+msgid "KwaWingu Featured Tours"
+msgstr ""
+
+#: blocks/featured-tours/block.json
+msgctxt "block description"
+msgid "A short, highlighted set of tours with a heading."
+msgstr ""
+
+#: blocks/gallery/block.json
+msgctxt "block title"
+msgid "KwaWingu Gallery"
+msgstr ""
+
+#: blocks/gallery/block.json
+msgctxt "block description"
+msgid "A tour's photo gallery."
+msgstr ""
+
+#: blocks/inquiry-form/block.json
+msgctxt "block title"
+msgid "KwaWingu Inquiry Form"
+msgstr ""
+
+#: blocks/inquiry-form/block.json
+msgctxt "block description"
+msgid "Send an inquiry to the operator directly from your website."
+msgstr ""
+
+#: blocks/reviews/block.json
+msgctxt "block title"
+msgid "KwaWingu Reviews"
+msgstr ""
+
+#: blocks/reviews/block.json
+msgctxt "block description"
+msgid "Aggregate rating for a tour."
+msgstr ""
+
+#: blocks/search/block.json
+msgctxt "block title"
+msgid "KwaWingu Tour Search"
+msgstr ""
+
+#: blocks/search/block.json
+msgctxt "block description"
+msgid "Live search across the operator's tours."
+msgstr ""
+
+#: blocks/tour-detail/block.json
+msgctxt "block title"
+msgid "KwaWingu Tour Detail"
+msgstr ""
+
+#: blocks/tour-detail/block.json
+msgctxt "block description"
+msgid "Full detail for a single tour."
+msgstr ""
+
+#: blocks/tours-grid/block.json
+msgctxt "block title"
+msgid "KwaWingu Tours Grid"
+msgstr ""
+
+#: blocks/tours-grid/block.json
+msgctxt "block description"
+msgid "A grid of your tours."
+msgstr ""

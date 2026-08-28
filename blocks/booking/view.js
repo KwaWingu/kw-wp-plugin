@@ -61,6 +61,61 @@ function kwtReadPortalUrl( res ) {
 	return ( res && ( res.portalUrl || ( res.data && res.data.portalUrl ) ) ) || booking.portalUrl || '';
 }
 
+/**
+ * Extract the guest portal token from the create-booking response
+ * (`BookingResult.portalToken` — a per-booking secret, not recoverable later).
+ */
+function kwtReadPortalToken( res ) {
+	var booking = ( res && ( res.booking || ( res.data && res.data.booking ) ) ) || {};
+	return ( res && ( res.portalToken || ( res.data && res.data.portalToken ) ) ) || booking.portalToken || '';
+}
+
+/**
+ * Whether a BookingDetail shows that money has arrived.
+ *
+ * The API's `status` is the booking lifecycle (INQUIRY, QUOTE, CONFIRMED, ON_TRIP,
+ * COMPLETED, CANCELLED — upper case) and a booking is CONFIRMED the moment it is
+ * created, before any payment, so it cannot mean "paid". What can: the balance
+ * dropping below the total. `*Minor` are exact integers and are preferred; the
+ * decimal pair is the fallback for an older payload; a lower-cased status of
+ * paid/completed is the last resort when no amounts are present at all.
+ *
+ * @param {Object} data BookingDetail (the `data` of a lookup response, or the response).
+ * @return {boolean}
+ */
+function kwtPaymentReceived( data ) {
+	data = data || {};
+	var pairs = [ [ data.totalAmountMinor, data.balanceAmountMinor ], [ data.totalAmount, data.balanceAmount ] ];
+	for ( var i = 0; i < pairs.length; i++ ) {
+		var total = Number( pairs[ i ][ 0 ] ), balance = Number( pairs[ i ][ 1 ] );
+		if ( pairs[ i ][ 0 ] != null && pairs[ i ][ 1 ] != null && ! isNaN( total ) && ! isNaN( balance ) ) {
+			return total > 0 && balance < total;
+		}
+	}
+	var st = String( data.paymentStatus || data.status || '' ).toLowerCase();
+	return st === 'paid' || st === 'completed';
+}
+
+/**
+ * The proxy request that looks a booking up while polling for payment.
+ *
+ * With a portal token the guest is identified by the `X-Portal-Token` header
+ * (the API's preferred, non-logged form). Without one — a response that did not
+ * carry a token — it falls back to the deprecated `?email=` lookup, which the
+ * API retires on 2027-07-01.
+ *
+ * @param {string} ref   Booking reference.
+ * @param {string} token Portal token, or '' when none was issued.
+ * @param {string} email Lead guest email (fallback only).
+ * @return {{params: Object, headers: Object}} Arguments for kwtProxy.get('/booking', …).
+ */
+function kwtBookingLookupRequest( ref, token, email ) {
+	if ( token ) {
+		return { params: { ref: ref }, headers: { 'X-Portal-Token': token } };
+	}
+	return { params: { ref: ref, email: email }, headers: {} };
+}
+
 ( function () {
 	'use strict';
 
@@ -130,21 +185,22 @@ function kwtReadPortalUrl( res ) {
 			window.kwtProxy.post( '/bookings', payload ).then( function ( res ) {
 				var ref = kwtReadBookingRef( res );
 				var portalUrl = kwtReadPortalUrl( res );
+				var portalToken = kwtReadPortalToken( res );
 				if ( ! ref ) { throw new Error( window.kwtProxy.i18n.error ); }
 				return window.kwtProxy.post( '/payment-intent', { ref: ref, phone: phone } ).then( function () {
 					status.textContent = window.kwtProxy.i18n.checkPhone;
-					poll( ref, email, portalUrl, 0 );
+					poll( ref, { token: portalToken, email: email }, portalUrl, 0 );
 				} );
 			} ).catch( function ( err ) { status.textContent = err.message || window.kwtProxy.i18n.error; } );
 		} );
 
-		function poll( ref, email, portalUrl, tries ) {
+		function poll( ref, guest, portalUrl, tries ) {
 			if ( tries > 40 ) { return; }
 			setTimeout( function () {
-				window.kwtProxy.get( '/booking', { ref: ref, email: email } ).then( function ( res ) {
+				var lookup = kwtBookingLookupRequest( ref, guest.token, guest.email );
+				window.kwtProxy.get( '/booking', lookup.params, lookup.headers ).then( function ( res ) {
 					var data = res && res.data ? res.data : res;
-					var st = data && ( data.status || data.paymentStatus );
-					if ( st === 'paid' || st === 'confirmed' || st === 'completed' ) {
+					if ( kwtPaymentReceived( data ) ) {
 						status.textContent = '';
 						var msg = document.createElement( 'span' );
 						msg.textContent = window.kwtProxy.i18n.paymentReceived + ' ';
@@ -157,9 +213,9 @@ function kwtReadPortalUrl( res ) {
 							status.appendChild( a );
 						}
 					} else {
-						poll( ref, email, portalUrl, tries + 1 );
+						poll( ref, guest, portalUrl, tries + 1 );
 					}
-				} ).catch( function () { poll( ref, email, portalUrl, tries + 1 ); } );
+				} ).catch( function () { poll( ref, guest, portalUrl, tries + 1 ); } );
 			}, 5000 );
 		}
 	}
@@ -175,6 +231,9 @@ if ( typeof module !== 'undefined' && module.exports ) {
 		buildBookingPayload: kwtBuildBookingPayload,
 		readBookingRef: kwtReadBookingRef,
 		readPortalUrl: kwtReadPortalUrl,
+		readPortalToken: kwtReadPortalToken,
+		bookingLookupRequest: kwtBookingLookupRequest,
+		paymentReceived: kwtPaymentReceived,
 		idemKey: kwtIdemKey,
 		money: kwtMoney,
 		quoteTotal: kwtQuoteTotal

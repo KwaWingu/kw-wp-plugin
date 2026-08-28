@@ -34,14 +34,17 @@ class Api_Client {
 	/**
 	 * GET a path under /api/v1/{slug}. Returns the decoded JSON body.
 	 *
-	 * @param string              $path    API path relative to the slug root.
-	 * @param array<string,mixed> $query   Optional query parameters.
-	 * @param int                 $timeout Request timeout in seconds. Front-end reads pass
-	 *                                     a short one so a slow API cannot stall a page.
+	 * @param string               $path    API path relative to the slug root.
+	 * @param array<string,mixed>  $query   Optional query parameters.
+	 * @param int                  $timeout Request timeout in seconds. Front-end reads pass
+	 *                                      a short one so a slow API cannot stall a page.
+	 * @param array<string,string> $headers Extra request headers — e.g. the guest's
+	 *                                      `X-Portal-Token`, which identifies a booking
+	 *                                      without putting a secret in the query string.
 	 * @return array<string,mixed>
 	 * @throws Api_Exception When the API request fails or returns a non-2xx status.
 	 */
-	public function get( string $path, array $query = array(), int $timeout = 15 ): array {
+	public function get( string $path, array $query = array(), int $timeout = 15, array $headers = array() ): array {
 		$slug = $this->settings->get_slug();
 		$key  = $this->settings->get_public_key();
 		if ( '' === $slug || '' === $key ) {
@@ -57,9 +60,12 @@ class Api_Client {
 			esc_url_raw( $url ),
 			array(
 				'timeout' => max( 1, $timeout ),
-				'headers' => array(
-					'X-API-Key' => $key,
-					'Accept'    => 'application/json',
+				'headers' => array_merge(
+					$headers,
+					array(
+						'X-API-Key' => $key,
+						'Accept'    => 'application/json',
+					)
 				),
 			)
 		);

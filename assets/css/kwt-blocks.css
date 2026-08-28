@@ -3,7 +3,21 @@
  *
  * Consumes the operator's brand colours via CSS custom properties emitted by
  * the Branding class (--kwt-primary / --kwt-accent), with brand defaults.
+ *
+ * The defaults live on `html` so that Branding's `:root{…}` (higher
+ * specificity, same element) wins whatever order the two are printed in.
+ * They must NOT be written as `--kwt-primary: var( --kwt-primary, #0a4a3a )`
+ * on the block roots: a custom property that references itself is a cycle,
+ * which makes it invalid at computed-value time on that element — so every
+ * `var( --kwt-primary )` below resolved to nothing, buttons rendered as white
+ * text on a transparent background, and the brand colour never reached a
+ * block at all (found while capturing the WordPress.org screenshots).
  */
+
+html {
+	--kwt-primary: #0a4a3a;
+	--kwt-accent: #e8920a;
+}
 
 .kwt-tours-grid,
 .kwt-destinations-grid,
@@ -13,10 +27,9 @@
 .kwt-search,
 .kwt-calculator,
 .kwt-booking,
+.kwt-inquiry,
 .kwt-gallery,
 .kwt-availcal {
-	--kwt-primary: var( --kwt-primary, #0a4a3a );
-	--kwt-accent: var( --kwt-accent, #e8920a );
 	--kwt-border: #e6e6e6;
 	--kwt-muted: #667085;
 	--kwt-radius: 12px;
@@ -31,6 +44,7 @@
 .kwt-search *,
 .kwt-calculator *,
 .kwt-booking *,
+.kwt-inquiry *,
 .kwt-gallery *,
 .kwt-availcal * {
 	box-sizing: border-box;
@@ -255,7 +269,8 @@
 /* ── Forms: calculator + booking ───────────────────────────────────────── */
 
 .kwt-calculator,
-.kwt-booking {
+.kwt-booking,
+.kwt-inquiry {
 	display: grid;
 	gap: 12px;
 	max-width: 480px;
@@ -266,7 +281,8 @@
 }
 
 .kwt-calculator label,
-.kwt-booking label {
+.kwt-booking label,
+.kwt-inquiry label {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
@@ -276,7 +292,9 @@
 
 .kwt-calculator input,
 .kwt-booking input,
-.kwt-booking select {
+.kwt-booking select,
+.kwt-inquiry input,
+.kwt-inquiry textarea {
 	padding: 10px 12px;
 	border: 1px solid var( --kwt-border );
 	border-radius: 8px;
@@ -290,10 +308,30 @@
 	margin: 4px 0 0;
 }
 
-.kwt-booking__status {
+.kwt-booking__status,
+.kwt-inquiry__status {
 	margin: 4px 0 0;
 	color: var( --kwt-muted );
 	min-height: 1.2em;
+}
+
+.kwt-inquiry__heading {
+	margin: 0 0 12px;
+}
+
+.kwt-inquiry textarea {
+	font-family: inherit;
+	resize: vertical;
+}
+
+/* Honeypot: off-screen for people, present for bots. Never display:none (some spam scripts skip hidden fields; screen readers already get aria-hidden). */
+.kwt-hp {
+	position: absolute;
+	left: -9999px;
+	width: 1px;
+	height: 1px;
+	opacity: 0;
+	pointer-events: none;
 }
 
 .kwt-booking__status a {
@@ -324,7 +362,7 @@
 
 /* ── Availability calendar ─────────────────────────────────────────────── */
 
-.kwt-availcal { --kwt-primary: var( --kwt-primary, #0a4a3a ); --kwt-accent: var( --kwt-accent, #e8920a ); max-width: 520px; }
+.kwt-availcal { max-width: 520px; }
 .kwt-availcal__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .kwt-availcal__title { font-weight: 700; color: var( --kwt-primary ); }
 .kwt-availcal__nav { background: none; border: 1px solid var( --kwt-primary ); color: var( --kwt-primary ); border-radius: 6px; width: 32px; height: 32px; cursor: pointer; }

@@ -19,6 +19,9 @@ class Rest_Proxy {
 
 	const NS = 'kwawingu/v1';
 
+	/** Header carrying the guest's per-booking portal token (BookingResult.portalToken). */
+	const PORTAL_TOKEN_HEADER = 'X-Portal-Token';
+
 	/**
 	 * API client instance.
 	 *
@@ -368,13 +371,24 @@ class Rest_Proxy {
 	/**
 	 * Proxies a booking lookup request to the KwaWingu API.
 	 *
+	 * The guest is identified by the `X-Portal-Token` header — the per-booking
+	 * secret returned as `portalToken` when the booking was created — and the
+	 * header is forwarded as a header, never as a query parameter, so it stays
+	 * out of access logs, CDN logs and Referer headers. The `?email=` lookup is
+	 * deprecated by the API (Sunset 2027-07-01) and is used only when the caller
+	 * has no token, e.g. a booking created before this version.
+	 *
 	 * @param \WP_REST_Request $request The REST request object.
 	 * @return array<string,mixed>|\WP_Error
 	 */
 	public function handle_booking_lookup( $request ) {
 		return $this->guard(
 			function () use ( $request ) {
-				$ref = (string) $request->get_param( 'ref' );
+				$ref   = (string) $request->get_param( 'ref' );
+				$token = trim( (string) $request->get_header( self::PORTAL_TOKEN_HEADER ) );
+				if ( '' !== $token ) {
+					return $this->api->get( '/bookings/' . rawurlencode( $ref ), array(), 15, array( self::PORTAL_TOKEN_HEADER => $token ) );
+				}
 				return $this->api->get( '/bookings/' . rawurlencode( $ref ), array( 'email' => (string) $request->get_param( 'email' ) ) );
 			}
 		);

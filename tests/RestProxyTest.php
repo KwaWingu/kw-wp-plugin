@@ -99,6 +99,37 @@ namespace KwaWingu\Tours\Tests {
             $this->assertSame( 'r', $out['reference'] );
         }
 
+        public function test_booking_lookup_forwards_the_portal_token_as_a_header_not_a_query_param(): void {
+            $api = Mockery::mock( Api_Client::class );
+            $api->shouldReceive( 'get' )->once()
+                ->with( '/bookings/KWG-1', array(), 15, array( 'X-Portal-Token' => 'tok-1' ) )
+                ->andReturn( array( 'status' => 'paid' ) );
+
+            $req = Mockery::mock();
+            $req->shouldReceive( 'get_param' )->with( 'ref' )->andReturn( 'KWG-1' );
+            // Even if a stale client sends both, the token wins and the email is never forwarded.
+            $req->shouldReceive( 'get_param' )->with( 'email' )->andReturn( 'g@example.com' );
+            $req->shouldReceive( 'get_header' )->with( 'X-Portal-Token' )->andReturn( ' tok-1 ' );
+
+            $out = ( new Rest_Proxy( $api ) )->handle_booking_lookup( $req );
+            $this->assertSame( 'paid', $out['status'] );
+        }
+
+        public function test_booking_lookup_falls_back_to_the_deprecated_email_lookup_without_a_token(): void {
+            $api = Mockery::mock( Api_Client::class );
+            $api->shouldReceive( 'get' )->once()
+                ->with( '/bookings/KWG-1', array( 'email' => 'g@example.com' ) )
+                ->andReturn( array( 'status' => 'pending' ) );
+
+            $req = Mockery::mock();
+            $req->shouldReceive( 'get_param' )->with( 'ref' )->andReturn( 'KWG-1' );
+            $req->shouldReceive( 'get_param' )->with( 'email' )->andReturn( 'g@example.com' );
+            $req->shouldReceive( 'get_header' )->with( 'X-Portal-Token' )->andReturn( null );
+
+            $out = ( new Rest_Proxy( $api ) )->handle_booking_lookup( $req );
+            $this->assertSame( 'pending', $out['status'] );
+        }
+
         public function test_handler_returns_wp_error_on_api_exception(): void {
             $api = Mockery::mock( Api_Client::class );
             $api->shouldReceive( 'get' )->andThrow( new \KwaWingu\Tours\Api_Exception( 'nope', 403, 'api_access_required' ) );

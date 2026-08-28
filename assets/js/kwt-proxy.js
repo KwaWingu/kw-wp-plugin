@@ -11,9 +11,13 @@
 	'use strict';
 	var cfg = window.kwtProxy || {};
 
-	function build( method, path, dataOrParams ) {
+	function build( method, path, dataOrParams, headers ) {
 		var url = cfg.root + path;
 		var opts = { method: method, headers: { 'X-WP-Nonce': cfg.nonce } };
+		// Caller headers (e.g. X-Portal-Token) never override the nonce.
+		Object.keys( headers || {} ).forEach( function ( k ) {
+			if ( 'X-WP-Nonce' !== k ) { opts.headers[ k ] = headers[ k ]; }
+		} );
 		if ( 'GET' === method && dataOrParams ) {
 			var qs = Object.keys( dataOrParams ).map( function ( k ) {
 				return encodeURIComponent( k ) + '=' + encodeURIComponent( dataOrParams[ k ] );
@@ -35,13 +39,13 @@
 		} );
 	}
 
-	function req( method, path, dataOrParams, retried ) {
-		var r = build( method, path, dataOrParams );
+	function req( method, path, dataOrParams, retried, headers ) {
+		var r = build( method, path, dataOrParams, headers );
 		return fetch( r.url, r.opts ).then( function ( resp ) {
 			if ( 403 === resp.status && ! retried ) {
 				// Stale nonce (likely a cached page) — mint a fresh one and retry once.
 				return refreshNonce().then( function () {
-					return req( method, path, dataOrParams, true );
+					return req( method, path, dataOrParams, true, headers );
 				} );
 			}
 			return resp.json().then( function ( body ) {
@@ -51,7 +55,7 @@
 		} );
 	}
 
-	cfg.get = function ( path, params ) { return req( 'GET', path, params, false ); };
+	cfg.get = function ( path, params, headers ) { return req( 'GET', path, params, false, headers ); };
 	cfg.post = function ( path, body ) { return req( 'POST', path, body, false ); };
 	window.kwtProxy = cfg;
 } )();

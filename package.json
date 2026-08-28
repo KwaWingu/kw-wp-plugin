@@ -12,9 +12,11 @@
     "make-pot": "wp i18n make-pot . languages/kwawingu-tours.pot --exclude=node_modules,vendor,tests,tests-integration,docs,graphify-out,.wordpress-org,*.test.js,webpack.config.js --headers='{\"Report-Msgid-Bugs-To\":\"https://tours.kwawingu.com\"}'",
     "env:start": "npx @wordpress/env start",
     "env:stop": "npx @wordpress/env stop",
+    "env:activate": "npx @wordpress/env run cli wp plugin activate kwawingu-tours",
     "test:integration": "npx @wordpress/env run tests-cli --env-cwd=wp-content/plugins/kwawingu-tours ./vendor/bin/phpunit -c phpunit-integration.xml.dist"
   },
   "devDependencies": {
+    "@wordpress/env": "^10.39.0",
     "@wordpress/scripts": "^30.0.0"
   }
 }

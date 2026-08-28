@@ -1,5 +1,8 @@
 {
 	"core": "WordPress/WordPress#6.6",
 	"phpVersion": "8.1",
-	"plugins": [ "." ]
+	"plugins": [],
+	"mappings": {
+		"wp-content/plugins/kwawingu-tours": "."
+	}
 }

@@ -24,6 +24,12 @@ Run with Docker:
 ```bash
 npm run env:start          # npx @wordpress/env start
 npm run test:integration   # runs phpunit-integration.xml.dist inside wp-env
+npm run env:activate       # dev site only: activate the plugin at http://localhost:8888
+
+# The plugin is mounted at wp-content/plugins/kwawingu-tours via `mappings` in .wp-env.json —
+# NOT via `plugins: ["."]`, which mounts under the checkout folder's name (kw-wp-plugin in CI)
+# and broke `--env-cwd`. The test bootstrap requires the plugin file itself, so no activation
+# is needed for phpunit.
 ```
 CI runs this as the `integration` job.
 

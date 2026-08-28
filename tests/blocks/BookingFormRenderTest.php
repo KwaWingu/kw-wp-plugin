@@ -18,7 +18,7 @@ class BookingFormRenderTest extends TestCase {
     protected function tearDown(): void { Monkey\tearDown(); parent::tearDown(); }
 
     public function test_renders_booking_form_with_fields(): void {
-        $html = kwt_render_booking_form( array(), '' );
+        $html = kwawingu_tours_render_booking_form( array(), '' );
         $this->assertStringContainsString( 'id="kwt-book"', $html );
         $this->assertStringContainsString( 'name="firstName"', $html );
         $this->assertStringContainsString( 'name="lastName"', $html );

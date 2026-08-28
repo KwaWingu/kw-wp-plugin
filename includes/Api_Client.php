@@ -115,7 +115,7 @@ class Api_Client {
 	private function handle_response( $response ): array {
 		if ( is_wp_error( $response ) ) {
 			$reason = method_exists( $response, 'get_error_message' ) ? $response->get_error_message() : '';
-			throw new Api_Exception( 'Request to KwaWingu API failed' . ( '' !== $reason ? ': ' . $reason : '.' ), 0 );
+			throw new Api_Exception( esc_html( 'Request to KwaWingu API failed' . ( '' !== $reason ? ': ' . $reason : '.' ) ), 0 );
 		}
 
 		$status = (int) wp_remote_retrieve_response_code( $response );
@@ -129,11 +129,11 @@ class Api_Client {
 				$code_string = (string) ( $json['error']['code'] ?? '' );
 				$message     = (string) ( $json['error']['message'] ?? $message );
 			}
-			throw new Api_Exception( $message, $status, $code_string );
+			throw new Api_Exception( esc_html( $message ), (int) $status, esc_html( $code_string ) );
 		}
 
 		if ( ! is_array( $json ) ) {
-			throw new Api_Exception( 'KwaWingu API returned an invalid JSON body.', $status );
+			throw new Api_Exception( 'KwaWingu API returned an invalid JSON body.', (int) $status );
 		}
 
 		return $json;

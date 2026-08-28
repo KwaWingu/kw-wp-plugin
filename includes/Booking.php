@@ -97,9 +97,17 @@ class Booking {
 		if ( '' === $slug || '' === $tour_slug ) {
 			return '';
 		}
-		return '<script src="' . esc_url( self::widget_src() ) . '"'
-			. ' data-operator="' . esc_attr( $slug ) . '"'
-			. ' data-tour="' . esc_attr( $tour_slug ) . '" async></script>';
+		// The widget is KwaWingu's own embed script, served from the operator's
+		// hosted booking site (KWT_SITE_BASE); it is the "Widget" booking mode the
+		// operator chose in settings. Core's tag builder escapes every attribute.
+		return wp_get_script_tag(
+			array(
+				'src'           => self::widget_src(),
+				'data-operator' => $slug,
+				'data-tour'     => $tour_slug,
+				'async'         => true,
+			)
+		);
 	}
 
 	/**

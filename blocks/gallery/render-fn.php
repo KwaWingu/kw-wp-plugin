@@ -5,7 +5,10 @@
  * @package KwaWingu\Tours
  */
 
-if ( ! function_exists( 'kwt_render_gallery' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+if ( ! function_exists( 'kwawingu_tours_render_gallery' ) ) {
 	/**
 	 * Render callback for kwawingu/gallery.
 	 *
@@ -13,7 +16,7 @@ if ( ! function_exists( 'kwt_render_gallery' ) ) {
 	 * @param string              $content    Inner content (unused).
 	 * @return string
 	 */
-	function kwt_render_gallery( array $attributes, string $content = '' ): string {
+	function kwawingu_tours_render_gallery( array $attributes, string $content = '' ): string {
 		$id   = ! empty( $attributes['postId'] ) ? (int) $attributes['postId'] : (int) get_the_ID();
 		$cols = isset( $attributes['columns'] ) ? (int) $attributes['columns'] : 3;
 		if ( $cols < 1 ) {

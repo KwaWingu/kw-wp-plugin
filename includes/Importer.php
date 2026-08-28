@@ -71,7 +71,7 @@ class Importer {
 				'post_status'    => array( 'publish', 'draft' ),
 				'posts_per_page' => 1,
 				'fields'         => 'ids',
-				'meta_query'     => array(
+				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- exact-match lookup on one plugin meta key over this site's own tour posts (a few hundred rows at most), not a user-driven search.
 					array(
 						'key'   => self::META,
 						'value' => $slug,

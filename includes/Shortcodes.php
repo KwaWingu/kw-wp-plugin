@@ -104,7 +104,7 @@ class Shortcodes {
 			),
 			$atts
 		);
-		return kwt_render_tours_grid(
+		return kwawingu_tours_render_tours_grid(
 			array(
 				'limit' => (int) $atts['limit'],
 				'type'  => (string) $atts['type'],
@@ -122,7 +122,7 @@ class Shortcodes {
 	public function render_tour( $atts ): string {
 		require_once Blocks::block_dir() . 'tour-detail/render-fn.php';
 		$atts = shortcode_atts( array( 'id' => 0 ), $atts );
-		return kwt_render_tour_detail( array( 'postId' => (int) $atts['id'] ), '' );
+		return kwawingu_tours_render_tour_detail( array( 'postId' => (int) $atts['id'] ), '' );
 	}
 
 	/**
@@ -140,7 +140,7 @@ class Shortcodes {
 			),
 			$atts
 		);
-		return kwt_render_book_button(
+		return kwawingu_tours_render_book_button(
 			array(
 				'postId' => (int) $atts['id'],
 				'label'  => (string) $atts['label'],
@@ -164,7 +164,7 @@ class Shortcodes {
 			),
 			$atts
 		);
-		return kwt_render_featured_tours(
+		return kwawingu_tours_render_featured_tours(
 			array(
 				'heading' => (string) $atts['heading'],
 				'limit'   => (int) $atts['limit'],
@@ -182,7 +182,7 @@ class Shortcodes {
 	public function render_reviews( $atts ): string {
 		require_once Blocks::block_dir() . 'reviews/render-fn.php';
 		$atts = shortcode_atts( array( 'id' => 0 ), $atts );
-		return kwt_render_reviews( array( 'postId' => (int) $atts['id'] ), '' );
+		return kwawingu_tours_render_reviews( array( 'postId' => (int) $atts['id'] ), '' );
 	}
 
 	/**
@@ -194,7 +194,7 @@ class Shortcodes {
 	public function render_destinations( $atts ): string {
 		require_once Blocks::block_dir() . 'destinations-grid/render-fn.php';
 		$atts = shortcode_atts( array( 'limit' => 12 ), $atts );
-		return kwt_render_destinations_grid( array( 'limit' => (int) $atts['limit'] ), '' );
+		return kwawingu_tours_render_destinations_grid( array( 'limit' => (int) $atts['limit'] ), '' );
 	}
 
 	/**
@@ -206,7 +206,7 @@ class Shortcodes {
 	public function render_search( $atts ): string {
 		$this->enqueue_view_script( 'kwawingu_search' );
 		require_once Blocks::block_dir() . 'search/render-fn.php';
-		return kwt_render_search( array(), '' );
+		return kwawingu_tours_render_search( array(), '' );
 	}
 
 	/**
@@ -218,7 +218,7 @@ class Shortcodes {
 	public function render_calculator( $atts ): string {
 		$this->enqueue_view_script( 'kwawingu_calculator' );
 		require_once Blocks::block_dir() . 'calculator/render-fn.php';
-		return kwt_render_calculator( array(), '' );
+		return kwawingu_tours_render_calculator( array(), '' );
 	}
 
 	/**
@@ -232,7 +232,7 @@ class Shortcodes {
 		require_once Blocks::block_dir() . 'booking/render-fn.php';
 		// `id`/`slug` were documented but never read: the form always bound to the
 		// current post, which on any page other than a tour is a form with no tour.
-		return kwt_render_booking_form( array( 'tourSlug' => $this->tour_slug_att( $atts ) ), '' );
+		return kwawingu_tours_render_booking_form( array( 'tourSlug' => $this->tour_slug_att( $atts ) ), '' );
 	}
 
 	/**
@@ -274,7 +274,7 @@ class Shortcodes {
 			),
 			$atts
 		);
-		return kwt_render_gallery(
+		return kwawingu_tours_render_gallery(
 			array(
 				'postId'  => (int) $atts['id'],
 				'columns' => (int) $atts['columns'],
@@ -292,7 +292,7 @@ class Shortcodes {
 	public function render_availability( $atts ): string {
 		$this->enqueue_view_script( 'kwawingu_availability' );
 		require_once Blocks::block_dir() . 'availability-calendar/render-fn.php';
-		return kwt_render_availability_calendar( array( 'tourSlug' => $this->tour_slug_att( $atts ) ), '' );
+		return kwawingu_tours_render_availability_calendar( array( 'tourSlug' => $this->tour_slug_att( $atts ) ), '' );
 	}
 
 	/**
@@ -311,7 +311,7 @@ class Shortcodes {
 			),
 			$atts
 		);
-		return kwt_render_inquiry_form(
+		return kwawingu_tours_render_inquiry_form(
 			array(
 				'heading'  => (string) $atts['heading'],
 				'tourSlug' => (string) $atts['tour_slug'],

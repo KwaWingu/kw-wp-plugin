@@ -61,7 +61,7 @@ namespace KwaWingu\Tours\Tests\Blocks {
             $query = new \WP_Query_Stub( array( 7 ) );
             // View::tour_query not called; query is injected via _query attribute.
             // Render directly with an injected query via the attribute hook:
-            $html = kwt_render_tours_grid( array( 'limit' => 6, '_query' => $query ), '' );
+            $html = kwawingu_tours_render_tours_grid( array( 'limit' => 6, '_query' => $query ), '' );
 
             $this->assertStringContainsString( 'Serengeti Safari', $html );
             $this->assertStringContainsString( 'TZS 450,000', $html );
@@ -81,7 +81,7 @@ namespace KwaWingu\Tours\Tests\Blocks {
                 )
             );
 
-            $html = kwt_render_tours_grid( array( '_query' => new \WP_Query_Stub( array( 7 ) ) ), '' );
+            $html = kwawingu_tours_render_tours_grid( array( '_query' => new \WP_Query_Stub( array( 7 ) ) ), '' );
 
             $this->assertStringContainsString( 'USD 1,250,000', $html );
             $this->assertStringNotContainsString( '450,000', $html );
@@ -100,7 +100,7 @@ namespace KwaWingu\Tours\Tests\Blocks {
                 )
             );
 
-            $html = kwt_render_tours_grid( array( '_query' => new \WP_Query_Stub( array( 7 ) ) ), '' );
+            $html = kwawingu_tours_render_tours_grid( array( '_query' => new \WP_Query_Stub( array( 7 ) ) ), '' );
 
             $this->assertStringContainsString( 'Sold out', $html );
         }
@@ -110,7 +110,7 @@ namespace KwaWingu\Tours\Tests\Blocks {
             $api->shouldReceive( 'get' )->andThrow( new Api_Exception( 'down', 502 ) );
             Live_Catalog::set_instance( new Live_Catalog( $api ) );
 
-            $html = kwt_render_tours_grid( array( '_query' => new \WP_Query_Stub( array( 7 ) ) ), '' );
+            $html = kwawingu_tours_render_tours_grid( array( '_query' => new \WP_Query_Stub( array( 7 ) ) ), '' );
 
             // The card still shows a price — the stored one — and never an error.
             $this->assertStringContainsString( 'TZS 450,000', $html );

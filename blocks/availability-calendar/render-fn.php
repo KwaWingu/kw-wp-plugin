@@ -5,7 +5,10 @@
  * @package KwaWingu\Tours
  */
 
-if ( ! function_exists( 'kwt_render_availability_calendar' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+if ( ! function_exists( 'kwawingu_tours_render_availability_calendar' ) ) {
 	/**
 	 * Render callback for kwawingu/availability-calendar.
 	 *
@@ -13,7 +16,7 @@ if ( ! function_exists( 'kwt_render_availability_calendar' ) ) {
 	 * @param string              $content    Inner content (unused).
 	 * @return string
 	 */
-	function kwt_render_availability_calendar( array $attributes, string $content = '' ): string {
+	function kwawingu_tours_render_availability_calendar( array $attributes, string $content = '' ): string {
 		if ( function_exists( 'wp_enqueue_script' ) ) {
 			wp_enqueue_script( 'kwt-grid' );
 			wp_enqueue_script( 'kwt-proxy' );

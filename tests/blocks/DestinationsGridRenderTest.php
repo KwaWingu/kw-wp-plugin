@@ -27,7 +27,7 @@ class DestinationsGridRenderTest extends TestCase {
 
     public function test_renders_destination_cards(): void {
         $query = new \WP_Query_Stub( array( 3 ) );
-        $html  = kwt_render_destinations_grid( array( '_query' => $query ), '' );
+        $html  = kwawingu_tours_render_destinations_grid( array( '_query' => $query ), '' );
         $this->assertStringContainsString( 'Serengeti', $html );
         $this->assertStringContainsString( 'kwt-destinations-grid', $html );
     }
@@ -40,14 +40,14 @@ class DestinationsGridRenderTest extends TestCase {
     public function test_card_links_to_the_hosted_destination_page_when_the_slug_is_synced(): void {
         Functions\when( 'get_post_meta' )->alias( static fn( $id, $key ) => 'kwt_slug' === $key ? 'serengeti-national-park' : '' );
         $query = new \WP_Query_Stub( array( 3 ) );
-        $html  = kwt_render_destinations_grid( array( '_query' => $query ), '' );
+        $html  = kwawingu_tours_render_destinations_grid( array( '_query' => $query ), '' );
         $this->assertStringContainsString( 'href="https://tours.kwawingu.com/acme/destinations/serengeti-national-park"', $html );
         $this->assertStringNotContainsString( 'https://site/destinations/serengeti/', $html );
     }
 
     public function test_card_falls_back_to_the_local_permalink_without_a_synced_slug(): void {
         $query = new \WP_Query_Stub( array( 3 ) );
-        $html  = kwt_render_destinations_grid( array( '_query' => $query ), '' );
+        $html  = kwawingu_tours_render_destinations_grid( array( '_query' => $query ), '' );
         $this->assertStringContainsString( 'href="https://site/destinations/serengeti/"', $html );
     }
 }

@@ -5,17 +5,20 @@
  * @package KwaWingu\Tours
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 use KwaWingu\Tours\Live_Catalog;
 use KwaWingu\Tours\View;
 
-if ( ! function_exists( 'kwt_render_tours_grid' ) ) {
+if ( ! function_exists( 'kwawingu_tours_render_tours_grid' ) ) {
 	/**
 	 * Render callback for kwawingu/tours-grid.
 	 *
 	 * @param array<string,mixed> $attributes Block attributes.
 	 * @param string              $content    Block inner content (unused).
 	 */
-	function kwt_render_tours_grid( array $attributes, string $content = '' ): string {
+	function kwawingu_tours_render_tours_grid( array $attributes, string $content = '' ): string {
 		$limit = isset( $attributes['limit'] ) ? (int) $attributes['limit'] : 12;
 
 		// Tests inject a query via _query; production builds one from View.
@@ -23,7 +26,7 @@ if ( ! function_exists( 'kwt_render_tours_grid' ) ) {
 		if ( null === $query ) {
 			$args = array( 'posts_per_page' => $limit );
 			if ( ! empty( $attributes['type'] ) ) {
-				$args['meta_query'] = array(
+				$args['meta_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- exact-match lookup on one plugin meta key over this site's own tour posts (a few hundred rows at most), not a user-driven search.
 					array(
 						'key'   => 'kwt_type',
 						'value' => (string) $attributes['type'],

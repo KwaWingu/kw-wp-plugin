@@ -20,11 +20,9 @@ jobs:
         with:
           node-version: '20'
 
-      # Build the distributable exactly as it ships: runtime PHP deps only,
-      # and the compiled editor block bundles under build/.
-      - name: Install runtime PHP deps (no dev)
-        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-
+      # Build the distributable exactly as it ships: the compiled editor block
+      # bundles under build/. The plugin has no runtime PHP dependencies and
+      # autoloads includes/ itself, so vendor/ is not built and is .distignored.
       - name: Build editor block bundles
         run: |
           npm ci

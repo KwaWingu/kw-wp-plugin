@@ -19,6 +19,7 @@ class ApiStatusTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		Monkey\setUp();
+		Functions\when( 'wp_specialchars_decode' )->alias( static function ( $t ) { return html_entity_decode( (string) $t, ENT_QUOTES ); } );
 		$this->options = array();
 		$opts          = &$this->options;
 		Functions\when( 'get_option' )->alias(

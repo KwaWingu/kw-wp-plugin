@@ -16,7 +16,7 @@ class SearchRenderTest extends TestCase {
     protected function tearDown(): void { Monkey\tearDown(); parent::tearDown(); }
 
     public function test_renders_search_shell(): void {
-        $html = kwt_render_search( array(), '' );
+        $html = kwawingu_tours_render_search( array(), '' );
         $this->assertStringContainsString( 'kwt-search', $html );
         $this->assertStringContainsString( '<input', $html );
         $this->assertStringContainsString( 'kwt-search__results', $html );

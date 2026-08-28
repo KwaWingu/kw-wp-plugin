@@ -89,8 +89,10 @@ class Api_Status {
 				return __( 'Online booking is not available at the moment. Please contact us directly.', 'kwawingu-tours' );
 		}
 		// Business refusals (price changed, sold out, invalid input) are written by the
-		// API for the guest and are safe to relay as-is.
-		return $e->getMessage();
+		// API for the guest and are safe to relay. Api_Client escapes the message when
+		// it throws (so an uncaught exception cannot print HTML); this sentence goes
+		// out as JSON and is set via textContent, so the entities are decoded back.
+		return wp_specialchars_decode( $e->getMessage(), ENT_QUOTES );
 	}
 
 	/**

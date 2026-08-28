@@ -5,14 +5,17 @@
  * @package KwaWingu\Tours
  */
 
-if ( ! function_exists( 'kwt_render_reviews' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+if ( ! function_exists( 'kwawingu_tours_render_reviews' ) ) {
 	/**
 	 * Render callback for kwawingu/reviews.
 	 *
 	 * @param array<string,mixed> $attributes Block attributes.
 	 * @param string              $content    Block inner content (unused).
 	 */
-	function kwt_render_reviews( array $attributes, string $content = '' ): string {
+	function kwawingu_tours_render_reviews( array $attributes, string $content = '' ): string {
 		$id     = ! empty( $attributes['postId'] ) ? (int) $attributes['postId'] : (int) get_the_ID();
 		$rating = (float) get_post_meta( $id, 'kwt_rating', true );
 		$count  = (int) get_post_meta( $id, 'kwt_review_count', true );

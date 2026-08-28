@@ -32,6 +32,7 @@ namespace KwaWingu\Tours\Tests {
             } );
             Functions\when( 'esc_url_raw' )->returnArg();
             Functions\when( 'wp_json_encode' )->alias( 'json_encode' );
+            Functions\when( 'esc_html' )->alias( static function ( $t ) { return htmlspecialchars( (string) $t, ENT_QUOTES ); } );
         }
 
         protected function tearDown(): void {
@@ -65,6 +66,22 @@ namespace KwaWingu\Tours\Tests {
 
             $body = $this->client()->get( '/bookings/KWG-1', array(), 15, array( 'X-Portal-Token' => 'tok-1', 'X-API-Key' => 'forged' ) );
             $this->assertSame( 'paid', $body['status'] );
+        }
+
+        public function test_api_error_message_is_html_escaped_when_thrown(): void {
+            // An uncaught exception is printed as HTML by PHP/WordPress, so the
+            // message must not carry markup the remote API could have injected.
+            Functions\when( 'wp_remote_get' )->justReturn(
+                array( 'code' => 422, 'body' => '{"error":{"code":"<x>","message":"Tour <b>gone</b> & sold"}}' )
+            );
+            try {
+                $this->client()->get( '/tours' );
+                $this->fail( 'Expected Api_Exception' );
+            } catch ( Api_Exception $e ) {
+                $this->assertSame( 'Tour &lt;b&gt;gone&lt;/b&gt; &amp; sold', $e->getMessage() );
+                $this->assertSame( '&lt;x&gt;', $e->get_code_string() );
+                $this->assertSame( 422, $e->get_status() );
+            }
         }
 
         public function test_get_throws_with_error_code_on_403(): void {

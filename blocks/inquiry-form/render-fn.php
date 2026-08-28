@@ -5,7 +5,10 @@
  * @package KwaWingu\Tours
  */
 
-if ( ! function_exists( 'kwt_render_inquiry_form' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+if ( ! function_exists( 'kwawingu_tours_render_inquiry_form' ) ) {
 	/**
 	 * Render callback for kwawingu/inquiry-form.
 	 *
@@ -13,7 +16,7 @@ if ( ! function_exists( 'kwt_render_inquiry_form' ) ) {
 	 * @param string              $content    Block inner content (unused).
 	 * @return string
 	 */
-	function kwt_render_inquiry_form( array $attributes, string $content = '' ): string {
+	function kwawingu_tours_render_inquiry_form( array $attributes, string $content = '' ): string {
 		if ( function_exists( 'wp_enqueue_script' ) ) {
 			wp_enqueue_script( 'kwt-proxy' );
 		}

@@ -5,14 +5,17 @@
  * @package KwaWingu\Tours
  */
 
-if ( ! function_exists( 'kwt_render_search' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+if ( ! function_exists( 'kwawingu_tours_render_search' ) ) {
 	/**
 	 * Render callback for kwawingu/search.
 	 *
 	 * @param array<string,mixed> $attributes Block attributes.
 	 * @param string              $content    Block inner content (unused).
 	 */
-	function kwt_render_search( array $attributes, string $content = '' ): string {
+	function kwawingu_tours_render_search( array $attributes, string $content = '' ): string {
 		if ( function_exists( 'wp_enqueue_script' ) ) {
 			wp_enqueue_script( 'kwt-proxy' );
 		}

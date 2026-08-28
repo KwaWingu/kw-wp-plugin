@@ -20,7 +20,7 @@ class AvailabilityCalendarRenderTest extends TestCase {
 	protected function tearDown(): void { Monkey\tearDown(); parent::tearDown(); }
 
 	public function test_renders_calendar_shell(): void {
-		$html = kwt_render_availability_calendar( array(), '' );
+		$html = kwawingu_tours_render_availability_calendar( array(), '' );
 		$this->assertStringContainsString( 'kwt-availcal', $html );
 		$this->assertStringContainsString( 'data-tour="safari"', $html );
 		$this->assertStringContainsString( 'kwt-availcal__grid', $html );

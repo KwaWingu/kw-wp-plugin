@@ -56,7 +56,7 @@ class TourDetailRenderTest extends TestCase {
     }
 
     public function test_renders_detail_with_price_and_difficulty(): void {
-        $html = kwt_render_tour_detail( array( 'postId' => 7 ), '' );
+        $html = kwawingu_tours_render_tour_detail( array( 'postId' => 7 ), '' );
         $this->assertStringContainsString( 'Kilimanjaro Trek', $html );
         $this->assertStringContainsString( 'TZS 1,200,000', $html );
         $this->assertStringContainsString( 'Challenging', $html );
@@ -76,7 +76,7 @@ class TourDetailRenderTest extends TestCase {
             )
         );
 
-        $html = kwt_render_tour_detail( array( 'postId' => 7 ), '' );
+        $html = kwawingu_tours_render_tour_detail( array( 'postId' => 7 ), '' );
 
         $this->assertStringContainsString( 'USD 1,500,000', $html );
         $this->assertStringNotContainsString( '1,200,000', $html );
@@ -98,7 +98,7 @@ class TourDetailRenderTest extends TestCase {
             )
         );
 
-        $html = kwt_render_tour_detail( array( 'postId' => 7 ), '' );
+        $html = kwawingu_tours_render_tour_detail( array( 'postId' => 7 ), '' );
 
         $this->assertStringContainsString( 'Sold out', $html );
         $this->assertStringNotContainsString( 'Next departure', $html );

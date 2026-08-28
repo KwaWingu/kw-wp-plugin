@@ -24,7 +24,7 @@ class ReviewsRenderTest extends TestCase {
             $map = array( 'kwt_rating' => 4.5, 'kwt_review_count' => 12 );
             return $map[ $key ] ?? '';
         } );
-        $html = kwt_render_reviews( array(), '' );
+        $html = kwawingu_tours_render_reviews( array(), '' );
         $this->assertStringContainsString( '4.5', $html );
         $this->assertStringContainsString( '12', $html );
         $this->assertStringContainsString( 'kwt-reviews', $html );
@@ -32,6 +32,6 @@ class ReviewsRenderTest extends TestCase {
 
     public function test_empty_when_no_rating(): void {
         Functions\when( 'get_post_meta' )->justReturn( 0 );
-        $this->assertSame( '', kwt_render_reviews( array(), '' ) );
+        $this->assertSame( '', kwawingu_tours_render_reviews( array(), '' ) );
     }
 }

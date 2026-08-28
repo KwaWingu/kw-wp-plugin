@@ -26,7 +26,7 @@ class FeaturedToursRenderTest extends TestCase {
 
     public function test_renders_heading_and_delegates_to_grid(): void {
         $query = new \WP_Query_Stub( array( 7 ) );
-        $html  = kwt_render_featured_tours( array( 'heading' => 'Popular trips', '_query' => $query ), '' );
+        $html  = kwawingu_tours_render_featured_tours( array( 'heading' => 'Popular trips', '_query' => $query ), '' );
         $this->assertStringContainsString( 'Popular trips', $html );
         $this->assertStringContainsString( 'Zanzibar Beach', $html );
         $this->assertStringContainsString( 'kwt-featured', $html );

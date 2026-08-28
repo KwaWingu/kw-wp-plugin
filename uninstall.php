@@ -12,6 +12,8 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 
 delete_option( 'kwt_settings' );
 delete_option( 'kwt_sync_status' );
+delete_option( 'kwt_api_status' );
 delete_transient( 'kwt_live_catalog' );
+delete_transient( 'kwt_live_catalog_last_good' );
 wp_clear_scheduled_hook( 'kwt_sync_cron' );
 wp_clear_scheduled_hook( 'kwt_sync_push' );

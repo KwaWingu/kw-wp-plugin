@@ -16,7 +16,7 @@ class CalculatorRenderTest extends TestCase {
     protected function tearDown(): void { Monkey\tearDown(); parent::tearDown(); }
 
     public function test_renders_calculator_form(): void {
-        $html = kwt_render_calculator( array(), '' );
+        $html = kwawingu_tours_render_calculator( array(), '' );
         $this->assertStringContainsString( 'kwt-calculator', $html );
         $this->assertStringContainsString( 'kwt-calculator__total', $html );
         $this->assertStringContainsString( 'name="adults"', $html );

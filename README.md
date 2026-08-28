@@ -18,14 +18,13 @@ Build a fast, SEO-friendly tour-operator website on your [KwaWingu Tours](https:
 
 ## Install
 
-**From WordPress.org:** search "KwaWingu Tours" in Plugins → Add New. (Coming soon.)
+**From WordPress.org:** search "KwaWingu Tours" in Plugins → Add New.
 
 **From source:**
 ```bash
 git clone https://github.com/KwaWingu/kw-wp-plugin.git wp-content/plugins/kwawingu-tours
-cd wp-content/plugins/kwawingu-tours && composer install --no-dev
 ```
-Then activate the plugin in WordPress.
+Then activate the plugin in WordPress. Nothing to build: the plugin autoloads its own classes and the compiled block bundles are committed. `composer install` is only for running the test suite.
 
 ## Configure
 

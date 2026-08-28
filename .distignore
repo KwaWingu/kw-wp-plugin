@@ -1,5 +1,6 @@
 # Files excluded from the WordPress.org SVN distribution.
-# (build/ and vendor/ are NOT ignored — they ship in the release.)
+# (build/ ships in the release — the compiled editor bundles. vendor/ does not: the
+# plugin has no runtime dependencies and autoloads includes/ itself.)
 
 # Dev config
 /.git
@@ -16,10 +17,15 @@
 /package.json
 /package-lock.json
 /skills-lock.json
+/patchwork.json
+/webpack.config.js
+/.phpunit.result.cache
+/.phpcs.cache
 /.editorconfig
 
 # Node / JS toolchain
 /node_modules
+/vendor
 
 # Tests
 /tests
@@ -28,7 +34,13 @@
 # Docs & source that shouldn't ship
 /docs
 /.superpowers
+/.claude
+/.agents
+/graphify-out
+/dist
 README.md
+CLAUDE.md
+*.zip
 
 # Block source (only the compiled build/ + block.json + render*.php ship)
 *.test.js

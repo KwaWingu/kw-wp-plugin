@@ -3,7 +3,7 @@
 Three layers, run in CI (`.github/workflows/ci.yml`):
 
 ## 1. PHP unit tests — `vendor/bin/phpunit`
-Pure-PHP, no WordPress/Docker (Brain\Monkey + Mockery mock WP functions). Covers Settings, Api_Client, Rest_Proxy, Sync (tours + destinations), CPT registration, block render functions, Seo, Media (byte-sniffing sideload), Branding, Importer, Setup_Wizard, Assets, Api_Status, Shortcodes (view-script enqueue, id/slug), the booking-lookup proxy (`X-Portal-Token` header forwarded, `?email=` only as fallback), and the block stylesheet (brand defaults that are not self-referencing custom properties; honeypot hidden). **175 tests.** Run anywhere with `composer install`.
+Pure-PHP, no WordPress/Docker (Brain\Monkey + Mockery mock WP functions). Covers Settings, Api_Client, Rest_Proxy, Sync (tours + destinations), CPT registration, block render functions, Seo, Media (byte-sniffing sideload), Branding, Importer, Setup_Wizard, Assets, Api_Status, Shortcodes (view-script enqueue, id/slug), the booking-lookup proxy (`X-Portal-Token` header forwarded, `?email=` only as fallback), and the block stylesheet (brand defaults that are not self-referencing custom properties; honeypot hidden). **176 tests.** Run anywhere with `composer install`.
 
 ## 2. Coding standards — `vendor/bin/phpcs -q`
 WPCS + PHPCompatibilityWP (7.4 floor). Blocking in CI. `build/`, `node_modules/`, `tests/`, and `*.js` are excluded.

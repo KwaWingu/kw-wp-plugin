@@ -14,7 +14,9 @@ Build a tour-operator website fast on your KwaWingu Tours data. Sync your catalo
 
 KwaWingu Tours turns your KwaWingu operator account into a fast, SEO-friendly WordPress site. It syncs your tour catalog into native WordPress content (Tours & Destinations), gives you blocks and a one-click setup wizard, and lets guests book — without you maintaining a separate site.
 
-This plugin connects to the KwaWingu Tours developer API using your operator slug and API key. **The Developer API is a paid add-on on your KwaWingu account** — the plugin is free and GPL-licensed; it talks to your own account.
+**Requires a KwaWingu Tours operator account with the Developer API add-on enabled.** This plugin is a free, open-source client for that service: it connects to the KwaWingu Tours Developer API using your operator slug and API key, and it does nothing without them. The Developer API is a paid add-on on your KwaWingu account, in the same way a payment-gateway plugin needs a merchant account. The plugin itself has no paid tiers, licence keys, trials or locked features — every block, shortcode and setting it ships works the moment your account's API access is on. Whether your account has API access is decided by the KwaWingu servers, never by this plugin: when access is off, the API answers `403 api_access_required`, your synced tours keep showing, and wp-admin shows you one notice with the fix.
+
+**What it does that a generic tour or booking plugin does not:** it does not ask you to maintain a second copy of your tours in WordPress. Your catalog, prices, departures, seat availability, reviews, destinations and brand colours live in your KwaWingu operator account — where your OTA channels and payment gateway already are — and this plugin mirrors them into native WordPress content, reads prices and availability live on every page view, and hands the booking and mobile-money payment to your account so a seat sold on your site is the same seat sold everywhere else.
 
 **What you get:**
 
@@ -28,7 +30,7 @@ This plugin connects to the KwaWingu Tours developer API using your operator slu
 
 == Installation ==
 
-1. Install from **Plugins → Add New** (search "KwaWingu Tours"), or upload the plugin zip, or `git clone` into `wp-content/plugins/` and run `composer install --no-dev`.
+1. Install from **Plugins → Add New** (search "KwaWingu Tours"), or upload the plugin zip, or `git clone` https://github.com/KwaWingu/kw-wp-plugin into `wp-content/plugins/kwawingu-tours` (no build step is needed — the compiled block bundles are committed).
 2. Activate the plugin.
 3. Go to **Settings → KwaWingu Tours**, enter your operator slug + public API key, choose a booking mode, and save. (Enable API access in your KwaWingu dashboard first — it is a paid add-on: without an active Developer API entitlement every API call answers `403 api_access_required` and the plugin tells you so in wp-admin.)
    * The **public API key** is a *publishable* key (`kw_pk_…`). KwaWingu only issues one with an **allowed origin**, so enter your WordPress site address (e.g. `https://www.example.com`) as the allowed origin when you create it in Dashboard → Developers.
@@ -39,10 +41,13 @@ This plugin connects to the KwaWingu Tours developer API using your operator slu
 == Frequently Asked Questions ==
 
 = Do I need a KwaWingu account? =
-Yes. This plugin is a client for the KwaWingu Tours platform. You need an operator account with the Developer API add-on enabled, and your operator slug + public API key.
+Yes. This plugin is a client for the KwaWingu Tours platform (https://tours.kwawingu.com) and has no standalone mode. You need an operator account with the Developer API add-on enabled, and your operator slug + public API key. Without them the plugin activates but has nothing to show.
 
-= Is the plugin itself paid? =
-No — the plugin is free and GPL-licensed. It connects to your paid KwaWingu Developer API, similar to how a payment-gateway plugin connects to your paid payment account.
+= Is the plugin itself paid? Does it lock any feature behind a plan? =
+No. The plugin is free and GPL-licensed, and nothing in it is disabled by a plan, licence key, trial period or usage quota. It connects to your paid KwaWingu Developer API, similar to how a payment-gateway plugin connects to your paid payment account. The only entitlement check is the one the KwaWingu API itself makes on every request; the plugin merely reports the API's answer (a 403) to the site owner and keeps your already-synced tours online.
+
+= What happens if my Developer API add-on lapses? =
+Your synced tour and destination posts stay published, editable and indexable. Live prices, availability, search, the calculator and on-site booking pause with a visitor-safe "not available at the moment" message, and administrators see one notice in wp-admin linking to the dashboard page where the add-on is enabled. Nothing is deleted.
 
 = Are my API keys safe? =
 Yes. Keys are stored server-side and never sent to the browser. Interactive features (search, calculator, on-site booking) call a same-origin, nonce-protected WordPress REST endpoint that forwards to the KwaWingu API on the server. The private key is only used for booking writes, server-side.
@@ -74,12 +79,27 @@ Tour content re-syncs automatically (hourly by default; configurable), via a "Sy
 
 == External services ==
 
-This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to fetch your tour catalog, availability, pricing, and related content, and — in on-site booking mode — to create bookings and start payments on your behalf. It uses the operator slug and API keys you configure. Data sent: your API key (in a request header) and the parameters for the content or booking requested (including guest details a visitor enters in the on-site booking form). No visitor personal data is sent during catalog sync. Current prices and availability are requested from the same API when a tour is displayed (the response is reused for 60 seconds), and KwaWingu can call back to this site's signed `kwt/v1/resync` endpoint to trigger a catalog sync; neither carries visitor data. See https://tours.kwawingu.com for the Terms and the KwaWingu privacy policy.
+This plugin is a client for the KwaWingu Tours platform, operated by KwaWingu (https://tours.kwawingu.com). It cannot work without it. Every external endpoint it talks to is listed here, with what is sent and when. Terms of service: https://tours.kwawingu.com/legal/terms — Privacy policy: https://tours.kwawingu.com/legal/privacy
+
+**1. KwaWingu Tours Developer API** — `https://tours.kwawingu.com/api/v1/{your-operator-slug}/…` (server-to-server, from your WordPress host). Used for: catalog sync (tours, destinations, reviews, branding), live prices and availability when a tour is displayed (reused for 60 seconds), tour search and the trip calculator, and — in on-site booking mode or with the Inquiry Form — creating bookings, quotes, inquiries and starting a payment. Data sent: your public or private API key in a request header, the operator slug, and the parameters of the request. Catalog sync and price reads carry no visitor data. Search and the calculator send only what the visitor typed into the form (search text, party size, dates). On-site booking and the Inquiry Form send the guest details the visitor enters (name, email, phone, nationality, message, chosen departure and add-ons) to your own KwaWingu account so the booking or inquiry exists there. Visitors reach the API only through a same-origin WordPress REST proxy on your site; the visitor's browser never contacts the API and never sees your keys.
+
+**2. Hosted booking pages and widget** — `https://tours.kwawingu.com/{your-operator-slug}/…` (from the visitor's browser). In *Redirect* mode, "Book" links send the visitor to your hosted booking page; destination cards link to your hosted destination pages. In *Widget* mode, the plugin loads KwaWingu's own embed script `https://tours.kwawingu.com/widget.js` on pages where a Book Button is placed; it is served by the same service and renders your booking flow in the page. Data sent: the ordinary browser request (IP address, user agent, referrer) plus your operator slug and the tour slug in the URL or as data attributes. No script is loaded from anywhere else, and none is loaded in *Redirect* or *On-site* mode.
+
+**3. Cloudflare Images (KwaWingu's image CDN)** — `https://imagedelivery.net/…` (server-to-server, during catalog sync only). Tour cover and gallery photos in your catalog are hosted there; the sync downloads them once into your WordPress media library so your pages serve them from your own domain. Data sent: the image URL request from your server. No visitor data; nothing is loaded from imagedelivery.net in a visitor's browser.
+
+**4. Inbound: instant resync** — KwaWingu can call this site's `POST /wp-json/kwt/v1/resync` endpoint (signed with the secret shown in Settings → KwaWingu Tours) to trigger a catalog sync a few seconds after you edit a tour. It carries no visitor data.
+
+Nothing is sent to KwaWingu on activation, and the plugin contains no analytics, telemetry or tracking of any kind. Guest booking confirmations are emailed by KwaWingu from your account; the optional owner notification is sent by your own WordPress install with `wp_mail()`.
+
+== Source code and build ==
+
+The editor block bundles under `build/` are compiled with `@wordpress/scripts` from the readable sources under `blocks/*/index.js` and `blocks/*/edit.js`, which ship in the plugin. The full development repository, build instructions and test suite are public at https://github.com/KwaWingu/kw-wp-plugin (`npm ci && npm run build`).
 
 == Changelog ==
 
 = 1.14.2 =
 * **Destination cards now open the destination's page on your hosted storefront** (`{hosted}/{operator}/destinations/{slug}`): what the place is, highlights, best months, the official park tariff on file and your tours that go there. They used to open the bare local `kwt_destination` post, which for most catalogue entries was an empty page — so visitors left to search the web for the park instead. The sync keeps the API's `slug` (`kwt_slug`); a destination synced before this release links to the local post until the next sync runs.
+* WordPress.org submission hardening (Plugin Check clean, all categories): every block render template now guards against direct access; block render helpers and template variables carry the full `kwawingu_tours_` prefix; API error messages are HTML-escaped when the exception is thrown; the Widget booking mode builds its `<script>` tag with core's `wp_get_script_tag()`; `load_plugin_textdomain()` is gone (WordPress loads language packs itself since 4.6); uninstall also removes the recorded API status and the live-price caches; the release zip no longer ships a `vendor/` directory — the plugin autoloads its own classes and has no runtime dependencies.
 
 = 1.14.1 =
 Release follow-ups, found while capturing the WordPress.org screenshots from a live install.

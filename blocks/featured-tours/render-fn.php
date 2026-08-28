@@ -5,14 +5,17 @@
  * @package KwaWingu\Tours
  */
 
-if ( ! function_exists( 'kwt_render_featured_tours' ) ) {
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+if ( ! function_exists( 'kwawingu_tours_render_featured_tours' ) ) {
 	/**
 	 * Render callback for kwawingu/featured-tours.
 	 *
 	 * @param array<string,mixed> $attributes Block attributes.
 	 * @param string              $content    Block inner content (unused).
 	 */
-	function kwt_render_featured_tours( array $attributes, string $content = '' ): string {
+	function kwawingu_tours_render_featured_tours( array $attributes, string $content = '' ): string {
 		require_once __DIR__ . '/../tours-grid/render-fn.php';
 		$heading = isset( $attributes['heading'] ) ? (string) $attributes['heading'] : __( 'Featured tours', 'kwawingu-tours' );
 		$limit   = isset( $attributes['limit'] ) ? (int) $attributes['limit'] : 3;
@@ -21,7 +24,7 @@ if ( ! function_exists( 'kwt_render_featured_tours' ) ) {
 		if ( isset( $attributes['_query'] ) ) {
 			$grid_attrs['_query'] = $attributes['_query'];
 		}
-		$grid = kwt_render_tours_grid( $grid_attrs, '' );
+		$grid = kwawingu_tours_render_tours_grid( $grid_attrs, '' );
 
 		$out = '<section class="kwt-featured">';
 		if ( '' !== $heading ) {

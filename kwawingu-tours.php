@@ -35,15 +35,30 @@ if ( ! defined( 'KWT_API_BASE' ) ) {
 	define( 'KWT_API_BASE', rtrim( KWT_SITE_BASE, '/' ) . '/api/v1' );
 }
 
-$kwt_autoload = KWT_PLUGIN_DIR . 'vendor/autoload.php';
-if ( file_exists( $kwt_autoload ) ) {
-	require $kwt_autoload;
+// The plugin has no runtime dependencies: everything under includes/ is its own
+// code, mapped PSR-4 from the KwaWingu\Tours namespace. The release zip therefore
+// ships no vendor/ directory; a development checkout also has Composer's autoloader
+// (for the test suite), which is loaded when present.
+spl_autoload_register(
+	static function ( string $class_name ): void {
+		$prefix = 'KwaWingu\\Tours\\';
+		if ( 0 !== strncmp( $class_name, $prefix, strlen( $prefix ) ) ) {
+			return;
+		}
+		$file = KWT_PLUGIN_DIR . 'includes/' . str_replace( '\\', '/', substr( $class_name, strlen( $prefix ) ) ) . '.php';
+		if ( is_file( $file ) ) {
+			require $file;
+		}
+	}
+);
+$kwawingu_tours_autoload = KWT_PLUGIN_DIR . 'vendor/autoload.php';
+if ( file_exists( $kwawingu_tours_autoload ) ) {
+	require $kwawingu_tours_autoload;
 }
 
 add_action(
 	'plugins_loaded',
 	static function () {
-		load_plugin_textdomain( 'kwawingu-tours', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 		\KwaWingu\Tours\Plugin::instance()->boot();
 	}
 );

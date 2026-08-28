@@ -5,17 +5,20 @@
  * @package KwaWingu\Tours
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 use KwaWingu\Tours\Booking;
 use KwaWingu\Tours\Settings;
 
-if ( ! function_exists( 'kwt_render_book_button' ) ) {
+if ( ! function_exists( 'kwawingu_tours_render_book_button' ) ) {
 	/**
 	 * Render callback for kwawingu/book-button.
 	 *
 	 * @param array<string,mixed> $attributes Block attributes.
 	 * @param string              $content    Block inner content (unused).
 	 */
-	function kwt_render_book_button( array $attributes, string $content = '' ): string {
+	function kwawingu_tours_render_book_button( array $attributes, string $content = '' ): string {
 		$id = ! empty( $attributes['postId'] ) ? (int) $attributes['postId'] : (int) get_the_ID();
 
 		$booking = new Booking( new Settings() );

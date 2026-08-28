@@ -24,7 +24,7 @@ class GalleryRenderTest extends TestCase {
 		Functions\when( 'wp_get_attachment_image_url' )->alias( static function ( $aid ) {
 			return 'https://img/' . $aid . '.jpg';
 		} );
-		$html = kwt_render_gallery( array( 'columns' => 4 ), '' );
+		$html = kwawingu_tours_render_gallery( array( 'columns' => 4 ), '' );
 		$this->assertStringContainsString( 'kwt-gallery', $html );
 		$this->assertStringContainsString( 'https://img/11.jpg', $html );
 		$this->assertStringContainsString( '--kwt-cols:4', $html );
@@ -35,10 +35,10 @@ class GalleryRenderTest extends TestCase {
 			return 'kwt_gallery' === $key ? array( 'https://img/x.jpg' ) : '';
 		} );
 		Functions\when( 'wp_get_attachment_image_url' )->justReturn( false );
-		$html = kwt_render_gallery( array(), '' );
+		$html = kwawingu_tours_render_gallery( array(), '' );
 		$this->assertStringContainsString( 'https://img/x.jpg', $html );
 
 		Functions\when( 'get_post_meta' )->justReturn( '' );
-		$this->assertSame( '', kwt_render_gallery( array(), '' ) );
+		$this->assertSame( '', kwawingu_tours_render_gallery( array(), '' ) );
 	}
 }

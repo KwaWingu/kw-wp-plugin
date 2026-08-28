@@ -5,11 +5,14 @@
  * @package KwaWingu\Tours
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 use KwaWingu\Tours\Booking;
 use KwaWingu\Tours\Cpt;
 use KwaWingu\Tours\Settings;
 
-if ( ! function_exists( 'kwt_destination_url' ) ) {
+if ( ! function_exists( 'kwawingu_tours_destination_url' ) ) {
 	/**
 	 * Where a destination card goes.
 	 *
@@ -22,7 +25,7 @@ if ( ! function_exists( 'kwt_destination_url' ) ) {
 	 * @param int $post_id kwt_destination post ID.
 	 * @return string
 	 */
-	function kwt_destination_url( int $post_id ): string {
+	function kwawingu_tours_destination_url( int $post_id ): string {
 		$slug     = (string) get_post_meta( $post_id, 'kwt_slug', true );
 		$operator = ( new Settings() )->get_slug();
 		if ( '' !== $slug && '' !== $operator ) {
@@ -33,14 +36,14 @@ if ( ! function_exists( 'kwt_destination_url' ) ) {
 	}
 }
 
-if ( ! function_exists( 'kwt_render_destinations_grid' ) ) {
+if ( ! function_exists( 'kwawingu_tours_render_destinations_grid' ) ) {
 	/**
 	 * Render callback for kwawingu/destinations-grid.
 	 *
 	 * @param array<string,mixed> $attributes Block attributes.
 	 * @param string              $content    Block inner content (unused).
 	 */
-	function kwt_render_destinations_grid( array $attributes, string $content = '' ): string {
+	function kwawingu_tours_render_destinations_grid( array $attributes, string $content = '' ): string {
 		$limit = isset( $attributes['limit'] ) ? (int) $attributes['limit'] : 12;
 		$query = $attributes['_query'] ?? null;
 		if ( null === $query ) {
@@ -64,7 +67,7 @@ if ( ! function_exists( 'kwt_render_destinations_grid' ) ) {
 			if ( $img ) {
 				$out .= '<img class="kwt-destination-card__img" src="' . esc_url( $img ) . '" alt="' . esc_attr( $title ) . '" loading="lazy" />';
 			}
-			$out .= '<h3 class="kwt-destination-card__title"><a href="' . esc_url( kwt_destination_url( (int) get_the_ID() ) ) . '">' . esc_html( $title ) . '</a></h3>';
+			$out .= '<h3 class="kwt-destination-card__title"><a href="' . esc_url( kwawingu_tours_destination_url( (int) get_the_ID() ) ) . '">' . esc_html( $title ) . '</a></h3>';
 			$out .= '</article>';
 		}
 		$out .= '</div>';

@@ -12,6 +12,7 @@ namespace KwaWingu\Tours\Tests {
         protected function setUp(): void {
             parent::setUp();
             Monkey\setUp();
+            Functions\when( 'wp_specialchars_decode' )->alias( static function ( $t ) { return html_entity_decode( (string) $t, ENT_QUOTES ); } );
             Functions\when( 'rest_ensure_response' )->returnArg();
             Functions\when( 'get_option' )->justReturn( false );
             Functions\when( 'update_option' )->justReturn( true );

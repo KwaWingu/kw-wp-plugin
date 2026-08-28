@@ -5,17 +5,20 @@
  * @package KwaWingu\Tours
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 use KwaWingu\Tours\Live_Catalog;
 use KwaWingu\Tours\View;
 
-if ( ! function_exists( 'kwt_render_tour_detail' ) ) {
+if ( ! function_exists( 'kwawingu_tours_render_tour_detail' ) ) {
 	/**
 	 * Render callback for kwawingu/tour-detail.
 	 *
 	 * @param array<string,mixed> $attributes Block attributes.
 	 * @param string              $content    Block inner content (unused).
 	 */
-	function kwt_render_tour_detail( array $attributes, string $content = '' ): string {
+	function kwawingu_tours_render_tour_detail( array $attributes, string $content = '' ): string {
 		$id = ! empty( $attributes['postId'] ) ? (int) $attributes['postId'] : (int) get_the_ID();
 		if ( $id <= 0 ) {
 			return '';
@@ -65,7 +68,7 @@ if ( ! function_exists( 'kwt_render_tour_detail' ) ) {
 		}
 		$out     .= '</ul>';
 		$kwt_post = get_post( $id );
-		$kwt_body = $kwt_post ? apply_filters( 'the_content', $kwt_post->post_content ) : '';
+		$kwt_body = $kwt_post ? apply_filters( 'the_content', $kwt_post->post_content ) : ''; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- applying core's own content filter, not defining a hook.
 		$out     .= '<div class="kwt-tour-detail__body">' . wp_kses_post( $kwt_body ) . '</div>';
 		$booking  = View::tour_booking_url( $id );
 		if ( '' !== $booking ) {

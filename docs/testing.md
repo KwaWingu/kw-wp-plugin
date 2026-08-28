@@ -26,6 +26,9 @@ npm run env:start          # npx @wordpress/env start
 npm run test:integration   # runs phpunit-integration.xml.dist inside wp-env
 npm run env:activate       # dev site only: activate the plugin at http://localhost:8888
 
+# Core version in .wp-env.json MUST match the wp-phpunit major in composer.json (7.0 ↔ ^7.0):
+# the test library requires files of its own core release (e.g. wp-includes/class-wp-phpmailer.php)
+# and fails to install WordPress against an older one. Bump both together.
 # The plugin is mounted at wp-content/plugins/kwawingu-tours via `mappings` in .wp-env.json —
 # NOT via `plugins: ["."]`, which mounts under the checkout folder's name (kw-wp-plugin in CI)
 # and broke `--env-cwd`. The test bootstrap requires the plugin file itself, so no activation

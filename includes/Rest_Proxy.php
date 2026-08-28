@@ -130,7 +130,7 @@ class Rest_Proxy {
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'handle_departures' ),
 				'permission_callback' => $auth,
-				'args'                => array( 'tourSlug' => array( 'sanitize_callback' => 'sanitize_title' ) ),
+				'args'                => array( 'tourSlug' => array( 'sanitize_callback' => array( __CLASS__, 'sanitize_slug' ) ) ),
 			)
 		);
 		register_rest_route(
@@ -151,6 +151,22 @@ class Rest_Proxy {
 				'permission_callback' => $auth,
 			)
 		);
+	}
+
+	/**
+	 * Sanitizes a tour slug REST argument.
+	 *
+	 * Not `sanitize_title` directly: REST calls a sanitize_callback as
+	 * `( $value, $request, $param )`, and sanitize_title's second parameter is a
+	 * *fallback title* returned whenever the value is empty — so `?tourSlug=` handed
+	 * the handler the WP_REST_Request object, which blew up as "could not be
+	 * converted to string" and turned every all-tours departures lookup into a 502.
+	 *
+	 * @param mixed $value Raw argument.
+	 * @return string
+	 */
+	public static function sanitize_slug( $value ): string {
+		return sanitize_title( is_scalar( $value ) ? (string) $value : '' );
 	}
 
 	/**
@@ -184,9 +200,91 @@ class Rest_Proxy {
 	public function handle_search( $request ) {
 		return $this->guard(
 			function () use ( $request ) {
-				return $this->api->get( '/search', array( 'q' => (string) $request->get_param( 'q' ) ) );
+				$raw = $this->api->get( '/search', array( 'q' => (string) $request->get_param( 'q' ) ) );
+				return self::search_results( $raw );
 			}
 		);
+	}
+
+	/**
+	 * Shapes the API's search response for the search block.
+	 *
+	 * The API answers `{ tours: [...], destinations: [...], ... }` — its `SearchResults`
+	 * schema has never had a `data` key — and a tour row carries a slug but no URL,
+	 * because the API does not know where this site publishes its tours. The block
+	 * reads `data[].url` / `data[].title`, so this resolves each hit to the synced
+	 * kwt_tour permalink (falling back to the hosted booking page for a tour that has
+	 * not been synced yet) and drops hits that resolve to nothing.
+	 *
+	 * @param array<string,mixed> $raw Decoded API response.
+	 * @return array<string,mixed> `{ data: [ { title, slug, url, price, currency } ], total }`.
+	 */
+	public static function search_results( array $raw ): array {
+		$rows = array();
+		if ( isset( $raw['tours'] ) && is_array( $raw['tours'] ) ) {
+			$rows = $raw['tours'];
+		} elseif ( isset( $raw['data'] ) && is_array( $raw['data'] ) ) {
+			$rows = $raw['data'];
+		}
+		$out = array();
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$slug = (string) ( $row['slug'] ?? '' );
+			$url  = (string) ( $row['url'] ?? '' );
+			if ( '' === $url && '' !== $slug ) {
+				$url = self::tour_url_for_slug( $slug );
+			}
+			if ( '' === $url ) {
+				continue;
+			}
+			$price = $row['basePriceAdult'] ?? ( $row['price'] ?? null );
+			$out[] = array(
+				'title'    => (string) ( $row['title'] ?? $slug ),
+				'slug'     => $slug,
+				'url'      => $url,
+				'price'    => null !== $price ? (int) round( (float) $price ) : null,
+				'currency' => (string) ( $row['currency'] ?? '' ),
+			);
+		}
+		return array(
+			'data'  => $out,
+			'total' => count( $out ),
+		);
+	}
+
+	/**
+	 * The local permalink of the synced tour with this slug, else the hosted booking
+	 * page, else empty.
+	 *
+	 * @param string $slug KwaWingu tour slug.
+	 * @return string
+	 */
+	private static function tour_url_for_slug( string $slug ): string {
+		if ( function_exists( 'get_posts' ) ) {
+			$ids = get_posts(
+				array(
+					'post_type'      => Cpt::TOUR,
+					'post_status'    => 'publish',
+					'posts_per_page' => 1,
+					'fields'         => 'ids',
+					'meta_key'       => 'kwt_slug', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+					'meta_value'     => $slug, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				)
+			);
+			if ( ! empty( $ids ) && function_exists( 'get_permalink' ) ) {
+				$link = get_permalink( (int) $ids[0] );
+				if ( is_string( $link ) && '' !== $link ) {
+					return $link;
+				}
+			}
+		}
+		$operator = ( new Settings() )->get_slug();
+		if ( '' === $operator ) {
+			return '';
+		}
+		return Booking::hosted_base() . '/' . rawurlencode( $operator ) . '/tours/' . rawurlencode( $slug );
 	}
 
 	/**
@@ -301,7 +399,12 @@ class Rest_Proxy {
 	}
 
 	/**
-	 * Price a trip (public key — no booking created).
+	 * Price a trip (no booking created).
+	 *
+	 * POST /quote needs the `quotes:write` scope, which only a secret key can carry —
+	 * the API answers `publishable_key_read_only` to the public key, so the on-site
+	 * form's live price never appeared. The quote is only ever requested by the
+	 * on-site booking form, which already requires the private key.
 	 *
 	 * @param \WP_REST_Request $request The request.
 	 * @return array<string,mixed>|\WP_Error
@@ -310,7 +413,7 @@ class Rest_Proxy {
 		return $this->guard(
 			function () use ( $request ) {
 				$body = is_array( $request->get_json_params() ) ? $request->get_json_params() : array();
-				return $this->api->post( '/quote', $body, false );
+				return $this->api->post( '/quote', $body, true );
 			}
 		);
 	}
@@ -338,10 +441,16 @@ class Rest_Proxy {
 			$body['children'] = $children;
 		}
 
-		foreach ( array( 'phone', 'message', 'tourSlug', 'date' ) as $field ) {
+		foreach ( array( 'phone', 'message', 'tourSlug' ) as $field ) {
 			if ( ! empty( $params[ $field ] ) ) {
 				$body[ $field ] = sanitize_text_field( (string) $params[ $field ] );
 			}
+		}
+		// The form field is `date`; the API's InquiryRequest names it `preferredDate` and
+		// silently defaults an unknown key to today — so the guest's date was being lost.
+		$date = sanitize_text_field( (string) ( $params['preferredDate'] ?? ( $params['date'] ?? '' ) ) );
+		if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date ) ) {
+			$body['preferredDate'] = $date;
 		}
 
 		$result = $this->guard(
@@ -383,8 +492,11 @@ class Rest_Proxy {
 			}
 			return new \WP_Error( $code, Api_Status::visitor_message( $e ), $data );
 		} catch ( \Throwable $e ) {
-			// Do NOT surface $e->getMessage() — avoids leaking internals.
-			// Real enforcement is the upstream API's own error handling.
+			// Do NOT surface $e->getMessage() — avoids leaking internals. It goes to the
+			// debug log instead, so a site owner with WP_DEBUG_LOG can see what failed.
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( 'KwaWingu Tours proxy: ' . get_class( $e ) . ': ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			}
 			return new \WP_Error( 'proxy_error', __( 'The request could not be completed.', 'kwawingu-tours' ), array( 'status' => 502 ) );
 		}
 	}

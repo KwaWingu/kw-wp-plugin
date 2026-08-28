@@ -29,7 +29,9 @@
 						li.appendChild( a );
 						list.appendChild( li );
 					} );
-				} ).catch( function () { list.textContent = window.kwtProxy.i18n.error; } );
+				} ).catch( function ( err ) {
+					list.textContent = ( err && err.message ) || window.kwtProxy.i18n.error;
+				} );
 			}, 250 );
 		} );
 	}

@@ -54,10 +54,15 @@ class Sync {
 	 */
 	public function run(): array {
 		$result = array(
-			'created'     => 0,
-			'updated'     => 0,
-			'unpublished' => 0,
-			'errors'      => array(),
+			'created'      => 0,
+			'updated'      => 0,
+			'unpublished'  => 0,
+			'destinations' => array(
+				'created'     => 0,
+				'updated'     => 0,
+				'unpublished' => 0,
+			),
+			'errors'       => array(),
 		);
 
 		try {
@@ -108,19 +113,92 @@ class Sync {
 			$result['errors'][] = 'Sync returned no usable tours; skipped unpublish to protect the catalog.';
 		}
 
+		$destinations           = isset( $site['destinations'] ) && is_array( $site['destinations'] ) ? $site['destinations'] : array();
+		$result['destinations'] = $this->sync_destinations( $destinations );
+
 		return $result;
+	}
+
+	/**
+	 * Upserts the operator's destinations into kwt_destination posts.
+	 *
+	 * The Destinations Grid block has always queried kwt_destination, but nothing ever
+	 * wrote one, so the grid rendered "No destinations yet." on every site. The /site
+	 * bundle carries the destinations; this mirrors them the same way tours are.
+	 *
+	 * @param array<int,mixed> $rows Destination rows from the /site bundle.
+	 * @return array{created:int,updated:int,unpublished:int}
+	 */
+	private function sync_destinations( array $rows ): array {
+		$out  = array(
+			'created'     => 0,
+			'updated'     => 0,
+			'unpublished' => 0,
+		);
+		$seen = array();
+		foreach ( $rows as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$kwt_id = (string) ( $row['id'] ?? '' );
+			$name   = (string) ( $row['name'] ?? '' );
+			if ( '' === $kwt_id || '' === $name ) {
+				continue;
+			}
+			$seen[]   = $kwt_id;
+			$existing = $this->find_post_by_kwt_id( $kwt_id, Cpt::DESTINATION );
+			$content  = wp_strip_all_tags( (string) ( $row['description'] ?? '' ) );
+			if ( 0 === $existing ) {
+				$id = wp_insert_post(
+					array(
+						'post_type'    => Cpt::DESTINATION,
+						'post_status'  => 'publish',
+						'post_title'   => sanitize_text_field( $name ),
+						'post_content' => $content,
+					)
+				);
+				if ( ! is_int( $id ) || $id <= 0 ) {
+					continue;
+				}
+				++$out['created'];
+			} else {
+				$id      = $existing;
+				$payload = array( 'ID' => $id );
+				if ( '1' !== (string) get_post_meta( $id, self::META_LOCK, true ) ) {
+					$payload['post_title']   = sanitize_text_field( $name );
+					$payload['post_content'] = $content;
+				}
+				wp_update_post( $payload );
+				++$out['updated'];
+			}
+			update_post_meta( $id, self::META_ID, $kwt_id );
+			update_post_meta( $id, 'kwt_region', sanitize_text_field( (string) ( $row['region'] ?? '' ) ) );
+			update_post_meta( $id, 'kwt_country', sanitize_text_field( (string) ( $row['country'] ?? '' ) ) );
+			update_post_meta( $id, 'kwt_destination_type', sanitize_text_field( (string) ( $row['destinationType'] ?? '' ) ) );
+			$cover = $this->esc_url_raw_or_empty( $row['coverImageUrl'] ?? '' );
+			update_post_meta( $id, 'kwt_cover_url', $cover );
+			update_post_meta( $id, 'kwt_synced_at', time() );
+			if ( null !== $this->media && '' !== $cover ) {
+				$this->media->ingest_cover( $id, $cover );
+			}
+		}
+		if ( $out['created'] + $out['updated'] > 0 ) {
+			$out['unpublished'] = $this->unpublish_missing( $seen, Cpt::DESTINATION );
+		}
+		return $out;
 	}
 
 	/**
 	 * Returns the WordPress post ID for the given KwaWingu tour ID, or 0 if not found.
 	 *
-	 * @param string $kwt_id KwaWingu tour ID.
+	 * @param string $kwt_id    KwaWingu tour ID.
+	 * @param string $post_type Post type to search (tours by default).
 	 * @return int
 	 */
-	private function find_post_by_kwt_id( string $kwt_id ): int {
+	private function find_post_by_kwt_id( string $kwt_id, string $post_type = Cpt::TOUR ): int {
 		$ids = get_posts(
 			array(
-				'post_type'      => Cpt::TOUR,
+				'post_type'      => $post_type,
 				'post_status'    => array( 'publish', 'draft', 'pending', 'private' ),
 				'posts_per_page' => 1,
 				'fields'         => 'ids',
@@ -238,13 +316,14 @@ class Sync {
 	/**
 	 * Drafts any published tours whose KWT IDs were not seen in the latest sync.
 	 *
-	 * @param array<int,string> $seen_ids KWT IDs seen during the current sync run.
+	 * @param array<int,string> $seen_ids  KWT IDs seen during the current sync run.
+	 * @param string            $post_type Post type to sweep (tours by default).
 	 * @return int Number of posts drafted.
 	 */
-	private function unpublish_missing( array $seen_ids ): int {
+	private function unpublish_missing( array $seen_ids, string $post_type = Cpt::TOUR ): int {
 		$all = get_posts(
 			array(
-				'post_type'      => Cpt::TOUR,
+				'post_type'      => $post_type,
 				'post_status'    => array( 'publish' ),
 				'posts_per_page' => -1,
 				'fields'         => 'ids',

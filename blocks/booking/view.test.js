@@ -8,6 +8,7 @@ const {
 	readBookingRef,
 	readPortalUrl,
 	idemKey,
+	quoteTotal,
 } = require( './view' );
 
 describe( 'buildBookingPayload', () => {
@@ -81,5 +82,13 @@ describe( 'response readers', () => {
 		expect( readPortalUrl( { data: { portalUrl: 'https://d' } } ) ).toBe( 'https://d' );
 		expect( readPortalUrl( { booking: { portalUrl: 'https://b' } } ) ).toBe( 'https://b' );
 		expect( readPortalUrl( {} ) ).toBe( '' );
+	} );
+} );
+
+describe( 'quoteTotal', () => {
+	it( 'reads totalAmount + currency from the Quote schema (never "TZS 0")', () => {
+		expect( quoteTotal( { totalAmount: 4900000, baseAmount: 4900000, currency: 'TZS' } ) )
+			.toBe( 'TZS ' + ( 4900000 ).toLocaleString() );
+		expect( quoteTotal( { data: { totalAmount: 1200, currency: 'USD' } } ) ).toBe( 'USD ' + ( 1200 ).toLocaleString() );
 	} );
 } );

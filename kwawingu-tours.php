@@ -3,7 +3,7 @@
  * Plugin Name:       KwaWingu Tours
  * Plugin URI:        https://tours.kwawingu.com
  * Description:        Build a tour-operator website fast on your KwaWingu Tours data — sync your catalog into WordPress, add blocks, and go live in minutes.
- * Version:           1.13.0
+ * Version:           1.14.0
  * Requires at least: 6.2
  * Requires PHP:      7.4
  * Author:            KwaWingu Tours
@@ -20,12 +20,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'KWT_VERSION', '1.13.0' );
+define( 'KWT_VERSION', '1.14.0' );
 define( 'KWT_PLUGIN_FILE', __FILE__ );
 define( 'KWT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'KWT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+// Where KwaWingu is. Override both in wp-config.php to point a site at a staging or
+// local KwaWingu (e.g. define( 'KWT_SITE_BASE', 'http://host.docker.internal:8085' );).
+// KWT_SITE_BASE is the hosted booking pages and dashboard; KWT_API_BASE is the
+// Developer API root and defaults to KWT_SITE_BASE . '/api/v1'.
+if ( ! defined( 'KWT_SITE_BASE' ) ) {
+	define( 'KWT_SITE_BASE', 'https://tours.kwawingu.com' );
+}
 if ( ! defined( 'KWT_API_BASE' ) ) {
-	define( 'KWT_API_BASE', 'https://tours.kwawingu.com/api/v1' );
+	define( 'KWT_API_BASE', rtrim( KWT_SITE_BASE, '/' ) . '/api/v1' );
 }
 
 $kwt_autoload = KWT_PLUGIN_DIR . 'vendor/autoload.php';

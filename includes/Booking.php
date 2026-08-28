@@ -18,8 +18,27 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Booking {
 
+	/** Production hosted base; {@see hosted_base()} honours the KWT_SITE_BASE override. */
 	const HOSTED_BASE = 'https://tours.kwawingu.com';
-	const WIDGET_SRC  = 'https://tours.kwawingu.com/widget.js';
+
+	/**
+	 * Base URL of the hosted booking pages and widget (KWT_SITE_BASE when overridden).
+	 *
+	 * @return string No trailing slash.
+	 */
+	public static function hosted_base(): string {
+		$base = defined( 'KWT_SITE_BASE' ) ? (string) KWT_SITE_BASE : self::HOSTED_BASE;
+		return rtrim( '' !== $base ? $base : self::HOSTED_BASE, '/' );
+	}
+
+	/**
+	 * URL of the embeddable booking widget script.
+	 *
+	 * @return string
+	 */
+	public static function widget_src(): string {
+		return self::hosted_base() . '/widget.js';
+	}
 
 	/**
 	 * Plugin settings instance.
@@ -78,7 +97,7 @@ class Booking {
 		if ( '' === $slug || '' === $tour_slug ) {
 			return '';
 		}
-		return '<script src="' . esc_url( self::WIDGET_SRC ) . '"'
+		return '<script src="' . esc_url( self::widget_src() ) . '"'
 			. ' data-operator="' . esc_attr( $slug ) . '"'
 			. ' data-tour="' . esc_attr( $tour_slug ) . '" async></script>';
 	}
@@ -96,6 +115,6 @@ class Booking {
 			return '';
 		}
 		// All modes resolve to the hosted flow in v0.2.
-		return self::HOSTED_BASE . '/' . rawurlencode( $slug ) . '/tours/' . rawurlencode( $tour_slug );
+		return self::hosted_base() . '/' . rawurlencode( $slug ) . '/tours/' . rawurlencode( $tour_slug );
 	}
 }

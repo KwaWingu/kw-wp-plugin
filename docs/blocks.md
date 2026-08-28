@@ -26,7 +26,7 @@ Displays the rating and guest reviews for a tour.
 - `postId` / `id` (number) — the tour to show reviews for; defaults to the current post in a tour template.
 
 ## Destinations Grid — `kwawingu/destinations-grid` / `[kwawingu_destinations]`
-A responsive grid of destination cards synced from your KwaWingu catalog.
+A responsive grid of destination cards. Destinations are synced from your KwaWingu catalog (the `/site` bundle) into `kwt_destination` posts on every catalog sync, with their cover image imported into the media library.
 - `limit` (number, default 12)
 
 ## Gallery — `kwawingu/gallery` / `[kwawingu_gallery]`
@@ -36,7 +36,7 @@ Displays a tour's photo gallery sourced from images imported into your media lib
 
 ## Availability Calendar — `kwawingu/availability-calendar` / `[kwawingu_availability]`
 A month grid of a tour's upcoming departures showing available seats and sold-out status.
-- `tourSlug` (block) / `slug` (shortcode) — the tour whose departures to show; defaults to the current tour's slug in a tour template.
+- `tourSlug` (block) / `slug` or `id` (shortcode; `id` is the tour post ID) — the tour whose departures to show; defaults to the current tour's slug in a tour template.
 
 The grid is rendered in the page from your live departures (`GET /api/v1/{slug}/tours/{tour}/departures`, fetched through the same-origin proxy below) — there is no iframe and nothing is embedded from tours.kwawingu.com, so it inherits your theme and works on any host. An older, pre-1.0 shortcode named `[kwawingu_calendar]` that iframed a hosted calendar page no longer exists; use `[kwawingu_availability]`.
 
@@ -48,6 +48,13 @@ Captures a visitor inquiry and forwards it to your KwaWingu booking inbox. The o
 - `tourSlug` / `tour_slug` (shortcode) (string, optional) — pre-fill the tour of interest
 
 Includes a honeypot field that silently blocks bot submissions without a CAPTCHA. Submissions are rate-limited (20 per 10 minutes per visitor IP).
+
+## On-site Booking — `kwawingu/booking` / `[kwawingu_booking_form]`
+The in-page booking form (see [booking-modes.md](booking-modes.md)). Loads the tour's real departures and shows a live quote (`POST /quote`, private key) before payment.
+- `tourSlug` (block) / `slug` or `id` (shortcode) — the tour to book; defaults to the current tour in a tour template.
+
+## Shortcodes on classic themes
+The five interactive shortcodes (`[kwawingu_search]`, `[kwawingu_calculator]`, `[kwawingu_booking_form]`, `[kwawingu_availability]`, `[kwawingu_inquiry]`) enqueue their block's view script themselves — WordPress only does that for the block — so they work on classic themes without any extra setup.
 
 ## Interactive blocks & full-page caching
 

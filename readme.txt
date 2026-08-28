@@ -4,7 +4,7 @@ Tags: tours, travel, tour operator, booking, safari
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.13.0
+Stable tag: 1.14.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,7 +30,9 @@ This plugin connects to the KwaWingu Tours developer API using your operator slu
 
 1. Install from **Plugins → Add New** (search "KwaWingu Tours"), or upload the plugin zip, or `git clone` into `wp-content/plugins/` and run `composer install --no-dev`.
 2. Activate the plugin.
-3. Go to **Settings → KwaWingu Tours**, enter your operator slug + public API key, choose a booking mode, and save. (Enable API access in your KwaWingu dashboard first — it is a paid add-on.)
+3. Go to **Settings → KwaWingu Tours**, enter your operator slug + public API key, choose a booking mode, and save. (Enable API access in your KwaWingu dashboard first — it is a paid add-on: without an active Developer API entitlement every API call answers `403 api_access_required` and the plugin tells you so in wp-admin.)
+   * The **public API key** is a *publishable* key (`kw_pk_…`). KwaWingu only issues one with an **allowed origin**, so enter your WordPress site address (e.g. `https://www.example.com`) as the allowed origin when you create it in Dashboard → Developers.
+   * The **private API key** (`kw_sk_…`) is only needed for the Inquiry Form and on-site booking. Grant it the `inquiries:write`, `quotes:write`, `bookings:write`, `payments:write` and `bookings:read` scopes.
 4. Go to **Settings → KwaWingu Setup** and click **Build my site**.
 5. Visit your site.
 
@@ -51,6 +53,9 @@ Start with **Redirect** — zero setup, always-correct availability, payment han
 = Will it work with my theme? =
 Yes. Blocks are theme-agnostic and server-rendered; classic themes can use the `[kwawingu_*]` shortcodes.
 
+= Can I point the plugin at a staging or self-hosted KwaWingu? =
+Yes. Add `define( 'KWT_SITE_BASE', 'https://staging.example' );` to `wp-config.php` — the Developer API root becomes `KWT_SITE_BASE/api/v1` and the hosted booking links and dashboard link follow it. `KWT_API_BASE` can still be defined separately to override only the API root.
+
 = How do tours stay up to date? =
 Tour content re-syncs automatically (hourly by default; configurable), via a "Sync now" button, and instantly when KwaWingu pushes a change to the Instant resync endpoint. Price, currency and sold-out state are not synced at all — they are read live from your account on every page view, with the last synced values as a fallback if the API is unreachable. Your manual edits to a tour are preserved on future syncs.
 
@@ -70,6 +75,23 @@ Tour content re-syncs automatically (hourly by default; configurable), via a "Sy
 This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to fetch your tour catalog, availability, pricing, and related content, and — in on-site booking mode — to create bookings and start payments on your behalf. It uses the operator slug and API keys you configure. Data sent: your API key (in a request header) and the parameters for the content or booking requested (including guest details a visitor enters in the on-site booking form). No visitor personal data is sent during catalog sync. Current prices and availability are requested from the same API when a tour is displayed (the response is reused for 60 seconds), and KwaWingu can call back to this site's signed `kwt/v1/resync` endpoint to trigger a catalog sync; neither carries visitor data. See https://tours.kwawingu.com for the Terms and the KwaWingu privacy policy.
 
 == Changelog ==
+
+= 1.14.0 =
+Found by running the plugin end-to-end against a real KwaWingu backend (WordPress in Docker, every shortcode and block, the editor, the proxy, the paid gate). Nine things did not work:
+
+* **Fix: no image was ever imported.** KwaWingu serves photos from Cloudflare Images (`imagedelivery.net/…/public`, no file extension) and `media_sideload_image()` refuses a URL without one, so covers and galleries silently never reached the media library. Images are now downloaded and identified by their bytes.
+* **Fix: the Destinations Grid was always empty.** Nothing ever wrote a Destination post. Destinations are now synced from your catalog (`/site`) alongside tours.
+* **Fix: Tour Search never showed results.** The API returns `tours`, the block read `data`; results now also link to the synced tour page on your site.
+* **Fix: the interactive shortcodes were dead on classic themes.** `[kwawingu_search]`, `[kwawingu_calculator]`, `[kwawingu_booking_form]`, `[kwawingu_availability]` and `[kwawingu_inquiry]` rendered forms without their scripts, because WordPress only loads a block's view script for the block.
+* **Fix: `[kwawingu_booking_form id=…]` and `[kwawingu_availability id=…]` ignored `id`** (and `slug`); the form bound to the page it sat on.
+* **Fix: the on-site form's live price was never shown** — `POST /quote` needs the private key, and the response field is `totalAmount`.
+* **Fix: the Trip Calculator showed the per-person figure as the total** and always labelled it TZS; it now shows `grandTotal` in your currency.
+* **Fix: the inquiry's preferred date was dropped** (sent as `date`, the API reads `preferredDate`).
+* **Fix: listing all departures (`?tourSlug=`) returned a 502** — a WordPress REST quirk with `sanitize_title` as a sanitize callback.
+* Gallery block: a Tour Post ID control in the editor, so it can show a tour's gallery on any page.
+* Block titles now match the documentation ("KwaWingu Destinations Grid", "KwaWingu On-site Booking").
+* Calculator and search show the API's visitor-safe message ("not available at the moment") instead of a generic error when the paid API is off.
+* `KWT_SITE_BASE` constant to point a site at a staging/self-hosted KwaWingu; proxy failures are written to the debug log when `WP_DEBUG` is on.
 
 = 1.13.0 =
 * **API refusals now say what to do — to the right person.** When the KwaWingu Developer API refuses a request, wp-admin shows the site owner a notice naming the fix: enable the paid API add-on, correct the public key, or correct the operator slug. Visitors never see a status code or anything about plans and keys — interactive blocks show a quiet "not available at the moment" instead. The notice clears itself on the next successful call.
@@ -143,6 +165,9 @@ This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to f
 * Initial release: settings, API client, Tours/Destinations post types, and scheduled catalog sync.
 
 == Upgrade Notice ==
+
+= 1.14.0 =
+Images, destinations, search, the calculator, the live price and every interactive shortcode were broken against the real API. Upgrade and run Sync now once to import your photos and destinations.
 
 = 1.12.0 =
 Prices and availability now come from your account live instead of going stale between syncs, and the sync interval setting finally takes effect when you change it. Recommended for everyone.

@@ -39,6 +39,22 @@ class Shortcodes {
 	);
 
 	/**
+	 * Shortcodes whose markup is only a shell that the block's `viewScript` brings
+	 * to life. WordPress enqueues a viewScript when the *block* renders, never for
+	 * a shortcode — so on a classic theme these five rendered dead forms: no search
+	 * results, no estimate, no departures, no calendar, no inquiry submission.
+	 *
+	 * @var array<int,string>
+	 */
+	const INTERACTIVE = array(
+		'kwawingu_search',
+		'kwawingu_calculator',
+		'kwawingu_booking_form',
+		'kwawingu_availability',
+		'kwawingu_inquiry',
+	);
+
+	/**
 	 * Registers all shortcodes with WordPress.
 	 */
 	public function register(): void {
@@ -54,6 +70,23 @@ class Shortcodes {
 		add_shortcode( 'kwawingu_gallery', array( $this, 'render_gallery' ) );
 		add_shortcode( 'kwawingu_availability', array( $this, 'render_availability' ) );
 		add_shortcode( 'kwawingu_inquiry', array( $this, 'render_inquiry' ) );
+	}
+
+	/**
+	 * Enqueues the view script the block registers for this shortcode's block.
+	 *
+	 * @param string $shortcode Shortcode tag (a key of self::BLOCKS).
+	 * @return void
+	 */
+	private function enqueue_view_script( string $shortcode ): void {
+		if ( ! function_exists( 'wp_enqueue_script' ) || ! function_exists( 'generate_block_asset_handle' ) ) {
+			return;
+		}
+		$block = self::BLOCKS[ $shortcode ] ?? '';
+		if ( '' === $block ) {
+			return;
+		}
+		wp_enqueue_script( generate_block_asset_handle( 'kwawingu/' . $block, 'viewScript' ) );
 	}
 
 	/**
@@ -171,6 +204,7 @@ class Shortcodes {
 	 * @return string
 	 */
 	public function render_search( $atts ): string {
+		$this->enqueue_view_script( 'kwawingu_search' );
 		require_once Blocks::block_dir() . 'search/render-fn.php';
 		return kwt_render_search( array(), '' );
 	}
@@ -182,6 +216,7 @@ class Shortcodes {
 	 * @return string
 	 */
 	public function render_calculator( $atts ): string {
+		$this->enqueue_view_script( 'kwawingu_calculator' );
 		require_once Blocks::block_dir() . 'calculator/render-fn.php';
 		return kwt_render_calculator( array(), '' );
 	}
@@ -193,8 +228,35 @@ class Shortcodes {
 	 * @return string
 	 */
 	public function render_booking_form( $atts ): string {
+		$this->enqueue_view_script( 'kwawingu_booking_form' );
 		require_once Blocks::block_dir() . 'booking/render-fn.php';
-		return kwt_render_booking_form( array(), '' );
+		// `id`/`slug` were documented but never read: the form always bound to the
+		// current post, which on any page other than a tour is a form with no tour.
+		return kwt_render_booking_form( array( 'tourSlug' => $this->tour_slug_att( $atts ) ), '' );
+	}
+
+	/**
+	 * Resolves a shortcode's `slug` / `id` attribute to a KwaWingu tour slug.
+	 *
+	 * @param array<string,mixed> $atts Raw shortcode attributes.
+	 * @return string Tour slug, or '' to let the renderer use the current post.
+	 */
+	private function tour_slug_att( $atts ): string {
+		$atts = shortcode_atts(
+			array(
+				'id'   => 0,
+				'slug' => '',
+			),
+			$atts
+		);
+		if ( '' !== (string) $atts['slug'] ) {
+			return (string) $atts['slug'];
+		}
+		$id = (int) $atts['id'];
+		if ( $id > 0 && function_exists( 'get_post_meta' ) ) {
+			return (string) get_post_meta( $id, 'kwt_slug', true );
+		}
+		return '';
 	}
 
 	/**
@@ -228,9 +290,9 @@ class Shortcodes {
 	 * @return string
 	 */
 	public function render_availability( $atts ): string {
+		$this->enqueue_view_script( 'kwawingu_availability' );
 		require_once Blocks::block_dir() . 'availability-calendar/render-fn.php';
-		$atts = shortcode_atts( array( 'slug' => '' ), $atts );
-		return kwt_render_availability_calendar( array( 'tourSlug' => (string) $atts['slug'] ), '' );
+		return kwt_render_availability_calendar( array( 'tourSlug' => $this->tour_slug_att( $atts ) ), '' );
 	}
 
 	/**
@@ -240,6 +302,7 @@ class Shortcodes {
 	 * @return string
 	 */
 	public function render_inquiry( $atts ): string {
+		$this->enqueue_view_script( 'kwawingu_inquiry' );
 		require_once Blocks::block_dir() . 'inquiry-form/render-fn.php';
 		$atts = shortcode_atts(
 			array(

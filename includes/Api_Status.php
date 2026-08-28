@@ -27,8 +27,17 @@ class Api_Status {
 	/** Option holding the last recorded failure (or nothing when the API is healthy). */
 	const OPTION = 'kwt_api_status';
 
-	/** URL of the dashboard page where the operator enables the Developer API add-on. */
-	const DASHBOARD_URL = 'https://tours.kwawingu.com/dashboard/booking-engine';
+	/** Dashboard path where the operator enables the Developer API add-on. */
+	const DASHBOARD_PATH = '/dashboard/booking-engine';
+
+	/**
+	 * URL of the dashboard page where the operator enables the Developer API add-on.
+	 *
+	 * @return string
+	 */
+	public static function dashboard_url(): string {
+		return Booking::hosted_base() . self::DASHBOARD_PATH;
+	}
 
 	/**
 	 * A sentence for the site owner, naming the fix.
@@ -200,7 +209,7 @@ class Api_Status {
 		echo '<div class="' . esc_attr( $class ) . '"><p><strong>' . esc_html__( 'KwaWingu Tours:', 'kwawingu-tours' ) . '</strong> '
 			. esc_html( (string) $last['message'] );
 		if ( Api_Exception::KIND_ENTITLEMENT === ( $last['kind'] ?? '' ) ) {
-			echo ' <a href="' . esc_url( self::DASHBOARD_URL ) . '" target="_blank" rel="noopener">' . esc_html__( 'Open KwaWingu dashboard', 'kwawingu-tours' ) . '</a>';
+			echo ' <a href="' . esc_url( self::dashboard_url() ) . '" target="_blank" rel="noopener">' . esc_html__( 'Open KwaWingu dashboard', 'kwawingu-tours' ) . '</a>';
 		}
 		echo '</p></div>';
 	}

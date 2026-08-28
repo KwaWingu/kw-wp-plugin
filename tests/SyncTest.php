@@ -176,4 +176,50 @@ class SyncTest extends TestCase {
         $this->assertStringContainsString( 'plan does not include API access', $out['errors'][0] );
         $this->assertStringNotContainsString( '403', $out['errors'][0] );
     }
+
+    public function test_syncs_destinations_from_the_site_bundle_into_kwt_destination_posts(): void {
+        // Before this, nothing ever wrote a kwt_destination post, so the Destinations
+        // Grid rendered its empty state on every site regardless of the catalog.
+        $lookups = array();
+        Functions\when( 'get_posts' )->alias( static function ( $args ) use ( &$lookups ) {
+            $lookups[] = $args;
+            return array();
+        } );
+        $inserted = array();
+        Functions\when( 'wp_insert_post' )->alias( static function ( $args ) use ( &$inserted ) {
+            $inserted[] = $args;
+            return count( $inserted ) + 200;
+        } );
+        $meta = array();
+        Functions\when( 'update_post_meta' )->alias( static function ( $id, $key, $value ) use ( &$meta ) {
+            $meta[ $id ][ $key ] = $value;
+            return true;
+        } );
+        Functions\when( 'get_post_meta' )->justReturn( '' );
+
+        $api = Mockery::mock( Api_Client::class );
+        $api->shouldReceive( 'get_site' )->once()->andReturn(
+            array(
+                'tours'        => array( array( 'id' => 'T1', 'slug' => 'safari', 'title' => 'Safari' ) ),
+                'destinations' => array(
+                    array( 'id' => 'D1', 'name' => 'Serengeti', 'region' => 'Mara', 'country' => 'Tanzania', 'description' => 'Plains', 'coverImageUrl' => 'https://img.test/s.jpg' ),
+                    array( 'id' => '', 'name' => 'No id — skipped' ),
+                ),
+            )
+        );
+        $out = ( new Sync( $api ) )->run();
+
+        $this->assertSame( 1, $out['created'] );
+        $this->assertSame( array( 'created' => 1, 'updated' => 0, 'unpublished' => 0 ), $out['destinations'] );
+        $dest = array_values( array_filter( $inserted, static fn( $a ) => 'kwt_destination' === $a['post_type'] ) );
+        $this->assertCount( 1, $dest );
+        $this->assertSame( 'Serengeti', $dest[0]['post_title'] );
+        $this->assertSame( 'publish', $dest[0]['post_status'] );
+        $this->assertSame( 'D1', $meta[202]['kwt_id'] );
+        $this->assertSame( 'https://img.test/s.jpg', $meta[202]['kwt_cover_url'] );
+        $this->assertSame( 'Mara', $meta[202]['kwt_region'] );
+        // The destination lookup and sweep are scoped to kwt_destination, never the tours.
+        $types = array_unique( array_map( static fn( $a ) => $a['post_type'], $lookups ) );
+        $this->assertContains( 'kwt_destination', $types );
+    }
 }

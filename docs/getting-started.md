@@ -2,7 +2,13 @@
 
 ## 1. Enable API access (paid add-on)
 
-The plugin reads your data through the KwaWingu Developer API, a paid per-operator add-on. In your KwaWingu dashboard, open **Developer API** and enable access, then copy your **operator slug** and **public API key**.
+The plugin reads your data through the KwaWingu Developer API, a paid per-operator add-on. Without an active entitlement every request answers `403 api_access_required` (the plugin shows you exactly that in wp-admin). In your KwaWingu dashboard, open **Developer API** and enable access, then:
+
+- create a **publishable key** (`kw_pk_…`) for the **public API key** field. KwaWingu only issues one with an **allowed origin** — enter your WordPress site address (scheme + host, e.g. `https://www.example.com`);
+- if you will use the Inquiry Form or on-site booking, create a **secret key** (`kw_sk_…`) with the `inquiries:write`, `quotes:write`, `bookings:write`, `payments:write` and `bookings:read` scopes for the **private API key** field;
+- note your **operator slug** — the last part of your booking page address, `tours.kwawingu.com/your-slug`.
+
+Testing against a staging or local KwaWingu? Put `define( 'KWT_SITE_BASE', 'http://host.docker.internal:8085' );` in `wp-config.php` — the API root becomes `KWT_SITE_BASE/api/v1` and booking links follow it. `KWT_API_BASE` overrides the API root alone.
 
 ## 2. Connect
 
@@ -14,7 +20,7 @@ In WordPress: **Settings → KwaWingu Tours**. Paste your slug + public key, cho
 
 - pull your branding (logo + colours) from your KwaWingu profile,
 - create starter pages (Home, Tours, About, Contact) and set your home page,
-- import your tours.
+- import your tours and destinations (covers and gallery photos go into your media library).
 
 Everything is normal WordPress content afterwards — edit freely. Once you edit a tour, future syncs won't overwrite your text (they still refresh price, photos, and the booking link).
 

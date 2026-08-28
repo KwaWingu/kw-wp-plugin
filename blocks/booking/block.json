@@ -2,7 +2,7 @@
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
   "name": "kwawingu/booking",
-  "title": "KwaWingu Booking",
+  "title": "KwaWingu On-site Booking",
   "category": "widgets",
   "icon": "cart",
   "description": "On-site booking + payment for the current tour.",

@@ -157,7 +157,7 @@ class ApiStatusTest extends TestCase {
 
 		$this->assertStringContainsString( 'notice-error', $html );
 		$this->assertStringContainsString( 'plan does not include API access', $html );
-		$this->assertStringContainsString( Api_Status::DASHBOARD_URL, $html );
+		$this->assertStringContainsString( Api_Status::dashboard_url(), $html );
 	}
 
 	public function test_retryable_notice_only_shows_on_the_plugin_settings_page(): void {

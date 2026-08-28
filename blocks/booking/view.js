@@ -2,8 +2,23 @@
  * kwawingu/booking view: load departures -> live quote -> create booking
  * (correct payload) -> start payment -> poll status -> link to portal.
  */
-function kwtMoney( n ) {
-	return 'TZS ' + ( Number( n ) || 0 ).toLocaleString();
+function kwtMoney( n, currency ) {
+	return ( currency || 'TZS' ) + ' ' + ( Number( n ) || 0 ).toLocaleString();
+}
+
+/**
+ * The party total of a POST /quote response, formatted in its own currency.
+ *
+ * The Quote schema names it `totalAmount` (with `currency`); the previous
+ * `total || perPersonTotal` chain matched nothing and always showed "TZS 0".
+ *
+ * @param {Object} res Proxy response (`{ data: Quote }` or the quote itself).
+ * @return {string} e.g. "TZS 4,900,000".
+ */
+function kwtQuoteTotal( res ) {
+	var data = ( res && res.data ) || res || {};
+	var amount = data.totalAmount != null ? data.totalAmount : ( data.total || 0 );
+	return kwtMoney( amount, data.currency );
 }
 
 /** ≤30-char idempotency key. */
@@ -49,8 +64,6 @@ function kwtReadPortalUrl( res ) {
 ( function () {
 	'use strict';
 
-	var money = kwtMoney;
-
 	function init( form ) {
 		var status = form.querySelector( '.kwt-booking__status' );
 		var priceEl = form.querySelector( '.kwt-booking__price' );
@@ -85,9 +98,7 @@ function kwtReadPortalUrl( res ) {
 			if ( select.value ) { body.departureId = select.value; }
 			priceEl.textContent = window.kwtProxy.i18n.loading;
 			window.kwtProxy.post( '/quote', body ).then( function ( res ) {
-				var data = ( res && res.data ) || res || {};
-				var total = data.total || data.perPersonTotal || 0;
-				priceEl.textContent = window.kwtProxy.i18n.priceFrom + ' ' + money( total );
+				priceEl.textContent = window.kwtProxy.i18n.priceFrom + ' ' + kwtQuoteTotal( res );
 			} ).catch( function () { priceEl.textContent = ''; } );
 		}
 		[ 'change' ].forEach( function ( ev ) {
@@ -165,6 +176,7 @@ if ( typeof module !== 'undefined' && module.exports ) {
 		readBookingRef: kwtReadBookingRef,
 		readPortalUrl: kwtReadPortalUrl,
 		idemKey: kwtIdemKey,
-		money: kwtMoney
+		money: kwtMoney,
+		quoteTotal: kwtQuoteTotal
 	};
 }

@@ -161,7 +161,6 @@ class Admin_Page {
 				</table>
 				<?php submit_button(); ?>
 			</form>
-		</div>
 		<?php
 		$status = get_option( \KwaWingu\Tours\Sync_Controller::STATUS_OPT, array() );
 		?>
@@ -181,6 +180,21 @@ class Admin_Page {
 				);
 				?>
 			</p>
+			<?php if ( ! empty( $status['destinations'] ) && is_array( $status['destinations'] ) ) : ?>
+				<p>
+					<?php
+					echo esc_html(
+						sprintf(
+						/* translators: 1: created, 2: updated, 3: unpublished */
+							__( 'Destinations — created %1$d, updated %2$d, unpublished %3$d.', 'kwawingu-tours' ),
+							(int) ( $status['destinations']['created'] ?? 0 ),
+							(int) ( $status['destinations']['updated'] ?? 0 ),
+							(int) ( $status['destinations']['unpublished'] ?? 0 )
+						)
+					);
+					?>
+				</p>
+			<?php endif; ?>
 			<?php if ( ! empty( $status['errors'] ) ) : ?>
 				<div class="notice notice-warning inline"><p><?php echo esc_html( implode( ' | ', array_map( 'strval', $status['errors'] ) ) ); ?></p></div>
 			<?php endif; ?>
@@ -192,6 +206,9 @@ class Admin_Page {
 		</form>
 		<?php
 		$this->render_push_section();
+		// The sync and push sections belong inside .wrap too: outside it they render
+		// without the admin page gutter and are missed by anything reading the page.
+		echo '</div>';
 	}
 
 	/**

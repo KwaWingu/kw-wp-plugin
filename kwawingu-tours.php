@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name:       KwaWingu Tours
- * Plugin URI:        https://tours.kwawingu.com
- * Description:        Build a tour-operator website fast on your KwaWingu Tours data — sync your catalog into WordPress, add blocks, and go live in minutes.
+ * Plugin URI:        https://github.com/KwaWingu/kw-wp-plugin
+ * Description:       Build a tour-operator website fast on your KwaWingu Tours data — sync your catalog into WordPress, add blocks, and go live in minutes.
  * Version:           1.14.2
  * Requires at least: 6.2
  * Requires PHP:      7.4
  * Author:            KwaWingu Tours
- * Author URI:        https://tours.kwawingu.com
+ * Author URI:        https://kwawingu.com
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       kwawingu-tours

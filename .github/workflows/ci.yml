@@ -47,6 +47,10 @@ jobs:
           node-version: '20'
       - name: Install PHP deps
         run: composer install --no-interaction --prefer-dist
+      # npm ci first so `npx @wordpress/env` resolves to the pinned devDependency (^10)
+      # instead of fetching whatever is latest on the registry.
+      - name: Install JS deps
+        run: npm ci
       - name: Start WordPress (wp-env / Docker)
         run: npx @wordpress/env start
       - name: Integration tests (real WordPress)

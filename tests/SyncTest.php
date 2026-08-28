@@ -202,7 +202,7 @@ class SyncTest extends TestCase {
             array(
                 'tours'        => array( array( 'id' => 'T1', 'slug' => 'safari', 'title' => 'Safari' ) ),
                 'destinations' => array(
-                    array( 'id' => 'D1', 'name' => 'Serengeti', 'region' => 'Mara', 'country' => 'Tanzania', 'description' => 'Plains', 'coverImageUrl' => 'https://img.test/s.jpg' ),
+                    array( 'id' => 'D1', 'name' => 'Serengeti', 'slug' => 'serengeti', 'region' => 'Mara', 'country' => 'Tanzania', 'description' => 'Plains', 'coverImageUrl' => 'https://img.test/s.jpg' ),
                     array( 'id' => '', 'name' => 'No id — skipped' ),
                 ),
             )
@@ -218,6 +218,8 @@ class SyncTest extends TestCase {
         $this->assertSame( 'D1', $meta[202]['kwt_id'] );
         $this->assertSame( 'https://img.test/s.jpg', $meta[202]['kwt_cover_url'] );
         $this->assertSame( 'Mara', $meta[202]['kwt_region'] );
+        // The API slug is kept so the grid can link to the hosted destination page.
+        $this->assertSame( 'serengeti', $meta[202]['kwt_slug'] );
         // The destination lookup and sweep are scoped to kwt_destination, never the tours.
         $types = array_unique( array_map( static fn( $a ) => $a['post_type'], $lookups ) );
         $this->assertContains( 'kwt_destination', $types );

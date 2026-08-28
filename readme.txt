@@ -4,7 +4,7 @@ Tags: tours, travel, tour operator, booking, safari
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.14.1
+Stable tag: 1.14.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,6 +77,9 @@ Tour content re-syncs automatically (hourly by default; configurable), via a "Sy
 This plugin connects to the KwaWingu Tours API (https://tours.kwawingu.com) to fetch your tour catalog, availability, pricing, and related content, and — in on-site booking mode — to create bookings and start payments on your behalf. It uses the operator slug and API keys you configure. Data sent: your API key (in a request header) and the parameters for the content or booking requested (including guest details a visitor enters in the on-site booking form). No visitor personal data is sent during catalog sync. Current prices and availability are requested from the same API when a tour is displayed (the response is reused for 60 seconds), and KwaWingu can call back to this site's signed `kwt/v1/resync` endpoint to trigger a catalog sync; neither carries visitor data. See https://tours.kwawingu.com for the Terms and the KwaWingu privacy policy.
 
 == Changelog ==
+
+= 1.14.2 =
+* **Destination cards now open the destination's page on your hosted storefront** (`{hosted}/{operator}/destinations/{slug}`): what the place is, highlights, best months, the official park tariff on file and your tours that go there. They used to open the bare local `kwt_destination` post, which for most catalogue entries was an empty page — so visitors left to search the web for the park instead. The sync keeps the API's `slug` (`kwt_slug`); a destination synced before this release links to the local post until the next sync runs.
 
 = 1.14.1 =
 Release follow-ups, found while capturing the WordPress.org screenshots from a live install.
@@ -177,6 +180,9 @@ Found by running the plugin end-to-end against a real KwaWingu backend (WordPres
 * Initial release: settings, API client, Tours/Destinations post types, and scheduled catalog sync.
 
 == Upgrade Notice ==
+
+= 1.14.2 =
+Destination cards link to the full destination page on your hosted storefront instead of an empty local post. Run Sync once after updating.
 
 = 1.14.1 =
 Buttons in every block were invisible and the inquiry form was unstyled with a visible spam-trap field. Recommended for everyone.

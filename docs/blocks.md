@@ -26,7 +26,7 @@ Displays the rating and guest reviews for a tour.
 - `postId` / `id` (number) — the tour to show reviews for; defaults to the current post in a tour template.
 
 ## Destinations Grid — `kwawingu/destinations-grid` / `[kwawingu_destinations]`
-A responsive grid of destination cards. Destinations are synced from your KwaWingu catalog (the `/site` bundle) into `kwt_destination` posts on every catalog sync, with their cover image imported into the media library.
+A responsive grid of destination cards. Destinations are synced from your KwaWingu catalog (the `/site` bundle) into `kwt_destination` posts on every catalog sync, with their cover image imported into the media library. Each card links to the destination's page on the hosted storefront (`{hosted}/{operator}/destinations/{slug}` — description, highlights, best months, park fees, the tours that go there); the local post permalink is only the fallback for a destination synced before the API exposed `slug`.
 - `limit` (number, default 12)
 
 ## Gallery — `kwawingu/gallery` / `[kwawingu_gallery]`

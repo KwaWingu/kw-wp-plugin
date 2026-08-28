@@ -5,7 +5,33 @@
  * @package KwaWingu\Tours
  */
 
+use KwaWingu\Tours\Booking;
 use KwaWingu\Tours\Cpt;
+use KwaWingu\Tours\Settings;
+
+if ( ! function_exists( 'kwt_destination_url' ) ) {
+	/**
+	 * Where a destination card goes.
+	 *
+	 * The hosted storefront page for the place — description, highlights, best months, the
+	 * official park tariff and the operator's tours that go there — when the sync recorded the
+	 * API's slug and the operator slug is configured. The local kwt_destination permalink only
+	 * as a fallback (a post synced before 1.14.2 has no slug yet; the next sync adds it), so a
+	 * card never links to an empty local page when the real one exists.
+	 *
+	 * @param int $post_id kwt_destination post ID.
+	 * @return string
+	 */
+	function kwt_destination_url( int $post_id ): string {
+		$slug     = (string) get_post_meta( $post_id, 'kwt_slug', true );
+		$operator = ( new Settings() )->get_slug();
+		if ( '' !== $slug && '' !== $operator ) {
+			return Booking::hosted_base() . '/' . rawurlencode( $operator ) . '/destinations/' . rawurlencode( $slug );
+		}
+		$link = get_permalink( $post_id );
+		return is_string( $link ) ? $link : '';
+	}
+}
 
 if ( ! function_exists( 'kwt_render_destinations_grid' ) ) {
 	/**
@@ -38,7 +64,7 @@ if ( ! function_exists( 'kwt_render_destinations_grid' ) ) {
 			if ( $img ) {
 				$out .= '<img class="kwt-destination-card__img" src="' . esc_url( $img ) . '" alt="' . esc_attr( $title ) . '" loading="lazy" />';
 			}
-			$out .= '<h3 class="kwt-destination-card__title"><a href="' . esc_url( get_permalink() ) . '">' . esc_html( $title ) . '</a></h3>';
+			$out .= '<h3 class="kwt-destination-card__title"><a href="' . esc_url( kwt_destination_url( (int) get_the_ID() ) ) . '">' . esc_html( $title ) . '</a></h3>';
 			$out .= '</article>';
 		}
 		$out .= '</div>';

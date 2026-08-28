@@ -172,6 +172,9 @@ class Sync {
 				++$out['updated'];
 			}
 			update_post_meta( $id, self::META_ID, $kwt_id );
+			// The API's slug is what the hosted destination page is addressed by
+			// ({hostedBase}/{operator}/destinations/{slug}); the grid links there.
+			update_post_meta( $id, 'kwt_slug', sanitize_title( (string) ( $row['slug'] ?? '' ) ) );
 			update_post_meta( $id, 'kwt_region', sanitize_text_field( (string) ( $row['region'] ?? '' ) ) );
 			update_post_meta( $id, 'kwt_country', sanitize_text_field( (string) ( $row['country'] ?? '' ) ) );
 			update_post_meta( $id, 'kwt_destination_type', sanitize_text_field( (string) ( $row['destinationType'] ?? '' ) ) );

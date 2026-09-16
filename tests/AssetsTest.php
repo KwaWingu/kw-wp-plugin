@@ -16,7 +16,7 @@ class AssetsTest extends TestCase {
     }
 
     public function test_enqueue_registers_and_localizes_proxy(): void {
-        Functions\when( 'plugins_url' )->justReturn( 'https://site/wp-content/plugins/kwawingu-tours/assets/js/kwt-proxy.js' );
+        Functions\when( 'plugins_url' )->justReturn( 'https://site/wp-content/plugins/kwawingu-tours/assets/js/kwawingu-tours-proxy.js' );
         Functions\when( 'rest_url' )->justReturn( 'https://site/wp-json/kwawingu/v1' );
         Functions\when( 'wp_create_nonce' )->justReturn( 'abc123' );
         Functions\when( 'get_option' )->justReturn( array( 'slug' => 'acme' ) );
@@ -31,12 +31,12 @@ class AssetsTest extends TestCase {
 
         ( new Assets() )->enqueue();
 
-        $this->assertContains( 'kwt-proxy', $registered );
-        $this->assertSame( 'kwtProxy', $localized[1] );
+        $this->assertContains( 'kwawingu-tours-proxy', $registered );
+        $this->assertSame( 'kwawinguToursProxy', $localized[1] );
         $this->assertSame( 'abc123', $localized[2]['nonce'] );
         $this->assertSame( 'acme', $localized[2]['slug'] );
-        $this->assertSame( 'kwt-blocks', $styles['reg'] );
-        $this->assertSame( 'kwt-blocks', $styles['enq'] );
+        $this->assertSame( 'kwawingu-tours-blocks', $styles['reg'] );
+        $this->assertSame( 'kwawingu-tours-blocks', $styles['enq'] );
     }
 
     /**
@@ -46,7 +46,7 @@ class AssetsTest extends TestCase {
      * `:root{}` outranks.
      */
     public function test_block_css_declares_brand_defaults_without_self_referencing_custom_properties(): void {
-        $css = (string) file_get_contents( dirname( __DIR__ ) . '/assets/css/kwt-blocks.css' );
+        $css = (string) file_get_contents( dirname( __DIR__ ) . '/assets/css/kwawingu-tours-blocks.css' );
         $css = (string) preg_replace( '#/\*.*?\*/#s', '', $css ); // The header comment quotes the broken form.
 
         $this->assertDoesNotMatchRegularExpression( '/--kwt-(primary|accent)\s*:\s*var\(\s*--kwt-\1/', $css );
@@ -58,7 +58,7 @@ class AssetsTest extends TestCase {
      * stray box in had their inquiry silently dropped as a bot.
      */
     public function test_block_css_styles_the_inquiry_form_and_hides_the_honeypot(): void {
-        $css = (string) file_get_contents( dirname( __DIR__ ) . '/assets/css/kwt-blocks.css' );
+        $css = (string) file_get_contents( dirname( __DIR__ ) . '/assets/css/kwawingu-tours-blocks.css' );
 
         $this->assertMatchesRegularExpression( '/\.kwt-inquiry\s*\{/', $css );
         $this->assertMatchesRegularExpression( '/\.kwt-hp\s*\{[^}]*(position:\s*absolute;[^}]*left:\s*-9999px|display:\s*none)/s', $css );

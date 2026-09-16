@@ -38,7 +38,7 @@ class DestinationsGridRenderTest extends TestCase {
      * not to the bare local post.
      */
     public function test_card_links_to_the_hosted_destination_page_when_the_slug_is_synced(): void {
-        Functions\when( 'get_post_meta' )->alias( static fn( $id, $key ) => 'kwt_slug' === $key ? 'serengeti-national-park' : '' );
+        Functions\when( 'get_post_meta' )->alias( static fn( $id, $key ) => 'kwawingu_tours_slug' === $key ? 'serengeti-national-park' : '' );
         $query = new \WP_Query_Stub( array( 3 ) );
         $html  = kwawingu_tours_render_destinations_grid( array( '_query' => $query ), '' );
         $this->assertStringContainsString( 'href="https://tours.kwawingu.com/acme/destinations/serengeti-national-park"', $html );

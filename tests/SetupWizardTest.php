@@ -24,7 +24,7 @@ namespace KwaWingu\Tours\Tests {
             );
             $w->register();
             $this->assertNotFalse( has_action( 'admin_menu' ) );
-            $this->assertNotFalse( has_action( 'admin_post_kwt_setup_scaffold' ) );
+            $this->assertNotFalse( has_action( 'admin_post_kwawingu_tours_setup_scaffold' ) );
         }
 
         public function test_scaffold_runs_branding_importer_sync(): void {

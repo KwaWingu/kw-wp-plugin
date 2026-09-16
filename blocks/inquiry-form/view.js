@@ -8,9 +8,9 @@
  * @param {HTMLFormElement} form
  * @returns {Object|null}
  */
-function kwtBuildInquiryPayload( form ) {
+function kwawinguToursBuildInquiryPayload( form ) {
 	// Honeypot — bots fill this; real users don't.
-	var hp = form.querySelector( '[name="kwt_hp"]' );
+	var hp = form.querySelector( '[name="kwawingu_tours_hp"]' );
 	if ( hp && '' !== hp.value ) {
 		return null;
 	}
@@ -54,32 +54,32 @@ function kwtBuildInquiryPayload( form ) {
 		form.addEventListener( 'submit', function ( e ) {
 			e.preventDefault();
 
-			var payload = kwtBuildInquiryPayload( form );
+			var payload = kwawinguToursBuildInquiryPayload( form );
 
 			// Honeypot triggered — silently succeed (don't reward bots with an error).
 			if ( null === payload ) {
-				status.textContent = window.kwtProxy.i18n.inquirySuccess || 'Thanks — we\'ll get back to you shortly.';
+				status.textContent = window.kwawinguToursProxy.i18n.inquirySuccess || 'Thanks — we\'ll get back to you shortly.';
 				return;
 			}
 
 			// Basic client-side required-field check.
 			if ( ! payload.name || ! payload.email ) {
-				status.textContent = window.kwtProxy.i18n.error || 'Please fill in all required fields.';
+				status.textContent = window.kwawinguToursProxy.i18n.error || 'Please fill in all required fields.';
 				return;
 			}
 
 			var btn = form.querySelector( 'button[type="submit"]' );
 			if ( btn ) { btn.disabled = true; }
-			status.textContent = window.kwtProxy.i18n.loading || 'Sending…';
+			status.textContent = window.kwawinguToursProxy.i18n.loading || 'Sending…';
 
-			window.kwtProxy.post( '/inquiry', payload )
+			window.kwawinguToursProxy.post( '/inquiry', payload )
 				.then( function () {
 					form.reset();
-					status.textContent = window.kwtProxy.i18n.inquirySuccess || 'Thanks — we\'ll get back to you shortly.';
+					status.textContent = window.kwawinguToursProxy.i18n.inquirySuccess || 'Thanks — we\'ll get back to you shortly.';
 					if ( btn ) { btn.disabled = false; }
 				} )
 				.catch( function ( err ) {
-					status.textContent = ( err && err.message ) || ( window.kwtProxy.i18n.error ) || 'Something went wrong. Please try again.';
+					status.textContent = ( err && err.message ) || ( window.kwawinguToursProxy.i18n.error ) || 'Something went wrong. Please try again.';
 					if ( btn ) { btn.disabled = false; }
 				} );
 		} );
@@ -93,6 +93,6 @@ function kwtBuildInquiryPayload( form ) {
 /* Testable exports (ignored in the browser). */
 if ( typeof module !== 'undefined' && module.exports ) {
 	module.exports = {
-		buildInquiryPayload: kwtBuildInquiryPayload,
+		buildInquiryPayload: kwawinguToursBuildInquiryPayload,
 	};
 }

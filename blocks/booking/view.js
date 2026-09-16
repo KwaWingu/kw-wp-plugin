@@ -2,7 +2,7 @@
  * kwawingu/booking view: load departures -> live quote -> create booking
  * (correct payload) -> start payment -> poll status -> link to portal.
  */
-function kwtMoney( n, currency ) {
+function kwawinguToursMoney( n, currency ) {
 	return ( currency || 'TZS' ) + ' ' + ( Number( n ) || 0 ).toLocaleString();
 }
 
@@ -15,14 +15,14 @@ function kwtMoney( n, currency ) {
  * @param {Object} res Proxy response (`{ data: Quote }` or the quote itself).
  * @return {string} e.g. "TZS 4,900,000".
  */
-function kwtQuoteTotal( res ) {
+function kwawinguToursQuoteTotal( res ) {
 	var data = ( res && res.data ) || res || {};
 	var amount = data.totalAmount != null ? data.totalAmount : ( data.total || 0 );
-	return kwtMoney( amount, data.currency );
+	return kwawinguToursMoney( amount, data.currency );
 }
 
 /** ≤30-char idempotency key. */
-function kwtIdemKey() {
+function kwawinguToursIdemKey() {
 	return ( 'wp-' + Date.now().toString( 36 ) + Math.random().toString( 36 ).slice( 2, 8 ) ).slice( 0, 30 );
 }
 
@@ -31,7 +31,7 @@ function kwtIdemKey() {
  * @param {Object} v - collected form values (tourSlug, adults, children, infants,
  *                      firstName, lastName, email, phone, departureId, idempotencyKey?).
  */
-function kwtBuildBookingPayload( v ) {
+function kwawinguToursBuildBookingPayload( v ) {
 	var payload = {
 		tourSlug: v.tourSlug,
 		adults: Number( v.adults ) || 1,
@@ -41,7 +41,7 @@ function kwtBuildBookingPayload( v ) {
 		guestLastName: ( v.lastName || '' ).trim(),
 		guestEmail: ( v.email || '' ).trim(),
 		guestPhone: ( v.phone || '' ).trim(),
-		idempotencyKey: v.idempotencyKey || kwtIdemKey()
+		idempotencyKey: v.idempotencyKey || kwawinguToursIdemKey()
 	};
 	if ( v.departureId ) {
 		payload.departureId = v.departureId;
@@ -50,13 +50,13 @@ function kwtBuildBookingPayload( v ) {
 }
 
 /** Extract the booking ref from the create-booking response (shape varies). */
-function kwtReadBookingRef( res ) {
+function kwawinguToursReadBookingRef( res ) {
 	var booking = ( res && ( res.booking || ( res.data && res.data.booking ) ) ) || res || {};
 	return booking.ref || booking.bookingReference || ( res && res.ref ) || '';
 }
 
 /** Extract the guest portal URL from the create-booking response. */
-function kwtReadPortalUrl( res ) {
+function kwawinguToursReadPortalUrl( res ) {
 	var booking = ( res && ( res.booking || ( res.data && res.data.booking ) ) ) || {};
 	return ( res && ( res.portalUrl || ( res.data && res.data.portalUrl ) ) ) || booking.portalUrl || '';
 }
@@ -65,7 +65,7 @@ function kwtReadPortalUrl( res ) {
  * Extract the guest portal token from the create-booking response
  * (`BookingResult.portalToken` — a per-booking secret, not recoverable later).
  */
-function kwtReadPortalToken( res ) {
+function kwawinguToursReadPortalToken( res ) {
 	var booking = ( res && ( res.booking || ( res.data && res.data.booking ) ) ) || {};
 	return ( res && ( res.portalToken || ( res.data && res.data.portalToken ) ) ) || booking.portalToken || '';
 }
@@ -83,7 +83,7 @@ function kwtReadPortalToken( res ) {
  * @param {Object} data BookingDetail (the `data` of a lookup response, or the response).
  * @return {boolean}
  */
-function kwtPaymentReceived( data ) {
+function kwawinguToursPaymentReceived( data ) {
 	data = data || {};
 	var pairs = [ [ data.totalAmountMinor, data.balanceAmountMinor ], [ data.totalAmount, data.balanceAmount ] ];
 	for ( var i = 0; i < pairs.length; i++ ) {
@@ -99,21 +99,20 @@ function kwtPaymentReceived( data ) {
 /**
  * The proxy request that looks a booking up while polling for payment.
  *
- * With a portal token the guest is identified by the `X-Portal-Token` header
- * (the API's preferred, non-logged form). Without one — a response that did not
- * carry a token — it falls back to the deprecated `?email=` lookup, which the
- * API retires on 2027-07-01.
+ * The guest is identified only by the `X-Portal-Token` header — the per-booking
+ * secret from the create response, which the API validates server-side. The
+ * proxy refuses tokenless lookups (403), so without a token this returns null
+ * and the caller must not poll.
  *
  * @param {string} ref   Booking reference.
  * @param {string} token Portal token, or '' when none was issued.
- * @param {string} email Lead guest email (fallback only).
- * @return {{params: Object, headers: Object}} Arguments for kwtProxy.get('/booking', …).
+ * @return {?{params: Object, headers: Object}} Arguments for the '/booking' get, or null.
  */
-function kwtBookingLookupRequest( ref, token, email ) {
-	if ( token ) {
-		return { params: { ref: ref }, headers: { 'X-Portal-Token': token } };
+function kwawinguToursBookingLookupRequest( ref, token ) {
+	if ( ! token ) {
+		return null;
 	}
-	return { params: { ref: ref, email: email }, headers: {} };
+	return { params: { ref: ref }, headers: { 'X-Portal-Token': token } };
 }
 
 ( function () {
@@ -134,7 +133,7 @@ function kwtBookingLookupRequest( ref, token, email ) {
 		}
 
 		// 1. Load departures for this tour into the select.
-		window.kwtProxy.get( '/departures', { tourSlug: tourSlug } ).then( function ( res ) {
+		window.kwawinguToursProxy.get( '/departures', { tourSlug: tourSlug } ).then( function ( res ) {
 			var items = ( res && res.data ) || [];
 			items.forEach( function ( d ) {
 				var opt = document.createElement( 'option' );
@@ -151,9 +150,9 @@ function kwtBookingLookupRequest( ref, token, email ) {
 			var p = pax();
 			var body = { tourSlug: tourSlug, adults: p.adults, children: p.children, infants: p.infants };
 			if ( select.value ) { body.departureId = select.value; }
-			priceEl.textContent = window.kwtProxy.i18n.loading;
-			window.kwtProxy.post( '/quote', body ).then( function ( res ) {
-				priceEl.textContent = window.kwtProxy.i18n.priceFrom + ' ' + kwtQuoteTotal( res );
+			priceEl.textContent = window.kwawinguToursProxy.i18n.loading;
+			window.kwawinguToursProxy.post( '/quote', body ).then( function ( res ) {
+				priceEl.textContent = window.kwawinguToursProxy.i18n.priceFrom + ' ' + kwawinguToursQuoteTotal( res );
 			} ).catch( function () { priceEl.textContent = ''; } );
 		}
 		[ 'change' ].forEach( function ( ev ) {
@@ -166,11 +165,11 @@ function kwtBookingLookupRequest( ref, token, email ) {
 		// 3. Submit: create booking with the REAL payload, then pay + poll.
 		form.addEventListener( 'submit', function ( e ) {
 			e.preventDefault();
-			status.textContent = window.kwtProxy.i18n.loading;
+			status.textContent = window.kwawinguToursProxy.i18n.loading;
 			var email = form.email.value.trim();
 			var phone = form.phone.value.trim();
 			var p = pax();
-			var payload = kwtBuildBookingPayload( {
+			var payload = kwawinguToursBuildBookingPayload( {
 				tourSlug: tourSlug,
 				adults: p.adults,
 				children: p.children,
@@ -182,34 +181,37 @@ function kwtBookingLookupRequest( ref, token, email ) {
 				departureId: select.value || ''
 			} );
 
-			window.kwtProxy.post( '/bookings', payload ).then( function ( res ) {
-				var ref = kwtReadBookingRef( res );
-				var portalUrl = kwtReadPortalUrl( res );
-				var portalToken = kwtReadPortalToken( res );
-				if ( ! ref ) { throw new Error( window.kwtProxy.i18n.error ); }
-				return window.kwtProxy.post( '/payment-intent', { ref: ref, phone: phone } ).then( function () {
-					status.textContent = window.kwtProxy.i18n.checkPhone;
-					poll( ref, { token: portalToken, email: email }, portalUrl, 0 );
+			window.kwawinguToursProxy.post( '/bookings', payload ).then( function ( res ) {
+				var ref = kwawinguToursReadBookingRef( res );
+				var portalUrl = kwawinguToursReadPortalUrl( res );
+				var portalToken = kwawinguToursReadPortalToken( res );
+				if ( ! ref ) { throw new Error( window.kwawinguToursProxy.i18n.error ); }
+				// The proxy requires the portal token on /payment-intent and /booking:
+				// it proves this browser owns this booking before any intent is created.
+				return window.kwawinguToursProxy.post( '/payment-intent', { ref: ref, phone: phone }, { 'X-Portal-Token': portalToken } ).then( function () {
+					status.textContent = window.kwawinguToursProxy.i18n.checkPhone;
+					poll( ref, { token: portalToken }, portalUrl, 0 );
 				} );
-			} ).catch( function ( err ) { status.textContent = err.message || window.kwtProxy.i18n.error; } );
+			} ).catch( function ( err ) { status.textContent = err.message || window.kwawinguToursProxy.i18n.error; } );
 		} );
 
 		function poll( ref, guest, portalUrl, tries ) {
 			if ( tries > 40 ) { return; }
+			var lookup = kwawinguToursBookingLookupRequest( ref, guest.token );
+			if ( ! lookup ) { return; }
 			setTimeout( function () {
-				var lookup = kwtBookingLookupRequest( ref, guest.token, guest.email );
-				window.kwtProxy.get( '/booking', lookup.params, lookup.headers ).then( function ( res ) {
+				window.kwawinguToursProxy.get( '/booking', lookup.params, lookup.headers ).then( function ( res ) {
 					var data = res && res.data ? res.data : res;
-					if ( kwtPaymentReceived( data ) ) {
+					if ( kwawinguToursPaymentReceived( data ) ) {
 						status.textContent = '';
 						var msg = document.createElement( 'span' );
-						msg.textContent = window.kwtProxy.i18n.paymentReceived + ' ';
+						msg.textContent = window.kwawinguToursProxy.i18n.paymentReceived + ' ';
 						status.appendChild( msg );
 						// Only link https URLs — never a javascript:/data: URI, even if the API is compromised.
 						if ( portalUrl && /^https:\/\//i.test( portalUrl ) ) {
 							var a = document.createElement( 'a' );
 							a.href = portalUrl;
-							a.textContent = window.kwtProxy.i18n.manageBooking;
+							a.textContent = window.kwawinguToursProxy.i18n.manageBooking;
 							status.appendChild( a );
 						}
 					} else {
@@ -228,14 +230,14 @@ function kwtBookingLookupRequest( ref, token, email ) {
 /* Testable exports (ignored in the browser). */
 if ( typeof module !== 'undefined' && module.exports ) {
 	module.exports = {
-		buildBookingPayload: kwtBuildBookingPayload,
-		readBookingRef: kwtReadBookingRef,
-		readPortalUrl: kwtReadPortalUrl,
-		readPortalToken: kwtReadPortalToken,
-		bookingLookupRequest: kwtBookingLookupRequest,
-		paymentReceived: kwtPaymentReceived,
-		idemKey: kwtIdemKey,
-		money: kwtMoney,
-		quoteTotal: kwtQuoteTotal
+		buildBookingPayload: kwawinguToursBuildBookingPayload,
+		readBookingRef: kwawinguToursReadBookingRef,
+		readPortalUrl: kwawinguToursReadPortalUrl,
+		readPortalToken: kwawinguToursReadPortalToken,
+		bookingLookupRequest: kwawinguToursBookingLookupRequest,
+		paymentReceived: kwawinguToursPaymentReceived,
+		idemKey: kwawinguToursIdemKey,
+		money: kwawinguToursMoney,
+		quoteTotal: kwawinguToursQuoteTotal
 	};
 }

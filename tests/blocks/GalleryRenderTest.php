@@ -19,7 +19,7 @@ class GalleryRenderTest extends TestCase {
 
 	public function test_renders_from_attachment_ids(): void {
 		Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {
-			return 'kwt_gallery_ids' === $key ? array( 11, 12 ) : '';
+			return 'kwawingu_tours_gallery_ids' === $key ? array( 11, 12 ) : '';
 		} );
 		Functions\when( 'wp_get_attachment_image_url' )->alias( static function ( $aid ) {
 			return 'https://img/' . $aid . '.jpg';
@@ -32,7 +32,7 @@ class GalleryRenderTest extends TestCase {
 
 	public function test_falls_back_to_urls_and_empty(): void {
 		Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {
-			return 'kwt_gallery' === $key ? array( 'https://img/x.jpg' ) : '';
+			return 'kwawingu_tours_gallery' === $key ? array( 'https://img/x.jpg' ) : '';
 		} );
 		Functions\when( 'wp_get_attachment_image_url' )->justReturn( false );
 		$html = kwawingu_tours_render_gallery( array(), '' );

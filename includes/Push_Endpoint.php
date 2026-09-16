@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; }
 
 /**
- * POST /wp-json/kwt/v1/resync — an HMAC-signed request from KwaWingu that queues
+ * POST /wp-json/kwawingu/v1/resync — an HMAC-signed request from KwaWingu that queues
  * an immediate catalog sync, so an edit in KwaWingu reaches WordPress in seconds
  * instead of waiting for the next cron tick.
  *
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Push_Endpoint {
 
-	const NS = 'kwt/v1';
+	const NS = 'kwawingu/v1';
 
 	/**
 	 * Maximum accepted clock skew, in seconds, between signer and this site.
@@ -106,7 +106,7 @@ class Push_Endpoint {
 		$secret = $this->settings->get_push_secret();
 		if ( '' === $secret ) {
 			return new \WP_Error(
-				'kwt_push_not_configured',
+				'kwawingu_tours_push_not_configured',
 				__( 'Push resync is not configured on this site.', 'kwawingu-tours' ),
 				array( 'status' => 503 )
 			);
@@ -149,7 +149,7 @@ class Push_Endpoint {
 		$slug       = sanitize_key( (string) ( $params['operatorSlug'] ?? '' ) );
 		if ( '' !== $slug && '' !== $configured && $slug !== $configured ) {
 			return new \WP_Error(
-				'kwt_slug_mismatch',
+				'kwawingu_tours_slug_mismatch',
 				__( 'This site is connected to a different operator.', 'kwawingu-tours' ),
 				array( 'status' => 409 )
 			);
@@ -195,7 +195,7 @@ class Push_Endpoint {
 	 */
 	private function unauthorized(): \WP_Error {
 		return new \WP_Error(
-			'kwt_push_unauthorized',
+			'kwawingu_tours_push_unauthorized',
 			__( 'Invalid signature.', 'kwawingu-tours' ),
 			array( 'status' => 401 )
 		);

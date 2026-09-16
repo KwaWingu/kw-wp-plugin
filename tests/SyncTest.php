@@ -40,7 +40,7 @@ class SyncTest extends TestCase {
     }
 
     public function test_creates_new_tour_when_no_existing_post(): void {
-        // No existing kwt_tour posts at all.
+        // No existing kwawingu_tour posts at all.
         Functions\when( 'get_posts' )->justReturn( array() );
         // wp_insert_post returns a new ID; capture the args.
         $inserted = array();
@@ -61,14 +61,14 @@ class SyncTest extends TestCase {
     }
 
     public function test_updates_existing_but_preserves_locked_content(): void {
-        // Existing post 55 for kwt_id T1, content locked.
+        // Existing post 55 for kwawingu_tours_id T1, content locked.
         Functions\when( 'get_posts' )->alias( static function ( $args ) {
-            // First call: lookup by meta kwt_id=T1 -> returns [55]; the "all existing" sweep also returns [55].
+            // First call: lookup by meta kwawingu_tours_id=T1 -> returns [55]; the "all existing" sweep also returns [55].
             return array( 55 );
         } );
         Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {
-            if ( 'kwt_id' === $key ) { return 'T1'; }
-            if ( 'kwt_content_locked' === $key ) { return '1'; }
+            if ( 'kwawingu_tours_id' === $key ) { return 'T1'; }
+            if ( 'kwawingu_tours_content_locked' === $key ) { return '1'; }
             return '';
         } );
         $updates = array();
@@ -90,13 +90,13 @@ class SyncTest extends TestCase {
     }
 
     public function test_unpublishes_tour_missing_from_response(): void {
-        // Existing post 77 (kwt_id GONE) is absent from the API response.
+        // Existing post 77 (kwawingu_tours_id GONE) is absent from the API response.
         Functions\when( 'get_posts' )->alias( static function ( $args ) {
             if ( isset( $args['meta_query'] ) ) { return array(); } // no match for incoming ids
             return array( 77 ); // the "all existing" sweep
         } );
         Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {
-            return 'kwt_id' === $key ? 'GONE' : '';
+            return 'kwawingu_tours_id' === $key ? 'GONE' : '';
         } );
         Functions\when( 'wp_insert_post' )->justReturn( 78 );
         $drafted = array();
@@ -134,16 +134,16 @@ class SyncTest extends TestCase {
         ) ) );
         ( new \KwaWingu\Tours\Sync( $api ) )->run();
 
-        $this->assertSame( 4.5, $saved['kwt_rating'] );
-        $this->assertSame( 12, $saved['kwt_review_count'] );
-        $this->assertSame( array( 'https://img/a.jpg', 'https://img/b.jpg' ), $saved['kwt_gallery'] );
+        $this->assertSame( 4.5, $saved['kwawingu_tours_rating'] );
+        $this->assertSame( 12, $saved['kwawingu_tours_review_count'] );
+        $this->assertSame( array( 'https://img/a.jpg', 'https://img/b.jpg' ), $saved['kwawingu_tours_gallery'] );
     }
 
     public function test_empty_tours_response_does_not_unpublish_catalog(): void {
         // A successful /site with an empty tours[] must NOT draft existing posts.
         Functions\when( 'get_posts' )->justReturn( array( 999 ) ); // an existing published tour
         Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {
-            return 'kwt_id' === $key ? 'STILL-HERE' : '';
+            return 'kwawingu_tours_id' === $key ? 'STILL-HERE' : '';
         } );
         $drafted = array();
         Functions\when( 'wp_update_post' )->alias( static function ( $args ) use ( &$drafted ) {
@@ -177,8 +177,8 @@ class SyncTest extends TestCase {
         $this->assertStringNotContainsString( '403', $out['errors'][0] );
     }
 
-    public function test_syncs_destinations_from_the_site_bundle_into_kwt_destination_posts(): void {
-        // Before this, nothing ever wrote a kwt_destination post, so the Destinations
+    public function test_syncs_destinations_from_the_site_bundle_into_kwawingu_destination_posts(): void {
+        // Before this, nothing ever wrote a kwawingu_destination post, so the Destinations
         // Grid rendered its empty state on every site regardless of the catalog.
         $lookups = array();
         Functions\when( 'get_posts' )->alias( static function ( $args ) use ( &$lookups ) {
@@ -211,17 +211,17 @@ class SyncTest extends TestCase {
 
         $this->assertSame( 1, $out['created'] );
         $this->assertSame( array( 'created' => 1, 'updated' => 0, 'unpublished' => 0 ), $out['destinations'] );
-        $dest = array_values( array_filter( $inserted, static fn( $a ) => 'kwt_destination' === $a['post_type'] ) );
+        $dest = array_values( array_filter( $inserted, static fn( $a ) => 'kwawingu_destination' === $a['post_type'] ) );
         $this->assertCount( 1, $dest );
         $this->assertSame( 'Serengeti', $dest[0]['post_title'] );
         $this->assertSame( 'publish', $dest[0]['post_status'] );
-        $this->assertSame( 'D1', $meta[202]['kwt_id'] );
-        $this->assertSame( 'https://img.test/s.jpg', $meta[202]['kwt_cover_url'] );
-        $this->assertSame( 'Mara', $meta[202]['kwt_region'] );
+        $this->assertSame( 'D1', $meta[202]['kwawingu_tours_id'] );
+        $this->assertSame( 'https://img.test/s.jpg', $meta[202]['kwawingu_tours_cover_url'] );
+        $this->assertSame( 'Mara', $meta[202]['kwawingu_tours_region'] );
         // The API slug is kept so the grid can link to the hosted destination page.
-        $this->assertSame( 'serengeti', $meta[202]['kwt_slug'] );
-        // The destination lookup and sweep are scoped to kwt_destination, never the tours.
+        $this->assertSame( 'serengeti', $meta[202]['kwawingu_tours_slug'] );
+        // The destination lookup and sweep are scoped to kwawingu_destination, never the tours.
         $types = array_unique( array_map( static fn( $a ) => $a['post_type'], $lookups ) );
-        $this->assertContains( 'kwt_destination', $types );
+        $this->assertContains( 'kwawingu_destination', $types );
     }
 }

@@ -98,16 +98,14 @@ describe( 'response readers', () => {
 
 describe( 'bookingLookupRequest (post-booking status poll)', () => {
 	it( 'sends the portal token as the X-Portal-Token header and never in the query string', () => {
-		const r = bookingLookupRequest( 'KWG-1', 'tok-1', 'g@example.com' );
+		const r = bookingLookupRequest( 'KWG-1', 'tok-1' );
 		expect( r.headers ).toEqual( { 'X-Portal-Token': 'tok-1' } );
 		expect( r.params ).toEqual( { ref: 'KWG-1' } );
-		expect( JSON.stringify( r.params ) ).not.toMatch( /tok-1|example\.com/ );
+		expect( JSON.stringify( r.params ) ).not.toMatch( /tok-1/ );
 	} );
 
-	it( 'falls back to the deprecated ?email= lookup only when no token was issued', () => {
-		const r = bookingLookupRequest( 'KWG-1', '', 'g@example.com' );
-		expect( r.headers ).toEqual( {} );
-		expect( r.params ).toEqual( { ref: 'KWG-1', email: 'g@example.com' } );
+	it( 'returns null without a token — the proxy refuses tokenless lookups, so no poll starts', () => {
+		expect( bookingLookupRequest( 'KWG-1', '' ) ).toBeNull();
 	} );
 } );
 

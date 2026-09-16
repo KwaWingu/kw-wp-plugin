@@ -21,7 +21,7 @@ class ReviewsRenderTest extends TestCase {
 
     public function test_renders_rating_and_count(): void {
         Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {
-            $map = array( 'kwt_rating' => 4.5, 'kwt_review_count' => 12 );
+            $map = array( 'kwawingu_tours_rating' => 4.5, 'kwawingu_tours_review_count' => 12 );
             return $map[ $key ] ?? '';
         } );
         $html = kwawingu_tours_render_reviews( array(), '' );

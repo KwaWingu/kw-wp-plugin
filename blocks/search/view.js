@@ -12,12 +12,12 @@
 			var q = input.value.trim();
 			if ( q.length < 2 ) { list.textContent = ''; return; }
 			t = setTimeout( function () {
-				window.kwtProxy.get( '/search', { q: q } ).then( function ( res ) {
+				window.kwawinguToursProxy.get( '/search', { q: q } ).then( function ( res ) {
 					list.textContent = '';
 					var items = ( res && res.data ) || [];
 					if ( ! items.length ) {
 						var li = document.createElement( 'li' );
-						li.textContent = window.kwtProxy.i18n.noResults;
+						li.textContent = window.kwawinguToursProxy.i18n.noResults;
 						list.appendChild( li );
 						return;
 					}
@@ -30,7 +30,7 @@
 						list.appendChild( li );
 					} );
 				} ).catch( function ( err ) {
-					list.textContent = ( err && err.message ) || window.kwtProxy.i18n.error;
+					list.textContent = ( err && err.message ) || window.kwawinguToursProxy.i18n.error;
 				} );
 			}, 250 );
 		} );

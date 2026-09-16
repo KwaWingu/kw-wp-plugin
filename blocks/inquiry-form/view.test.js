@@ -19,8 +19,8 @@ function makeForm( overrides ) {
 	return {
 		getAttribute: function () { return 'safari'; },
 		querySelector: function ( selector ) {
-			if ( selector === '[name="kwt_hp"]' ) {
-				return fields.kwt_hp || { value: '' };
+			if ( selector === '[name="kwawingu_tours_hp"]' ) {
+				return fields.kwawingu_tours_hp || { value: '' };
 			}
 			return null;
 		},
@@ -36,12 +36,12 @@ function makeForm( overrides ) {
 
 describe( 'buildInquiryPayload', () => {
 	it( 'returns null when the honeypot is filled', () => {
-		var form = makeForm( { kwt_hp: { value: 'spam' } } );
+		var form = makeForm( { kwawingu_tours_hp: { value: 'spam' } } );
 		expect( buildInquiryPayload( form ) ).toBeNull();
 	} );
 
 	it( 'returns null when honeypot is whitespace', () => {
-		var form = makeForm( { kwt_hp: { value: '   ' } } );
+		var form = makeForm( { kwawingu_tours_hp: { value: '   ' } } );
 		// '   ' is non-empty so honeypot triggers
 		expect( buildInquiryPayload( form ) ).toBeNull();
 	} );

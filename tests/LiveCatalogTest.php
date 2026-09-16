@@ -103,7 +103,7 @@ class LiveCatalogTest extends TestCase {
 
         ( new Live_Catalog( $api ) )->tours();
 
-        $this->assertSame( 'kwt_live_catalog', $stored[0][0] );
+        $this->assertSame( 'kwawingu_tours_live_catalog', $stored[0][0] );
         $this->assertSame( array(), $stored[0][1] );
         $this->assertSame( 60, $stored[0][2] );
     }
@@ -148,7 +148,7 @@ class LiveCatalogTest extends TestCase {
         Live_Catalog::flush();
         $catalog->tours();
 
-        $this->assertSame( array( 'kwt_live_catalog' ), $deleted );
+        $this->assertSame( array( 'kwawingu_tours_live_catalog' ), $deleted );
     }
 
     /** get_transient stub that answers the last-good key and nothing else. */
@@ -219,7 +219,7 @@ class LiveCatalogTest extends TestCase {
         $api->shouldReceive( 'get' )->andThrow( new Api_Exception( 'api_access_required', 403, 'api_access_required' ) );
 
         $this->assertSame( array(), ( new Live_Catalog( $api ) )->tour( 'serengeti' ) );
-        $this->assertSame( 'kwt_api_status', $recorded[0] );
+        $this->assertSame( 'kwawingu_tours_api_status', $recorded[0] );
         $this->assertSame( 'entitlement', $recorded[1]['kind'] );
     }
 }

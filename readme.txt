@@ -4,7 +4,7 @@ Tags: tours, travel, tour operator, booking, safari
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.14.2
+Stable tag: 1.14.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -59,7 +59,7 @@ Start with **Redirect** — zero setup, always-correct availability, payment han
 Yes. Blocks are theme-agnostic and server-rendered; classic themes can use the `[kwawingu_*]` shortcodes.
 
 = Can I point the plugin at a staging or self-hosted KwaWingu? =
-Yes. Add `define( 'KWT_SITE_BASE', 'https://staging.example' );` to `wp-config.php` — the Developer API root becomes `KWT_SITE_BASE/api/v1` and the hosted booking links and dashboard link follow it. `KWT_API_BASE` can still be defined separately to override only the API root.
+Yes. Add `define( 'KWAWINGU_TOURS_SITE_BASE', 'https://staging.example' );` to `wp-config.php` — the Developer API root becomes `KWAWINGU_TOURS_SITE_BASE/api/v1` and the hosted booking links and dashboard link follow it. `KWAWINGU_TOURS_API_BASE` can still be defined separately to override only the API root.
 
 = How do tours stay up to date? =
 Tour content re-syncs automatically (hourly by default; configurable), via a "Sync now" button, and instantly when KwaWingu pushes a change to the Instant resync endpoint. Price, currency and sold-out state are not synced at all — they are read live from your account on every page view, with the last synced values as a fallback if the API is unreachable. Your manual edits to a tour are preserved on future syncs.
@@ -87,7 +87,7 @@ This plugin is a client for the KwaWingu Tours platform, operated by KwaWingu (h
 
 **3. Cloudflare Images (KwaWingu's image CDN)** — `https://imagedelivery.net/…` (server-to-server, during catalog sync only). Tour cover and gallery photos in your catalog are hosted there; the sync downloads them once into your WordPress media library so your pages serve them from your own domain. Data sent: the image URL request from your server. No visitor data; nothing is loaded from imagedelivery.net in a visitor's browser.
 
-**4. Inbound: instant resync** — KwaWingu can call this site's `POST /wp-json/kwt/v1/resync` endpoint (signed with the secret shown in Settings → KwaWingu Tours) to trigger a catalog sync a few seconds after you edit a tour. It carries no visitor data.
+**4. Inbound: instant resync** — KwaWingu can call this site's `POST /wp-json/kwawingu/v1/resync` endpoint (signed with the secret shown in Settings → KwaWingu Tours) to trigger a catalog sync a few seconds after you edit a tour. It carries no visitor data.
 
 Nothing is sent to KwaWingu on activation, and the plugin contains no analytics, telemetry or tracking of any kind. Guest booking confirmations are emailed by KwaWingu from your account; the optional owner notification is sent by your own WordPress install with `wp_mail()`.
 
@@ -97,8 +97,12 @@ The editor block bundles under `build/` are compiled with `@wordpress/scripts` f
 
 == Changelog ==
 
+= 1.14.3 =
+* WordPress.org review round 1. Every plugin identifier now carries the full `kwawingu_tours_` prefix (options, transients, cron hooks, post meta, post types, admin-post actions, script/style handles, constants, JS globals); the old 3-character `kwt_` prefix is gone. Brand colours are now attached through `wp_add_inline_style()` on the block stylesheet instead of a hand-printed `<style>` tag, and the JSON-LD block is emitted with `wp_print_inline_script_tag()`.
+* **Security: the booking lookup and payment-intent proxy routes now require the per-booking portal token** (`X-Portal-Token`, issued once when the booking is created and validated by the KwaWingu API), in addition to the REST nonce. The deprecated ref+email booking lookup fallback is removed — without a token these routes answer 403 and point the guest at the "Manage your booking" link in their confirmation email. A payment intent is only created after a token-validated lookup of the same booking proves ownership.
+
 = 1.14.2 =
-* **Destination cards now open the destination's page on your hosted storefront** (`{hosted}/{operator}/destinations/{slug}`): what the place is, highlights, best months, the official park tariff on file and your tours that go there. They used to open the bare local `kwt_destination` post, which for most catalogue entries was an empty page — so visitors left to search the web for the park instead. The sync keeps the API's `slug` (`kwt_slug`); a destination synced before this release links to the local post until the next sync runs.
+* **Destination cards now open the destination's page on your hosted storefront** (`{hosted}/{operator}/destinations/{slug}`): what the place is, highlights, best months, the official park tariff on file and your tours that go there. They used to open the bare local `kwawingu_destination` post, which for most catalogue entries was an empty page — so visitors left to search the web for the park instead. The sync keeps the API's `slug` (`kwawingu_tours_slug`); a destination synced before this release links to the local post until the next sync runs.
 * WordPress.org submission hardening (Plugin Check clean, all categories): every block render template now guards against direct access; block render helpers and template variables carry the full `kwawingu_tours_` prefix; API error messages are HTML-escaped when the exception is thrown; the Widget booking mode builds its `<script>` tag with core's `wp_get_script_tag()`; `load_plugin_textdomain()` is gone (WordPress loads language packs itself since 4.6); uninstall also removes the recorded API status and the live-price caches; the release zip no longer ships a `vendor/` directory — the plugin autoloads its own classes and has no runtime dependencies.
 
 = 1.14.1 =
@@ -126,7 +130,7 @@ Found by running the plugin end-to-end against a real KwaWingu backend (WordPres
 * Gallery block: a Tour Post ID control in the editor, so it can show a tour's gallery on any page.
 * Block titles now match the documentation ("KwaWingu Destinations Grid", "KwaWingu On-site Booking").
 * Calculator and search show the API's visitor-safe message ("not available at the moment") instead of a generic error when the paid API is off.
-* `KWT_SITE_BASE` constant to point a site at a staging/self-hosted KwaWingu; proxy failures are written to the debug log when `WP_DEBUG` is on.
+* `KWAWINGU_TOURS_SITE_BASE` constant to point a site at a staging/self-hosted KwaWingu; proxy failures are written to the debug log when `WP_DEBUG` is on.
 
 = 1.13.0 =
 * **API refusals now say what to do — to the right person.** When the KwaWingu Developer API refuses a request, wp-admin shows the site owner a notice naming the fix: enable the paid API add-on, correct the public key, or correct the operator slug. Visitors never see a status code or anything about plans and keys — interactive blocks show a quiet "not available at the moment" instead. The notice clears itself on the next successful call.
@@ -137,7 +141,7 @@ Found by running the plugin end-to-end against a real KwaWingu backend (WordPres
 
 = 1.12.0 =
 * **Prices and availability are now read live.** Tour cards, tour pages and their structured data show the current price, currency and sold-out state on every page view instead of whatever the last scheduled sync stored. If the API cannot be reached, the last synced values are shown — never an error or a blank price.
-* **Instant resync.** A new signed endpoint (`POST /wp-json/kwt/v1/resync`) lets KwaWingu tell your site to re-sync within seconds of you editing a tour. Copy the endpoint URL and signing secret from **Settings → KwaWingu Tours → Instant resync** into your KwaWingu dashboard.
+* **Instant resync.** A new signed endpoint (`POST /wp-json/kwawingu/v1/resync`) lets KwaWingu tell your site to re-sync within seconds of you editing a tour. Copy the endpoint URL and signing secret from **Settings → KwaWingu Tours → Instant resync** into your KwaWingu dashboard.
 * Fix: changing the sync interval in settings now takes effect immediately. Previously the new interval was ignored until the plugin was deactivated and reactivated.
 * Fix: tour prices are read from the API's `basePriceAdult` field, so synced prices are no longer always zero. Tour currency, category, gallery and rating fields are now mapped correctly too.
 * Prices render in the operator's own currency rather than always TZS.
@@ -200,6 +204,9 @@ Found by running the plugin end-to-end against a real KwaWingu backend (WordPres
 * Initial release: settings, API client, Tours/Destinations post types, and scheduled catalog sync.
 
 == Upgrade Notice ==
+
+= 1.14.3 =
+Identifier prefix rename and hardened booking-route authorization for the WordPress.org review. No action needed on a fresh install.
 
 = 1.14.2 =
 Destination cards link to the full destination page on your hosted storefront instead of an empty local post. Run Sync once after updating.

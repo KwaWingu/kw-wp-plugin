@@ -18,7 +18,7 @@ if ( ! function_exists( 'kwawingu_tours_render_inquiry_form' ) ) {
 	 */
 	function kwawingu_tours_render_inquiry_form( array $attributes, string $content = '' ): string {
 		if ( function_exists( 'wp_enqueue_script' ) ) {
-			wp_enqueue_script( 'kwt-proxy' );
+			wp_enqueue_script( 'kwawingu-tours-proxy' );
 		}
 		$heading   = ! empty( $attributes['heading'] ) ? (string) $attributes['heading'] : __( 'Send us an inquiry', 'kwawingu-tours' );
 		$tour_slug = ! empty( $attributes['tourSlug'] ) ? (string) $attributes['tourSlug'] : '';
@@ -42,7 +42,7 @@ if ( ! function_exists( 'kwawingu_tours_render_inquiry_form' ) ) {
 			. '<label>' . $l_adults . ' <input type="number" name="adults" min="1" value="2" /></label>'
 			. '<label>' . $l_children . ' <input type="number" name="children" min="0" value="0" /></label>'
 			. '<label>' . $l_message . ' <textarea name="message" rows="4"></textarea></label>'
-			. '<input type="text" name="kwt_hp" class="kwt-hp" aria-hidden="true" tabindex="-1" autocomplete="off" />'
+			. '<input type="text" name="kwawingu_tours_hp" class="kwt-hp" aria-hidden="true" tabindex="-1" autocomplete="off" />'
 			. '<button type="submit" class="kwt-btn">' . $l_submit . '</button>'
 			. '<p class="kwt-inquiry__status" aria-live="polite"></p>'
 			. '</form>'

@@ -28,7 +28,7 @@ if ( ! function_exists( 'kwawingu_tours_render_tours_grid' ) ) {
 			if ( ! empty( $attributes['type'] ) ) {
 				$args['meta_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- exact-match lookup on one plugin meta key over this site's own tour posts (a few hundred rows at most), not a user-driven search.
 					array(
-						'key'   => 'kwt_type',
+						'key'   => 'kwawingu_tours_type',
 						'value' => (string) $attributes['type'],
 					),
 				);
@@ -49,12 +49,12 @@ if ( ! function_exists( 'kwawingu_tours_render_tours_grid' ) ) {
 			$live     = Live_Catalog::for_post( $id );
 			$price    = isset( $live['price'] ) && null !== $live['price']
 				? (int) $live['price']
-				: (int) get_post_meta( $id, 'kwt_price', true );
+				: (int) get_post_meta( $id, 'kwawingu_tours_price', true );
 			$currency = ! empty( $live['currency'] )
 				? (string) $live['currency']
-				: (string) get_post_meta( $id, 'kwt_currency', true );
+				: (string) get_post_meta( $id, 'kwawingu_tours_currency', true );
 			$sold_out = ! empty( $live['soldOut'] );
-			$days     = (int) get_post_meta( $id, 'kwt_duration_days', true );
+			$days     = (int) get_post_meta( $id, 'kwawingu_tours_duration_days', true );
 			$img      = (string) get_the_post_thumbnail_url( $id, 'medium' );
 			$out     .= '<article class="kwt-tour-card">';
 			if ( $img ) {

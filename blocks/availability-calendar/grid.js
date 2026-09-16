@@ -51,7 +51,7 @@
 		return { year: year, month: month, weeks: weeks };
 	}
 
-	root.kwtBuildMonthGrid = buildMonthGrid;
+	root.kwawinguToursBuildMonthGrid = buildMonthGrid;
 	if ( typeof module !== 'undefined' && module.exports ) {
 		module.exports = { buildMonthGrid: buildMonthGrid };
 	}

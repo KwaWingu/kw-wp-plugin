@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; }
 
 /**
- * The kwt_tour post carries the SEO-bearing content — title, body, images,
+ * The kwawingu_tour post carries the SEO-bearing content — title, body, images,
  * permalink — and is worth keeping stale-tolerant. Price and availability are not:
  * a price that is hours old is a price you may have to honour.
  *
@@ -22,14 +22,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Live_Catalog {
 
-	const CACHE_KEY = 'kwt_live_catalog';
+	const CACHE_KEY = 'kwawingu_tours_live_catalog';
 
 	/**
 	 * The last snapshot the API actually returned, kept well beyond TTL. When the
 	 * API is rate-limiting us or is down, this is what the page shows — a price a
 	 * few minutes old rather than a blank one — and it is retried on the next TTL.
 	 */
-	const LAST_GOOD_KEY = 'kwt_live_catalog_last_good';
+	const LAST_GOOD_KEY = 'kwawingu_tours_live_catalog_last_good';
 
 	/**
 	 * Seconds a fetched catalog snapshot is reused for. Bounds the upstream load to
@@ -116,7 +116,7 @@ class Live_Catalog {
 		if ( null === self::$instance || $post_id <= 0 || ! function_exists( 'get_post_meta' ) ) {
 			return array();
 		}
-		$slug = (string) get_post_meta( $post_id, 'kwt_slug', true );
+		$slug = (string) get_post_meta( $post_id, 'kwawingu_tours_slug', true );
 		return self::$instance->tour( $slug );
 	}
 

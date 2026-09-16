@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Api_Status {
 
 	/** Option holding the last recorded failure (or nothing when the API is healthy). */
-	const OPTION = 'kwt_api_status';
+	const OPTION = 'kwawingu_tours_api_status';
 
 	/** Dashboard path where the operator enables the Developer API add-on. */
 	const DASHBOARD_PATH = '/dashboard/booking-engine';

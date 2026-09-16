@@ -14,20 +14,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Builds booking links. Redirect (hosted URL), widget (widget.js embed), and
  * on-site (in-page booking form via the REST proxy) modes are all implemented;
- * on-site links to the on-site booking form (#kwt-book).
+ * on-site links to the on-site booking form (#kwawingu-tours-book).
  */
 class Booking {
 
-	/** Production hosted base; {@see hosted_base()} honours the KWT_SITE_BASE override. */
+	/** Production hosted base; {@see hosted_base()} honours the KWAWINGU_TOURS_SITE_BASE override. */
 	const HOSTED_BASE = 'https://tours.kwawingu.com';
 
 	/**
-	 * Base URL of the hosted booking pages and widget (KWT_SITE_BASE when overridden).
+	 * Base URL of the hosted booking pages and widget (KWAWINGU_TOURS_SITE_BASE when overridden).
 	 *
 	 * @return string No trailing slash.
 	 */
 	public static function hosted_base(): string {
-		$base = defined( 'KWT_SITE_BASE' ) ? (string) KWT_SITE_BASE : self::HOSTED_BASE;
+		$base = defined( 'KWAWINGU_TOURS_SITE_BASE' ) ? (string) KWAWINGU_TOURS_SITE_BASE : self::HOSTED_BASE;
 		return rtrim( '' !== $base ? $base : self::HOSTED_BASE, '/' );
 	}
 
@@ -93,12 +93,12 @@ class Booking {
 	 */
 	public function widget_embed( int $post_id ): string {
 		$slug      = $this->settings->get_slug();
-		$tour_slug = (string) get_post_meta( $post_id, 'kwt_slug', true );
+		$tour_slug = (string) get_post_meta( $post_id, 'kwawingu_tours_slug', true );
 		if ( '' === $slug || '' === $tour_slug ) {
 			return '';
 		}
 		// The widget is KwaWingu's own embed script, served from the operator's
-		// hosted booking site (KWT_SITE_BASE); it is the "Widget" booking mode the
+		// hosted booking site (KWAWINGU_TOURS_SITE_BASE); it is the "Widget" booking mode the
 		// operator chose in settings. Core's tag builder escapes every attribute.
 		return wp_get_script_tag(
 			array(
@@ -118,7 +118,7 @@ class Booking {
 	 */
 	public function url( int $post_id ): string {
 		$slug      = $this->settings->get_slug();
-		$tour_slug = (string) get_post_meta( $post_id, 'kwt_slug', true );
+		$tour_slug = (string) get_post_meta( $post_id, 'kwawingu_tours_slug', true );
 		if ( '' === $slug || '' === $tour_slug ) {
 			return '';
 		}

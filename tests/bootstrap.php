@@ -5,14 +5,14 @@ require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 if ( ! defined( 'ABSPATH' ) ) {
     define( 'ABSPATH', sys_get_temp_dir() . '/' );
 }
-if ( ! defined( 'KWT_API_BASE' ) ) {
-    define( 'KWT_API_BASE', 'https://tours.kwawingu.com/api/v1' );
+if ( ! defined( 'KWAWINGU_TOURS_API_BASE' ) ) {
+    define( 'KWAWINGU_TOURS_API_BASE', 'https://tours.kwawingu.com/api/v1' );
 }
-if ( ! defined( 'KWT_VERSION' ) ) {
-    define( 'KWT_VERSION', '0.4.0' );
+if ( ! defined( 'KWAWINGU_TOURS_VERSION' ) ) {
+    define( 'KWAWINGU_TOURS_VERSION', '0.4.0' );
 }
-if ( ! defined( 'KWT_PLUGIN_FILE' ) ) {
-    define( 'KWT_PLUGIN_FILE', dirname( __DIR__ ) . '/kwawingu-tours.php' );
+if ( ! defined( 'KWAWINGU_TOURS_PLUGIN_FILE' ) ) {
+    define( 'KWAWINGU_TOURS_PLUGIN_FILE', dirname( __DIR__ ) . '/kwawingu-tours.php' );
 }
 if ( ! defined( 'MINUTE_IN_SECONDS' ) ) {
     define( 'MINUTE_IN_SECONDS', 60 );

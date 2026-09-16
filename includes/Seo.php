@@ -36,7 +36,10 @@ class Seo {
 		$id   = (int) get_the_ID();
 		$data = $this->json_ld( $id );
 
-		echo '<script type="application/ld+json">' . wp_json_encode( $data ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput -- wp_json_encode output inside a JSON-LD script tag.
+		// JSON-LD is data, not executable JS, so it cannot be enqueued; core's tag
+		// builder still emits it so attribute escaping and the wp_inline_script
+		// filters apply.
+		wp_print_inline_script_tag( (string) wp_json_encode( $data ), array( 'type' => 'application/ld+json' ) );
 
 		$img = (string) get_the_post_thumbnail_url( $id, 'large' );
 		echo '<meta property="og:type" content="product" />' . "\n";
@@ -59,12 +62,12 @@ class Seo {
 		$live     = Live_Catalog::for_post( $post_id );
 		$price    = isset( $live['price'] ) && null !== $live['price']
 			? (int) $live['price']
-			: (int) get_post_meta( $post_id, 'kwt_price', true );
+			: (int) get_post_meta( $post_id, 'kwawingu_tours_price', true );
 		$currency = ! empty( $live['currency'] )
 			? (string) $live['currency']
-			: (string) get_post_meta( $post_id, 'kwt_currency', true );
-		$rating   = (float) get_post_meta( $post_id, 'kwt_rating', true );
-		$count    = (int) get_post_meta( $post_id, 'kwt_review_count', true );
+			: (string) get_post_meta( $post_id, 'kwawingu_tours_currency', true );
+		$rating   = (float) get_post_meta( $post_id, 'kwawingu_tours_rating', true );
+		$count    = (int) get_post_meta( $post_id, 'kwawingu_tours_review_count', true );
 
 		$data = array(
 			'@context'    => 'https://schema.org',

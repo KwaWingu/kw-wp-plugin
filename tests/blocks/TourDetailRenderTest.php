@@ -27,10 +27,10 @@ class TourDetailRenderTest extends TestCase {
         Functions\when( 'wp_kses_post' )->returnArg();
         Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {
             $map = array(
-                'kwt_price'         => 1200000,
-                'kwt_duration_days' => 7,
-                'kwt_difficulty'    => 'Challenging',
-                'kwt_slug'          => 'kili',
+                'kwawingu_tours_price'         => 1200000,
+                'kwawingu_tours_duration_days' => 7,
+                'kwawingu_tours_difficulty'    => 'Challenging',
+                'kwawingu_tours_slug'          => 'kili',
             );
             return $map[ $key ] ?? '';
         } );

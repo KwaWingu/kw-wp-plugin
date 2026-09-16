@@ -254,7 +254,7 @@ class Shortcodes {
 		}
 		$id = (int) $atts['id'];
 		if ( $id > 0 && function_exists( 'get_post_meta' ) ) {
-			return (string) get_post_meta( $id, 'kwt_slug', true );
+			return (string) get_post_meta( $id, 'kwawingu_tours_slug', true );
 		}
 		return '';
 	}

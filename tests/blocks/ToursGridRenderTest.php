@@ -32,10 +32,10 @@ namespace KwaWingu\Tours\Tests\Blocks {
             Functions\when( 'get_the_post_thumbnail_url' )->justReturn( 'https://img/cover.jpg' );
             Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {
                 $map = array(
-                    'kwt_price'          => 450000,
-                    'kwt_duration_days'  => 3,
-                    'kwt_slug'           => 'serengeti',
-                    'kwt_currency'       => 'TZS',
+                    'kwawingu_tours_price'          => 450000,
+                    'kwawingu_tours_duration_days'  => 3,
+                    'kwawingu_tours_slug'           => 'serengeti',
+                    'kwawingu_tours_currency'       => 'TZS',
                 );
                 return $map[ $key ] ?? '';
             } );

@@ -9,7 +9,7 @@
  */
 ( function () {
 	'use strict';
-	var cfg = window.kwtProxy || {};
+	var cfg = window.kwawinguToursProxy || {};
 
 	function build( method, path, dataOrParams, headers ) {
 		var url = cfg.root + path;
@@ -56,6 +56,6 @@
 	}
 
 	cfg.get = function ( path, params, headers ) { return req( 'GET', path, params, false, headers ); };
-	cfg.post = function ( path, body ) { return req( 'POST', path, body, false ); };
-	window.kwtProxy = cfg;
+	cfg.post = function ( path, body, headers ) { return req( 'POST', path, body, false, headers ); };
+	window.kwawinguToursProxy = cfg;
 } )();

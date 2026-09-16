@@ -88,7 +88,7 @@ namespace KwaWingu\Tours\Tests {
             foreach ( Shortcodes::INTERACTIVE as $tag ) {
                 $this->assertContains( 'kwawingu-' . Shortcodes::BLOCKS[ $tag ] . '-view-script', $enqueued, $tag );
             }
-            $this->assertContains( 'kwt-proxy', $enqueued );
+            $this->assertContains( 'kwawingu-tours-proxy', $enqueued );
         }
 
         public function test_booking_form_and_availability_shortcodes_accept_id_or_slug(): void {
@@ -101,7 +101,7 @@ namespace KwaWingu\Tours\Tests {
             Functions\when( 'generate_block_asset_handle' )->justReturn( 'h' );
             Functions\when( 'get_the_ID' )->justReturn( 99 );
             Functions\when( 'get_post_meta' )->alias( static function ( $id, $key ) {
-                return ( 4 === (int) $id && 'kwt_slug' === $key ) ? 'kili' : '';
+                return ( 4 === (int) $id && 'kwawingu_tours_slug' === $key ) ? 'kili' : '';
             } );
             $sc = new Shortcodes();
 

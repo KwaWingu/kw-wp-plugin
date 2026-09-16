@@ -9,23 +9,23 @@
 /**
  * @group integration
  */
-class KWT_CptAndRestTest extends WP_UnitTestCase {
+class KWAWINGU_TOURS_CptAndRestTest extends WP_UnitTestCase {
 
 	/**
 	 * The tour CPT is registered, public, and has an archive.
 	 */
 	public function test_tour_cpt_registered() {
-		$pt = get_post_type_object( 'kwt_tour' );
-		$this->assertNotNull( $pt, 'kwt_tour not registered' );
+		$pt = get_post_type_object( 'kwawingu_tour' );
+		$this->assertNotNull( $pt, 'kwawingu_tour not registered' );
 		$this->assertTrue( (bool) $pt->public );
 		$this->assertTrue( (bool) $pt->has_archive );
 
-		$dest = get_post_type_object( 'kwt_destination' );
+		$dest = get_post_type_object( 'kwawingu_destination' );
 		$this->assertNotNull( $dest );
 
-		$lead = get_post_type_object( 'kwt_lead' );
-		$this->assertNotNull( $lead, 'kwt_lead not registered' );
-		$this->assertFalse( (bool) $lead->public, 'kwt_lead should be private' );
+		$lead = get_post_type_object( 'kwawingu_lead' );
+		$this->assertNotNull( $lead, 'kwawingu_lead not registered' );
+		$this->assertFalse( (bool) $lead->public, 'kwawingu_lead should be private' );
 	}
 
 	/**

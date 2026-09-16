@@ -15,10 +15,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Sync_Controller {
 
-	const CRON_HOOK  = 'kwt_sync_cron';
-	const PUSH_HOOK  = 'kwt_sync_push';
-	const STATUS_OPT = 'kwt_sync_status';
-	const ACTION     = 'kwt_sync_now';
+	const CRON_HOOK  = 'kwawingu_tours_sync_cron';
+	const PUSH_HOOK  = 'kwawingu_tours_sync_push';
+	const STATUS_OPT = 'kwawingu_tours_sync_status';
+	const ACTION     = 'kwawingu_tours_sync_now';
 
 	/**
 	 * Sync service instance.
@@ -143,8 +143,8 @@ class Sync_Controller {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page'       => 'kwawingu-tours',
-					'kwt_synced' => '1',
+					'page'                  => 'kwawingu-tours',
+					'kwawingu_tours_synced' => '1',
 				),
 				admin_url( 'options-general.php' )
 			)

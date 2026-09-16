@@ -50,14 +50,14 @@ class MediaTest extends TestCase {
         Functions\when( 'get_option' )->justReturn( array( 'media_mode' => 'sideload' ) );
         // a.jpg already ingested (src list), b.jpg is new.
         Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {
-            if ( 'kwt_gallery_src' === $key ) { return array( 'https://img/a.jpg' ); }
-            if ( 'kwt_gallery_ids' === $key ) { return array( 11 ); }
+            if ( 'kwawingu_tours_gallery_src' === $key ) { return array( 'https://img/a.jpg' ); }
+            if ( 'kwawingu_tours_gallery_ids' === $key ) { return array( 11 ); }
             return '';
         } );
         $sideloaded = array();
         Functions\when( 'download_url' )->alias( static function ( $url ) use ( &$sideloaded ) {
             $sideloaded[] = $url;
-            return '/tmp/kwt-test-download';
+            return '/tmp/kwawingu-tours-test-download';
         } );
         Functions\when( 'wp_get_image_mime' )->justReturn( 'image/jpeg' );
         Functions\when( 'wp_parse_url' )->alias( 'parse_url' );
@@ -74,13 +74,13 @@ class MediaTest extends TestCase {
 
         $this->assertSame( array( 'https://img/b.jpg' ), $sideloaded );      // only the new one
         $this->assertSame( array( 11, 22 ), $out );                          // existing + new id
-        $this->assertSame( array( 11, 22 ), $saved['kwt_gallery_ids'] );
-        $this->assertSame( array( 'https://img/a.jpg', 'https://img/b.jpg' ), $saved['kwt_gallery_src'] );
+        $this->assertSame( array( 11, 22 ), $saved['kwawingu_tours_gallery_ids'] );
+        $this->assertSame( array( 'https://img/a.jpg', 'https://img/b.jpg' ), $saved['kwawingu_tours_gallery_src'] );
     }
 
     /** Stubs a successful download + import returning $attachment_id; records the file array. */
     private function stub_download( int $attachment_id, string $mime = 'image/jpeg', array &$files = null ): void {
-        Functions\when( 'download_url' )->justReturn( '/tmp/kwt-test-download' );
+        Functions\when( 'download_url' )->justReturn( '/tmp/kwawingu-tours-test-download' );
         Functions\when( 'wp_get_image_mime' )->justReturn( $mime );
         Functions\when( 'wp_parse_url' )->alias( 'parse_url' );
         Functions\when( 'sanitize_file_name' )->returnArg();
@@ -103,8 +103,8 @@ class MediaTest extends TestCase {
         $this->assertSame( 77, $id );
         $this->assertCount( 1, $files );
         $this->assertSame( 'image/webp', $files[0]['type'] );
-        $this->assertSame( '/tmp/kwt-test-download', $files[0]['tmp_name'] );
-        $this->assertMatchesRegularExpression( '/^kwt-[0-9a-f]{12}\\.webp$/', $files[0]['name'] );
+        $this->assertSame( '/tmp/kwawingu-tours-test-download', $files[0]['tmp_name'] );
+        $this->assertMatchesRegularExpression( '/^kwawingu-[0-9a-f]{12}\\.webp$/', $files[0]['name'] );
     }
 
     public function test_sideload_keeps_a_real_filename_and_rejects_non_images(): void {

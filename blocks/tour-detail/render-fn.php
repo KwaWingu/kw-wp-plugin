@@ -29,14 +29,14 @@ if ( ! function_exists( 'kwawingu_tours_render_tour_detail' ) ) {
 		$live       = Live_Catalog::for_post( $id );
 		$price      = isset( $live['price'] ) && null !== $live['price']
 			? (int) $live['price']
-			: (int) get_post_meta( $id, 'kwt_price', true );
+			: (int) get_post_meta( $id, 'kwawingu_tours_price', true );
 		$currency   = ! empty( $live['currency'] )
 			? (string) $live['currency']
-			: (string) get_post_meta( $id, 'kwt_currency', true );
+			: (string) get_post_meta( $id, 'kwawingu_tours_currency', true );
 		$sold_out   = ! empty( $live['soldOut'] );
 		$next_dep   = isset( $live['nextDeparture'] ) ? (string) $live['nextDeparture'] : '';
-		$days       = (int) get_post_meta( $id, 'kwt_duration_days', true );
-		$difficulty = (string) get_post_meta( $id, 'kwt_difficulty', true );
+		$days       = (int) get_post_meta( $id, 'kwawingu_tours_duration_days', true );
+		$difficulty = (string) get_post_meta( $id, 'kwawingu_tours_difficulty', true );
 		$img        = (string) get_the_post_thumbnail_url( $id, 'large' );
 
 		$out  = '<div class="kwt-tour-detail">';
@@ -66,11 +66,11 @@ if ( ! function_exists( 'kwawingu_tours_render_tour_detail' ) ) {
 				)
 			) . '</li>';
 		}
-		$out     .= '</ul>';
-		$kwt_post = get_post( $id );
-		$kwt_body = $kwt_post ? apply_filters( 'the_content', $kwt_post->post_content ) : ''; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- applying core's own content filter, not defining a hook.
-		$out     .= '<div class="kwt-tour-detail__body">' . wp_kses_post( $kwt_body ) . '</div>';
-		$booking  = View::tour_booking_url( $id );
+		$out                .= '</ul>';
+		$kwawingu_tours_post = get_post( $id );
+		$kwawingu_tours_body = $kwawingu_tours_post ? apply_filters( 'the_content', $kwawingu_tours_post->post_content ) : ''; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- applying core's own content filter, not defining a hook.
+		$out                .= '<div class="kwt-tour-detail__body">' . wp_kses_post( $kwawingu_tours_body ) . '</div>';
+		$booking             = View::tour_booking_url( $id );
 		if ( '' !== $booking ) {
 			$out .= '<a class="kwt-book-btn" href="' . esc_url( $booking ) . '">' . esc_html__( 'Book this tour', 'kwawingu-tours' ) . '</a>';
 		}

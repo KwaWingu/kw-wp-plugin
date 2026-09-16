@@ -30,7 +30,7 @@ class InquiryFormRenderTest extends TestCase {
 
 	public function test_renders_honeypot_field(): void {
 		$html = kwawingu_tours_render_inquiry_form( array(), '' );
-		$this->assertStringContainsString( 'name="kwt_hp"', $html );
+		$this->assertStringContainsString( 'name="kwawingu_tours_hp"', $html );
 		$this->assertStringContainsString( 'kwt-hp', $html );
 	}
 

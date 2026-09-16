@@ -27,7 +27,7 @@ if ( ! function_exists( 'kwawingu_tours_render_gallery' ) ) {
 		}
 
 		$items = array();
-		$ids   = get_post_meta( $id, 'kwt_gallery_ids', true );
+		$ids   = get_post_meta( $id, 'kwawingu_tours_gallery_ids', true );
 		if ( is_array( $ids ) && ! empty( $ids ) ) {
 			foreach ( $ids as $aid ) {
 				$url = wp_get_attachment_image_url( (int) $aid, 'large' );
@@ -37,7 +37,7 @@ if ( ! function_exists( 'kwawingu_tours_render_gallery' ) ) {
 			}
 		}
 		if ( empty( $items ) ) {
-			$urls = get_post_meta( $id, 'kwt_gallery', true );
+			$urls = get_post_meta( $id, 'kwawingu_tours_gallery', true );
 			if ( is_array( $urls ) ) {
 				foreach ( $urls as $u ) {
 					if ( is_string( $u ) && '' !== $u ) {

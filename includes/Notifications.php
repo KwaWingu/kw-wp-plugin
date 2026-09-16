@@ -86,7 +86,7 @@ class Notifications {
 	}
 
 	/**
-	 * Store a kwt_lead post.
+	 * Store a kwawingu_lead post.
 	 *
 	 * @param string $name  Guest name.
 	 * @param string $email Guest email.
@@ -104,10 +104,10 @@ class Notifications {
 			)
 		);
 		if ( is_int( $post_id ) && $post_id > 0 ) {
-			update_post_meta( $post_id, 'kwt_lead_email', $email );
-			update_post_meta( $post_id, 'kwt_lead_phone', $phone );
-			update_post_meta( $post_id, 'kwt_lead_tour', $tour );
-			update_post_meta( $post_id, 'kwt_lead_ref', $ref );
+			update_post_meta( $post_id, 'kwawingu_tours_lead_email', $email );
+			update_post_meta( $post_id, 'kwawingu_tours_lead_phone', $phone );
+			update_post_meta( $post_id, 'kwawingu_tours_lead_tour', $tour );
+			update_post_meta( $post_id, 'kwawingu_tours_lead_ref', $ref );
 		}
 	}
 

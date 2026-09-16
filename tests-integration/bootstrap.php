@@ -9,9 +9,9 @@
  * @package KwaWingu\Tours
  */
 
-$kwt_wp_phpunit = getenv( 'WP_PHPUNIT__DIR' );
-if ( ! $kwt_wp_phpunit ) {
-	$kwt_wp_phpunit = dirname( __DIR__ ) . '/vendor/wp-phpunit/wp-phpunit';
+$kwawingu_tours_wp_phpunit = getenv( 'WP_PHPUNIT__DIR' );
+if ( ! $kwawingu_tours_wp_phpunit ) {
+	$kwawingu_tours_wp_phpunit = dirname( __DIR__ ) . '/vendor/wp-phpunit/wp-phpunit';
 }
 
 require_once dirname( __DIR__ ) . '/vendor/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php';
@@ -21,23 +21,23 @@ require_once dirname( __DIR__ ) . '/vendor/yoast/phpunit-polyfills/phpunitpolyfi
 // install.php child process it spawns needs the same file (DB credentials, ABSPATH,
 // WP_TESTS_DOMAIN/EMAIL/TITLE, WP_PHP_BINARY — wp-env writes all of them there).
 if ( ! defined( 'WP_TESTS_CONFIG_FILE_PATH' ) ) {
-	$kwt_tests_dir = getenv( 'WP_TESTS_DIR' );
-	$kwt_candidates = array(
+	$kwawingu_tours_tests_dir = getenv( 'WP_TESTS_DIR' );
+	$kwawingu_tours_candidates = array(
 		getenv( 'WP_PHPUNIT__TESTS_CONFIG' ),
-		$kwt_tests_dir ? $kwt_tests_dir . '/wp-tests-config.php' : null,
+		$kwawingu_tours_tests_dir ? $kwawingu_tours_tests_dir . '/wp-tests-config.php' : null,
 		'/wordpress-phpunit/wp-tests-config.php',
 		dirname( __DIR__ ) . '/wp-tests-config.php',
 	);
-	foreach ( $kwt_candidates as $kwt_candidate ) {
-		if ( $kwt_candidate && is_readable( $kwt_candidate ) ) {
-			define( 'WP_TESTS_CONFIG_FILE_PATH', $kwt_candidate );
+	foreach ( $kwawingu_tours_candidates as $kwawingu_tours_candidate ) {
+		if ( $kwawingu_tours_candidate && is_readable( $kwawingu_tours_candidate ) ) {
+			define( 'WP_TESTS_CONFIG_FILE_PATH', $kwawingu_tours_candidate );
 			break;
 		}
 	}
-	unset( $kwt_tests_dir, $kwt_candidates, $kwt_candidate );
+	unset( $kwawingu_tours_tests_dir, $kwawingu_tours_candidates, $kwawingu_tours_candidate );
 }
 
-require_once $kwt_wp_phpunit . '/includes/functions.php';
+require_once $kwawingu_tours_wp_phpunit . '/includes/functions.php';
 
 // Load the plugin into the test WordPress before it boots.
 tests_add_filter(
@@ -47,4 +47,4 @@ tests_add_filter(
 	}
 );
 
-require $kwt_wp_phpunit . '/includes/bootstrap.php';
+require $kwawingu_tours_wp_phpunit . '/includes/bootstrap.php';

@@ -4,14 +4,14 @@
  */
 
 const loadProxy = ( nonce ) => {
-	window.kwtProxy = {
+	window.kwawinguToursProxy = {
 		root: '/wp-json/kwawingu/v1',
 		nonce,
 		i18n: { error: 'err' },
 	};
 	jest.resetModules();
-	require( './kwt-proxy.js' );
-	return window.kwtProxy;
+	require( './kwawingu-tours-proxy.js' );
+	return window.kwawinguToursProxy;
 };
 
 const jsonResponse = ( ok, status, body ) =>
@@ -23,7 +23,7 @@ const jsonResponse = ( ok, status, body ) =>
 
 afterEach( () => {
 	delete global.fetch;
-	delete window.kwtProxy;
+	delete window.kwawinguToursProxy;
 } );
 
 test( 'retries once with a fresh nonce after a 403', async () => {

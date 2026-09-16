@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Setup_Wizard {
 
-	const ACTION = 'kwt_setup_scaffold';
+	const ACTION = 'kwawingu_tours_setup_scaffold';
 
 	/**
 	 * Settings instance.
@@ -123,8 +123,8 @@ class Setup_Wizard {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page'     => 'kwawingu-setup',
-					'kwt_done' => '1',
+					'page'                => 'kwawingu-setup',
+					'kwawingu_tours_done' => '1',
 				),
 				admin_url( 'options-general.php' )
 			)

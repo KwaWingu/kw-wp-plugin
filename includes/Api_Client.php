@@ -51,7 +51,7 @@ class Api_Client {
 			throw new Api_Exception( 'KwaWingu Tours is not configured (slug or public key missing).', 0 );
 		}
 
-		$url = KWT_API_BASE . '/' . rawurlencode( $slug ) . '/' . ltrim( $path, '/' );
+		$url = KWAWINGU_TOURS_API_BASE . '/' . rawurlencode( $slug ) . '/' . ltrim( $path, '/' );
 		if ( ! empty( $query ) ) {
 			$url = add_query_arg( $query, $url );
 		}
@@ -88,7 +88,7 @@ class Api_Client {
 		if ( '' === $slug || '' === $key ) {
 			throw new Api_Exception( 'KwaWingu Tours is not configured (slug or API key missing).', 0 );
 		}
-		$url = KWT_API_BASE . '/' . rawurlencode( $slug ) . '/' . ltrim( $path, '/' );
+		$url = KWAWINGU_TOURS_API_BASE . '/' . rawurlencode( $slug ) . '/' . ltrim( $path, '/' );
 
 		$response = wp_remote_post(
 			esc_url_raw( $url ),

@@ -15,10 +15,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Cpt {
 
-	const TOUR        = 'kwt_tour';
-	const DESTINATION = 'kwt_destination';
-	const TYPE_TAX    = 'kwt_tour_type';
-	const LEAD        = 'kwt_lead';
+	const TOUR        = 'kwawingu_tour';
+	const DESTINATION = 'kwawingu_destination';
+	const TYPE_TAX    = 'kwawingu_tour_type';
+	const LEAD        = 'kwawingu_lead';
 
 	/**
 	 * Registers the init action hook for post type and taxonomy registration.

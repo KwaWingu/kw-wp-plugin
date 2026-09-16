@@ -17,7 +17,7 @@ if ( ! function_exists( 'kwawingu_tours_render_search' ) ) {
 	 */
 	function kwawingu_tours_render_search( array $attributes, string $content = '' ): string {
 		if ( function_exists( 'wp_enqueue_script' ) ) {
-			wp_enqueue_script( 'kwt-proxy' );
+			wp_enqueue_script( 'kwawingu-tours-proxy' );
 		}
 		$placeholder = isset( $attributes['placeholder'] ) && '' !== $attributes['placeholder']
 			? esc_attr( (string) $attributes['placeholder'] )

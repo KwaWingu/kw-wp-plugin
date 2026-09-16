@@ -17,7 +17,7 @@ class Blocks {
 
 	/** Absolute path to the blocks directory (with trailing slash). */
 	public static function block_dir(): string {
-		return defined( 'KWT_PLUGIN_DIR' ) ? KWT_PLUGIN_DIR . 'blocks/' : __DIR__ . '/../blocks/';
+		return defined( 'KWAWINGU_TOURS_PLUGIN_DIR' ) ? KWAWINGU_TOURS_PLUGIN_DIR . 'blocks/' : __DIR__ . '/../blocks/';
 	}
 
 	/**

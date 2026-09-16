@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Settings {
 
-	const OPTION = 'kwt_settings';
+	const OPTION = 'kwawingu_tours_settings';
 
 	const SYNC_INTERVALS = array( 'hourly', 'twicedaily', 'daily' );
 	const MEDIA_MODES    = array( 'sideload', 'hotlink' );
@@ -212,7 +212,7 @@ class Settings {
 			'admin_init',
 			function () {
 				register_setting(
-					'kwt_settings_group',
+					'kwawingu_tours_settings_group',
 					self::OPTION,
 					array(
 						'type'              => 'array',

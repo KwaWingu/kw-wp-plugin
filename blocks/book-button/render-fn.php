@@ -30,11 +30,11 @@ if ( ! function_exists( 'kwawingu_tours_render_book_button' ) ) {
 		}
 
 		if ( 'onsite' === $booking->mode() ) {
-			// The on-site booking form lives in the kwawingu/booking block (anchor #kwt-book).
+			// The on-site booking form lives in the kwawingu/booking block (anchor #kwawingu-tours-book).
 			$label = isset( $attributes['label'] ) && '' !== $attributes['label']
 				? (string) $attributes['label']
 				: __( 'Book now', 'kwawingu-tours' );
-			return '<a class="kwt-book-btn" href="#kwt-book">' . esc_html( $label ) . '</a>';
+			return '<a class="kwt-book-btn" href="#kwawingu-tours-book">' . esc_html( $label ) . '</a>';
 		}
 
 		$label = isset( $attributes['label'] ) && '' !== $attributes['label']

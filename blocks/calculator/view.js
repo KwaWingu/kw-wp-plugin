@@ -11,7 +11,7 @@
  * @param {Object} res Proxy response (`{ data: CalculatorEstimate }` or the estimate itself).
  * @return {string} e.g. "TZS 920,000".
  */
-function kwtCalculatorTotal( res ) {
+function kwawinguToursCalculatorTotal( res ) {
 	var data = ( res && res.data ) || res || {};
 	var amount = data.grandTotal != null ? data.grandTotal : ( data.total || 0 );
 	var currency = data.currency || 'TZS';
@@ -24,18 +24,18 @@ function kwtCalculatorTotal( res ) {
 		var total = form.querySelector( '.kwt-calculator__total' );
 		form.addEventListener( 'submit', function ( e ) {
 			e.preventDefault();
-			total.textContent = window.kwtProxy.i18n.loading;
+			total.textContent = window.kwawinguToursProxy.i18n.loading;
 			var body = {
 				adults: Number( form.adults.value ) || 1,
 				children: Number( form.children.value ) || 0,
 				nights: Number( form.nights.value ) || 1
 			};
-			window.kwtProxy.post( '/calculator/estimate', body ).then( function ( res ) {
-				total.textContent = kwtCalculatorTotal( res );
+			window.kwawinguToursProxy.post( '/calculator/estimate', body ).then( function ( res ) {
+				total.textContent = kwawinguToursCalculatorTotal( res );
 			} ).catch( function ( err ) {
 				// The proxy's message is written for the visitor (e.g. "not available at the
 				// moment"); only fall back to the generic error when there is none.
-				total.textContent = ( err && err.message ) || window.kwtProxy.i18n.error;
+				total.textContent = ( err && err.message ) || window.kwawinguToursProxy.i18n.error;
 			} );
 		} );
 	}
@@ -46,5 +46,5 @@ function kwtCalculatorTotal( res ) {
 
 /* Testable exports (ignored in the browser). */
 if ( typeof module !== 'undefined' && module.exports ) {
-	module.exports = { calculatorTotal: kwtCalculatorTotal };
+	module.exports = { calculatorTotal: kwawinguToursCalculatorTotal };
 }

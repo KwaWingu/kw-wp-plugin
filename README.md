@@ -33,7 +33,7 @@ Then activate the plugin in WordPress. Nothing to build: the plugin autoloads it
 3. **Settings → KwaWingu Setup** — click **Build my site**.
 4. Visit your site.
 
-Pointing at a staging/self-hosted KwaWingu: `define( 'KWT_SITE_BASE', 'https://staging.example' );` in `wp-config.php` (API root becomes `…/api/v1`; `KWT_API_BASE` overrides the API root alone).
+Pointing at a staging/self-hosted KwaWingu: `define( 'KWAWINGU_TOURS_SITE_BASE', 'https://staging.example' );` in `wp-config.php` (API root becomes `…/api/v1`; `KWAWINGU_TOURS_API_BASE` overrides the API root alone).
 
 See [docs/getting-started.md](docs/getting-started.md).
 

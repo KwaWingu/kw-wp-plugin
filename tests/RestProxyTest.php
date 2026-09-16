@@ -81,13 +81,18 @@ namespace KwaWingu\Tours\Tests {
             $this->assertSame( 'Linked', $out['data'][0]['title'] );
         }
 
-        public function test_payment_intent_uses_ref_and_phone(): void {
+        public function test_payment_intent_verifies_booking_ownership_then_creates_the_intent(): void {
             // Rate limiting runs when get_transient exists; another test file may have
             // defined it already, so stub it here rather than depend on test order.
             Functions\when( 'get_transient' )->justReturn( 0 );
             Functions\when( 'set_transient' )->justReturn( true );
 
             $api = Mockery::mock( Api_Client::class );
+            // The API's payment-intent call authenticates the operator, not the guest,
+            // so the proxy first proves ownership: a token-validated lookup of the ref.
+            $api->shouldReceive( 'get' )->once()
+                ->with( '/bookings/KWG-1', array(), 15, array( 'X-Portal-Token' => 'tok-1' ) )
+                ->andReturn( array( 'ref' => 'KWG-1' ) );
             $api->shouldReceive( 'post' )->once()
                 ->with( '/bookings/KWG-1/payment-intent', array( 'phone' => '255700' ), true )
                 ->andReturn( array( 'reference' => 'r', 'paymentUrl' => '' ) );
@@ -95,9 +100,61 @@ namespace KwaWingu\Tours\Tests {
             $req = Mockery::mock();
             $req->shouldReceive( 'get_param' )->with( 'ref' )->andReturn( 'KWG-1' );
             $req->shouldReceive( 'get_param' )->with( 'phone' )->andReturn( '255700' );
+            $req->shouldReceive( 'get_header' )->with( 'X-Portal-Token' )->andReturn( 'tok-1' );
 
             $out = ( new Rest_Proxy( $api ) )->handle_payment_intent( $req );
             $this->assertSame( 'r', $out['reference'] );
+        }
+
+        public function test_payment_intent_creates_nothing_when_the_token_does_not_own_the_ref(): void {
+            Functions\when( 'get_transient' )->justReturn( 0 );
+            Functions\when( 'set_transient' )->justReturn( true );
+
+            $api = Mockery::mock( Api_Client::class );
+            $api->shouldReceive( 'get' )->once()
+                ->with( '/bookings/KWG-1', array(), 15, array( 'X-Portal-Token' => 'wrong' ) )
+                ->andThrow( new \KwaWingu\Tours\Api_Exception( 'Booking not found.', 404, 'not_found' ) );
+            $api->shouldNotReceive( 'post' );
+
+            $req = Mockery::mock();
+            $req->shouldReceive( 'get_param' )->with( 'ref' )->andReturn( 'KWG-1' );
+            $req->shouldReceive( 'get_param' )->with( 'phone' )->andReturn( '255700' );
+            $req->shouldReceive( 'get_header' )->with( 'X-Portal-Token' )->andReturn( 'wrong' );
+
+            $out = ( new Rest_Proxy( $api ) )->handle_payment_intent( $req );
+            $this->assertInstanceOf( \WP_Error::class, $out );
+            $this->assertSame( 404, $out->data['status'] );
+        }
+
+        public function test_booking_access_is_refused_without_a_portal_token(): void {
+            Functions\when( 'wp_verify_nonce' )->justReturn( true );
+            $req = Mockery::mock();
+            $req->shouldReceive( 'get_header' )->with( 'X-WP-Nonce' )->andReturn( 'good' );
+            $req->shouldReceive( 'get_header' )->with( 'X-Portal-Token' )->andReturn( '' );
+
+            $out = ( new Rest_Proxy( Mockery::mock( Api_Client::class ) ) )->check_booking_access( $req );
+
+            $this->assertInstanceOf( \WP_Error::class, $out );
+            $this->assertSame( 403, $out->data['status'] );
+            $this->assertStringContainsString( 'confirmation email', $out->message );
+        }
+
+        public function test_booking_access_keeps_the_nonce_as_csrf_protection(): void {
+            Functions\when( 'wp_verify_nonce' )->justReturn( false );
+            $req = Mockery::mock();
+            $req->shouldReceive( 'get_header' )->with( 'X-WP-Nonce' )->andReturn( 'bad' );
+            $req->shouldReceive( 'get_header' )->with( 'X-Portal-Token' )->andReturn( 'tok-1' );
+
+            $this->assertFalse( ( new Rest_Proxy( Mockery::mock( Api_Client::class ) ) )->check_booking_access( $req ) );
+        }
+
+        public function test_booking_access_passes_with_nonce_and_token(): void {
+            Functions\when( 'wp_verify_nonce' )->justReturn( true );
+            $req = Mockery::mock();
+            $req->shouldReceive( 'get_header' )->with( 'X-WP-Nonce' )->andReturn( 'good' );
+            $req->shouldReceive( 'get_header' )->with( 'X-Portal-Token' )->andReturn( ' tok-1 ' );
+
+            $this->assertTrue( ( new Rest_Proxy( Mockery::mock( Api_Client::class ) ) )->check_booking_access( $req ) );
         }
 
         public function test_booking_lookup_forwards_the_portal_token_as_a_header_not_a_query_param(): void {
@@ -108,27 +165,26 @@ namespace KwaWingu\Tours\Tests {
 
             $req = Mockery::mock();
             $req->shouldReceive( 'get_param' )->with( 'ref' )->andReturn( 'KWG-1' );
-            // Even if a stale client sends both, the token wins and the email is never forwarded.
-            $req->shouldReceive( 'get_param' )->with( 'email' )->andReturn( 'g@example.com' );
+            // Even if a stale client sends an email too, it is never read or forwarded.
             $req->shouldReceive( 'get_header' )->with( 'X-Portal-Token' )->andReturn( ' tok-1 ' );
 
             $out = ( new Rest_Proxy( $api ) )->handle_booking_lookup( $req );
             $this->assertSame( 'paid', $out['status'] );
         }
 
-        public function test_booking_lookup_falls_back_to_the_deprecated_email_lookup_without_a_token(): void {
+        public function test_booking_lookup_surfaces_the_api_refusal_for_a_wrong_token(): void {
             $api = Mockery::mock( Api_Client::class );
             $api->shouldReceive( 'get' )->once()
-                ->with( '/bookings/KWG-1', array( 'email' => 'g@example.com' ) )
-                ->andReturn( array( 'status' => 'pending' ) );
+                ->with( '/bookings/KWG-1', array(), 15, array( 'X-Portal-Token' => 'wrong' ) )
+                ->andThrow( new \KwaWingu\Tours\Api_Exception( 'Booking not found.', 404, 'not_found' ) );
 
             $req = Mockery::mock();
             $req->shouldReceive( 'get_param' )->with( 'ref' )->andReturn( 'KWG-1' );
-            $req->shouldReceive( 'get_param' )->with( 'email' )->andReturn( 'g@example.com' );
-            $req->shouldReceive( 'get_header' )->with( 'X-Portal-Token' )->andReturn( null );
+            $req->shouldReceive( 'get_header' )->with( 'X-Portal-Token' )->andReturn( 'wrong' );
 
             $out = ( new Rest_Proxy( $api ) )->handle_booking_lookup( $req );
-            $this->assertSame( 'pending', $out['status'] );
+            $this->assertInstanceOf( \WP_Error::class, $out );
+            $this->assertSame( 404, $out->data['status'] );
         }
 
         public function test_handler_returns_wp_error_on_api_exception(): void {

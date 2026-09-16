@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Admin_Page {
 
-	const REGEN_ACTION = 'kwt_regen_push_secret';
+	const REGEN_ACTION = 'kwawingu_tours_regen_push_secret';
 
 	/**
 	 * Plugin settings instance.
@@ -66,8 +66,8 @@ class Admin_Page {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page'           => 'kwawingu-tours',
-					'kwt_new_secret' => '1',
+					'page'                      => 'kwawingu-tours',
+					'kwawingu_tours_new_secret' => '1',
 				),
 				admin_url( 'options-general.php' )
 			)
@@ -108,20 +108,20 @@ class Admin_Page {
 			<h1><?php echo esc_html__( 'KwaWingu Tours', 'kwawingu-tours' ); ?></h1>
 			<p><?php echo esc_html__( 'Connect your KwaWingu Tours account. The Developer API is a paid add-on — enable it in your KwaWingu dashboard.', 'kwawingu-tours' ); ?></p>
 			<form method="post" action="options.php">
-				<?php settings_fields( 'kwt_settings_group' ); ?>
+				<?php settings_fields( 'kwawingu_tours_settings_group' ); ?>
 				<table class="form-table" role="presentation">
 					<tr>
-						<th scope="row"><label for="kwt_slug"><?php echo esc_html__( 'Operator slug', 'kwawingu-tours' ); ?></label></th>
-						<td><input name="<?php echo esc_attr( $opt ); ?>[slug]" id="kwt_slug" type="text" class="regular-text" value="<?php echo esc_attr( $slug ); ?>" /></td>
+						<th scope="row"><label for="kwawingu_tours_slug"><?php echo esc_html__( 'Operator slug', 'kwawingu-tours' ); ?></label></th>
+						<td><input name="<?php echo esc_attr( $opt ); ?>[slug]" id="kwawingu_tours_slug" type="text" class="regular-text" value="<?php echo esc_attr( $slug ); ?>" /></td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="kwt_public_key"><?php echo esc_html__( 'Public API key', 'kwawingu-tours' ); ?></label></th>
-						<td><input name="<?php echo esc_attr( $opt ); ?>[public_key]" id="kwt_public_key" type="text" class="regular-text" value="<?php echo esc_attr( $public_key ); ?>" autocomplete="off" /></td>
+						<th scope="row"><label for="kwawingu_tours_public_key"><?php echo esc_html__( 'Public API key', 'kwawingu-tours' ); ?></label></th>
+						<td><input name="<?php echo esc_attr( $opt ); ?>[public_key]" id="kwawingu_tours_public_key" type="text" class="regular-text" value="<?php echo esc_attr( $public_key ); ?>" autocomplete="off" /></td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="kwt_booking_mode"><?php echo esc_html__( 'Booking mode', 'kwawingu-tours' ); ?></label></th>
+						<th scope="row"><label for="kwawingu_tours_booking_mode"><?php echo esc_html__( 'Booking mode', 'kwawingu-tours' ); ?></label></th>
 						<td>
-							<select name="<?php echo esc_attr( $opt ); ?>[booking_mode]" id="kwt_booking_mode">
+							<select name="<?php echo esc_attr( $opt ); ?>[booking_mode]" id="kwawingu_tours_booking_mode">
 								<?php foreach ( array( 'redirect', 'widget', 'onsite' ) as $mode ) : ?>
 									<option value="<?php echo esc_attr( $mode ); ?>" <?php selected( $booking_mode, $mode ); ?>><?php echo esc_html( $mode ); ?></option>
 								<?php endforeach; ?>
@@ -129,9 +129,9 @@ class Admin_Page {
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="kwt_private_key"><?php echo esc_html__( 'Private API key (on-site booking only)', 'kwawingu-tours' ); ?></label></th>
+						<th scope="row"><label for="kwawingu_tours_private_key"><?php echo esc_html__( 'Private API key (on-site booking only)', 'kwawingu-tours' ); ?></label></th>
 						<td>
-							<input name="<?php echo esc_attr( $opt ); ?>[private_key]" id="kwt_private_key" type="password" class="regular-text" value="<?php echo esc_attr( $this->settings->get_private_key() ); ?>" autocomplete="off" />
+							<input name="<?php echo esc_attr( $opt ); ?>[private_key]" id="kwawingu_tours_private_key" type="password" class="regular-text" value="<?php echo esc_attr( $this->settings->get_private_key() ); ?>" autocomplete="off" />
 							<p class="description"><?php echo esc_html__( 'Only needed for on-site booking. Stored server-side, never shown on your website.', 'kwawingu-tours' ); ?></p>
 						</td>
 					</tr>
@@ -146,8 +146,8 @@ class Admin_Page {
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="kwt_notify_email"><?php echo esc_html__( 'Notification email', 'kwawingu-tours' ); ?></label></th>
-						<td><input type="email" id="kwt_notify_email" class="regular-text" name="<?php echo esc_attr( $opt ); ?>[notify_email]" value="<?php echo esc_attr( $this->settings->notification_recipient() ); ?>" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" /></td>
+						<th scope="row"><label for="kwawingu_tours_notify_email"><?php echo esc_html__( 'Notification email', 'kwawingu-tours' ); ?></label></th>
+						<td><input type="email" id="kwawingu_tours_notify_email" class="regular-text" name="<?php echo esc_attr( $opt ); ?>[notify_email]" value="<?php echo esc_attr( $this->settings->notification_recipient() ); ?>" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" /></td>
 					</tr>
 					<tr>
 						<th scope="row"><?php echo esc_html__( 'Save booking leads', 'kwawingu-tours' ); ?></th>
@@ -226,15 +226,15 @@ class Admin_Page {
 		<p><?php echo esc_html__( 'Paste these into your KwaWingu dashboard so edits to a tour reach this site in seconds instead of waiting for the next scheduled sync.', 'kwawingu-tours' ); ?></p>
 		<table class="form-table" role="presentation">
 			<tr>
-				<th scope="row"><label for="kwt_push_url"><?php echo esc_html__( 'Endpoint URL', 'kwawingu-tours' ); ?></label></th>
+				<th scope="row"><label for="kwawingu_tours_push_url"><?php echo esc_html__( 'Endpoint URL', 'kwawingu-tours' ); ?></label></th>
 				<td>
-					<input type="text" id="kwt_push_url" class="large-text code" readonly value="<?php echo esc_attr( \KwaWingu\Tours\Push_Endpoint::endpoint_url() ); ?>" onfocus="this.select();" />
+					<input type="text" id="kwawingu_tours_push_url" class="large-text code" readonly value="<?php echo esc_attr( \KwaWingu\Tours\Push_Endpoint::endpoint_url() ); ?>" onfocus="this.select();" />
 				</td>
 			</tr>
 			<tr>
-				<th scope="row"><label for="kwt_push_secret"><?php echo esc_html__( 'Signing secret', 'kwawingu-tours' ); ?></label></th>
+				<th scope="row"><label for="kwawingu_tours_push_secret"><?php echo esc_html__( 'Signing secret', 'kwawingu-tours' ); ?></label></th>
 				<td>
-					<input type="text" id="kwt_push_secret" class="large-text code" readonly value="<?php echo esc_attr( $secret ); ?>" onfocus="this.select();" />
+					<input type="text" id="kwawingu_tours_push_secret" class="large-text code" readonly value="<?php echo esc_attr( $secret ); ?>" onfocus="this.select();" />
 					<p class="description"><?php echo esc_html__( 'Requests must send X-KW-Timestamp (unix seconds) and X-KW-Signature — the hex HMAC-SHA256 of "{timestamp}.{body}" using this secret. Requests older than 5 minutes are rejected.', 'kwawingu-tours' ); ?></p>
 				</td>
 			</tr>

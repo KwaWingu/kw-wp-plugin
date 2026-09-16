@@ -15,7 +15,7 @@ class SeoTest extends TestCase {
         Functions\when( 'get_the_post_thumbnail_url' )->justReturn( 'https://img/cover.jpg' );
         Functions\when( 'get_the_excerpt' )->justReturn( 'A wild ride.' );
         Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {
-            $map = array( 'kwt_price' => 450000, 'kwt_rating' => 4.5, 'kwt_review_count' => 12 );
+            $map = array( 'kwawingu_tours_price' => 450000, 'kwawingu_tours_rating' => 4.5, 'kwawingu_tours_review_count' => 12 );
             return $map[ $key ] ?? '';
         } );
     }
@@ -33,7 +33,7 @@ class SeoTest extends TestCase {
 
     public function test_json_ld_omits_rating_when_zero(): void {
         Functions\when( 'get_post_meta' )->alias( static function ( $id, $key, $single ) {
-            return 'kwt_price' === $key ? 100000 : 0;
+            return 'kwawingu_tours_price' === $key ? 100000 : 0;
         } );
         $data = ( new Seo() )->json_ld( 7 );
         $this->assertArrayNotHasKey( 'aggregateRating', $data );

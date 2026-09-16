@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Importer {
 
-	const META = 'kwt_pattern';
+	const META = 'kwawingu_tours_pattern';
 
 	/**
 	 * Create any missing starter pages and optionally set the static front page.
@@ -59,9 +59,9 @@ class Importer {
 	}
 
 	/**
-	 * Check whether a page with the given kwt_pattern meta value already exists.
+	 * Check whether a page with the given kwawingu_tours_pattern meta value already exists.
 	 *
-	 * @param string $slug Pattern slug used as the kwt_pattern meta value.
+	 * @param string $slug Pattern slug used as the kwawingu_tours_pattern meta value.
 	 * @return bool True if the page exists, false otherwise.
 	 */
 	private function page_exists( string $slug ): bool {

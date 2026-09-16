@@ -17,8 +17,8 @@ if ( ! function_exists( 'kwawingu_tours_render_reviews' ) ) {
 	 */
 	function kwawingu_tours_render_reviews( array $attributes, string $content = '' ): string {
 		$id     = ! empty( $attributes['postId'] ) ? (int) $attributes['postId'] : (int) get_the_ID();
-		$rating = (float) get_post_meta( $id, 'kwt_rating', true );
-		$count  = (int) get_post_meta( $id, 'kwt_review_count', true );
+		$rating = (float) get_post_meta( $id, 'kwawingu_tours_rating', true );
+		$count  = (int) get_post_meta( $id, 'kwawingu_tours_review_count', true );
 		if ( $rating <= 0 || $count <= 0 ) {
 			return '';
 		}

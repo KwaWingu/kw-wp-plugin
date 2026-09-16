@@ -17,7 +17,7 @@ if ( ! function_exists( 'kwawingu_tours_render_calculator' ) ) {
 	 */
 	function kwawingu_tours_render_calculator( array $attributes, string $content = '' ): string {
 		if ( function_exists( 'wp_enqueue_script' ) ) {
-			wp_enqueue_script( 'kwt-proxy' );
+			wp_enqueue_script( 'kwawingu-tours-proxy' );
 		}
 		$l_adults   = esc_html__( 'Adults', 'kwawingu-tours' );
 		$l_children = esc_html__( 'Children', 'kwawingu-tours' );

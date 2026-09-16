@@ -17,7 +17,7 @@ class PluginTest extends TestCase {
     public function test_version_constant_matches_plugin_header(): void {
         $main = file_get_contents( dirname( __DIR__ ) . '/kwawingu-tours.php' );
         $this->assertSame( 1, preg_match( '/^\s*\*\s*Version:\s*(\S+)/m', $main, $header ) );
-        $this->assertSame( 1, preg_match( "/define\(\s*'KWT_VERSION',\s*'([^']+)'/", $main, $constant ) );
+        $this->assertSame( 1, preg_match( "/define\(\s*'KWAWINGU_TOURS_VERSION',\s*'([^']+)'/", $main, $constant ) );
 
         $this->assertSame( $header[1], Plugin::VERSION );
         $this->assertSame( $header[1], $constant[1] );

@@ -18,15 +18,15 @@ if ( ! function_exists( 'kwawingu_tours_destination_url' ) ) {
 	 *
 	 * The hosted storefront page for the place — description, highlights, best months, the
 	 * official park tariff and the operator's tours that go there — when the sync recorded the
-	 * API's slug and the operator slug is configured. The local kwt_destination permalink only
+	 * API's slug and the operator slug is configured. The local kwawingu_destination permalink only
 	 * as a fallback (a post synced before 1.14.2 has no slug yet; the next sync adds it), so a
 	 * card never links to an empty local page when the real one exists.
 	 *
-	 * @param int $post_id kwt_destination post ID.
+	 * @param int $post_id kwawingu_destination post ID.
 	 * @return string
 	 */
 	function kwawingu_tours_destination_url( int $post_id ): string {
-		$slug     = (string) get_post_meta( $post_id, 'kwt_slug', true );
+		$slug     = (string) get_post_meta( $post_id, 'kwawingu_tours_slug', true );
 		$operator = ( new Settings() )->get_slug();
 		if ( '' !== $slug && '' !== $operator ) {
 			return Booking::hosted_base() . '/' . rawurlencode( $operator ) . '/destinations/' . rawurlencode( $slug );

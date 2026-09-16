@@ -1,6 +1,6 @@
 <?php
 /**
- * Imports the operator's KwaWingu catalog into kwt_tour posts.
+ * Imports the operator's KwaWingu catalog into kwawingu_tour posts.
  *
  * @package KwaWingu\Tours
  */
@@ -11,16 +11,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; }
 
 /**
- * Imports the operator's KwaWingu catalog into kwt_tour posts.
+ * Imports the operator's KwaWingu catalog into kwawingu_tour posts.
  *
- * Upserts by the kwt_id meta. Structured meta is always refreshed; title/body
+ * Upserts by the kwawingu_tours_id meta. Structured meta is always refreshed; title/body
  * are written only for new posts or posts the operator has not locked by
  * editing. Tours that vanish from the API are drafted (never hard-deleted).
  */
 class Sync {
 
-	const META_ID   = 'kwt_id';
-	const META_LOCK = 'kwt_content_locked';
+	const META_ID   = 'kwawingu_tours_id';
+	const META_LOCK = 'kwawingu_tours_content_locked';
 
 	/**
 	 * API client instance.
@@ -82,20 +82,20 @@ class Sync {
 			if ( ! is_array( $tour ) ) {
 				continue;
 			}
-			$kwt_id = (string) ( $tour['id'] ?? '' );
-			if ( '' === $kwt_id ) {
+			$kwawingu_tours_id = (string) ( $tour['id'] ?? '' );
+			if ( '' === $kwawingu_tours_id ) {
 				$result['errors'][] = 'Skipped a tour with no id.';
 				continue;
 			}
-			$seen_ids[] = $kwt_id;
+			$seen_ids[] = $kwawingu_tours_id;
 
-			$existing = $this->find_post_by_kwt_id( $kwt_id );
+			$existing = $this->find_post_by_kwawingu_tours_id( $kwawingu_tours_id );
 			if ( 0 === $existing ) {
-				$new_id = $this->insert_tour( $tour, $kwt_id );
+				$new_id = $this->insert_tour( $tour, $kwawingu_tours_id );
 				if ( $new_id > 0 ) {
 					++$result['created'];
 				} else {
-					$result['errors'][] = "Failed to create tour {$kwt_id}.";
+					$result['errors'][] = "Failed to create tour {$kwawingu_tours_id}.";
 				}
 			} else {
 				$this->update_tour( $existing, $tour );
@@ -120,9 +120,9 @@ class Sync {
 	}
 
 	/**
-	 * Upserts the operator's destinations into kwt_destination posts.
+	 * Upserts the operator's destinations into kwawingu_destination posts.
 	 *
-	 * The Destinations Grid block has always queried kwt_destination, but nothing ever
+	 * The Destinations Grid block has always queried kwawingu_destination, but nothing ever
 	 * wrote one, so the grid rendered "No destinations yet." on every site. The /site
 	 * bundle carries the destinations; this mirrors them the same way tours are.
 	 *
@@ -140,13 +140,13 @@ class Sync {
 			if ( ! is_array( $row ) ) {
 				continue;
 			}
-			$kwt_id = (string) ( $row['id'] ?? '' );
-			$name   = (string) ( $row['name'] ?? '' );
-			if ( '' === $kwt_id || '' === $name ) {
+			$kwawingu_tours_id = (string) ( $row['id'] ?? '' );
+			$name              = (string) ( $row['name'] ?? '' );
+			if ( '' === $kwawingu_tours_id || '' === $name ) {
 				continue;
 			}
-			$seen[]   = $kwt_id;
-			$existing = $this->find_post_by_kwt_id( $kwt_id, Cpt::DESTINATION );
+			$seen[]   = $kwawingu_tours_id;
+			$existing = $this->find_post_by_kwawingu_tours_id( $kwawingu_tours_id, Cpt::DESTINATION );
 			$content  = wp_strip_all_tags( (string) ( $row['description'] ?? '' ) );
 			if ( 0 === $existing ) {
 				$id = wp_insert_post(
@@ -171,16 +171,16 @@ class Sync {
 				wp_update_post( $payload );
 				++$out['updated'];
 			}
-			update_post_meta( $id, self::META_ID, $kwt_id );
+			update_post_meta( $id, self::META_ID, $kwawingu_tours_id );
 			// The API's slug is what the hosted destination page is addressed by
 			// ({hostedBase}/{operator}/destinations/{slug}); the grid links there.
-			update_post_meta( $id, 'kwt_slug', sanitize_title( (string) ( $row['slug'] ?? '' ) ) );
-			update_post_meta( $id, 'kwt_region', sanitize_text_field( (string) ( $row['region'] ?? '' ) ) );
-			update_post_meta( $id, 'kwt_country', sanitize_text_field( (string) ( $row['country'] ?? '' ) ) );
-			update_post_meta( $id, 'kwt_destination_type', sanitize_text_field( (string) ( $row['destinationType'] ?? '' ) ) );
+			update_post_meta( $id, 'kwawingu_tours_slug', sanitize_title( (string) ( $row['slug'] ?? '' ) ) );
+			update_post_meta( $id, 'kwawingu_tours_region', sanitize_text_field( (string) ( $row['region'] ?? '' ) ) );
+			update_post_meta( $id, 'kwawingu_tours_country', sanitize_text_field( (string) ( $row['country'] ?? '' ) ) );
+			update_post_meta( $id, 'kwawingu_tours_destination_type', sanitize_text_field( (string) ( $row['destinationType'] ?? '' ) ) );
 			$cover = $this->esc_url_raw_or_empty( $row['coverImageUrl'] ?? '' );
-			update_post_meta( $id, 'kwt_cover_url', $cover );
-			update_post_meta( $id, 'kwt_synced_at', time() );
+			update_post_meta( $id, 'kwawingu_tours_cover_url', $cover );
+			update_post_meta( $id, 'kwawingu_tours_synced_at', time() );
 			if ( null !== $this->media && '' !== $cover ) {
 				$this->media->ingest_cover( $id, $cover );
 			}
@@ -194,11 +194,11 @@ class Sync {
 	/**
 	 * Returns the WordPress post ID for the given KwaWingu tour ID, or 0 if not found.
 	 *
-	 * @param string $kwt_id    KwaWingu tour ID.
+	 * @param string $kwawingu_tours_id    KwaWingu tour ID.
 	 * @param string $post_type Post type to search (tours by default).
 	 * @return int
 	 */
-	private function find_post_by_kwt_id( string $kwt_id, string $post_type = Cpt::TOUR ): int {
+	private function find_post_by_kwawingu_tours_id( string $kwawingu_tours_id, string $post_type = Cpt::TOUR ): int {
 		$ids = get_posts(
 			array(
 				'post_type'      => $post_type,
@@ -208,7 +208,7 @@ class Sync {
 				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- exact-match lookup on one plugin meta key over this site's own tour posts (a few hundred rows at most), not a user-driven search.
 					array(
 						'key'   => self::META_ID,
-						'value' => $kwt_id,
+						'value' => $kwawingu_tours_id,
 					),
 				),
 			)
@@ -220,10 +220,10 @@ class Sync {
 	 * Inserts a new tour post and writes its meta.
 	 *
 	 * @param array<string,mixed> $tour   Tour data from the API.
-	 * @param string              $kwt_id KwaWingu tour ID.
+	 * @param string              $kwawingu_tours_id KwaWingu tour ID.
 	 * @return int New post ID on success, 0 on failure.
 	 */
-	private function insert_tour( array $tour, string $kwt_id ): int {
+	private function insert_tour( array $tour, string $kwawingu_tours_id ): int {
 		$id = wp_insert_post(
 			array(
 				'post_type'    => Cpt::TOUR,
@@ -234,7 +234,7 @@ class Sync {
 			)
 		);
 		if ( is_int( $id ) && $id > 0 ) {
-			$this->write_meta( $id, $tour, $kwt_id );
+			$this->write_meta( $id, $tour, $kwawingu_tours_id );
 			return $id;
 		}
 		return 0;
@@ -256,8 +256,8 @@ class Sync {
 			$payload['post_content'] = wp_strip_all_tags( (string) ( $tour['description'] ?? $tour['descriptionFull'] ?? $tour['descriptionShort'] ?? '' ) );
 		}
 		wp_update_post( $payload );
-		$existing_kwt_id = (string) get_post_meta( $post_id, self::META_ID, true );
-		$this->write_meta( $post_id, $tour, ! empty( $existing_kwt_id ) ? $existing_kwt_id : (string) ( $tour['id'] ?? '' ) );
+		$existing_kwawingu_tours_id = (string) get_post_meta( $post_id, self::META_ID, true );
+		$this->write_meta( $post_id, $tour, ! empty( $existing_kwawingu_tours_id ) ? $existing_kwawingu_tours_id : (string) ( $tour['id'] ?? '' ) );
 	}
 
 	/**
@@ -265,21 +265,21 @@ class Sync {
 	 *
 	 * @param int                 $post_id WordPress post ID.
 	 * @param array<string,mixed> $tour    Tour data from the API.
-	 * @param string              $kwt_id  KwaWingu tour ID.
+	 * @param string              $kwawingu_tours_id  KwaWingu tour ID.
 	 */
-	private function write_meta( int $post_id, array $tour, string $kwt_id ): void {
-		update_post_meta( $post_id, self::META_ID, $kwt_id );
-		update_post_meta( $post_id, 'kwt_slug', sanitize_title( (string) ( $tour['slug'] ?? '' ) ) );
+	private function write_meta( int $post_id, array $tour, string $kwawingu_tours_id ): void {
+		update_post_meta( $post_id, self::META_ID, $kwawingu_tours_id );
+		update_post_meta( $post_id, 'kwawingu_tours_slug', sanitize_title( (string) ( $tour['slug'] ?? '' ) ) );
 		// The API's public "from" price is basePriceAdult; 'price' is kept as a fallback
 		// so an older/summary payload shape still populates the meta.
-		update_post_meta( $post_id, 'kwt_price', (int) round( (float) ( $tour['basePriceAdult'] ?? $tour['price'] ?? 0 ) ) );
-		update_post_meta( $post_id, 'kwt_currency', sanitize_text_field( (string) ( $tour['currency'] ?? '' ) ) );
-		update_post_meta( $post_id, 'kwt_duration_days', (int) ( $tour['durationDays'] ?? 0 ) );
-		update_post_meta( $post_id, 'kwt_difficulty', sanitize_text_field( (string) ( $tour['difficulty'] ?? '' ) ) );
-		update_post_meta( $post_id, 'kwt_type', sanitize_text_field( (string) ( $tour['type'] ?? $tour['productType'] ?? $tour['category'] ?? '' ) ) );
-		update_post_meta( $post_id, 'kwt_cover_url', $this->esc_url_raw_or_empty( $tour['coverImageUrl'] ?? '' ) );
-		update_post_meta( $post_id, 'kwt_rating', (float) ( $tour['rating'] ?? $tour['averageRating'] ?? 0 ) );
-		update_post_meta( $post_id, 'kwt_review_count', (int) ( $tour['reviewCount'] ?? 0 ) );
+		update_post_meta( $post_id, 'kwawingu_tours_price', (int) round( (float) ( $tour['basePriceAdult'] ?? $tour['price'] ?? 0 ) ) );
+		update_post_meta( $post_id, 'kwawingu_tours_currency', sanitize_text_field( (string) ( $tour['currency'] ?? '' ) ) );
+		update_post_meta( $post_id, 'kwawingu_tours_duration_days', (int) ( $tour['durationDays'] ?? 0 ) );
+		update_post_meta( $post_id, 'kwawingu_tours_difficulty', sanitize_text_field( (string) ( $tour['difficulty'] ?? '' ) ) );
+		update_post_meta( $post_id, 'kwawingu_tours_type', sanitize_text_field( (string) ( $tour['type'] ?? $tour['productType'] ?? $tour['category'] ?? '' ) ) );
+		update_post_meta( $post_id, 'kwawingu_tours_cover_url', $this->esc_url_raw_or_empty( $tour['coverImageUrl'] ?? '' ) );
+		update_post_meta( $post_id, 'kwawingu_tours_rating', (float) ( $tour['rating'] ?? $tour['averageRating'] ?? 0 ) );
+		update_post_meta( $post_id, 'kwawingu_tours_review_count', (int) ( $tour['reviewCount'] ?? 0 ) );
 		$gallery     = array();
 		$gallery_src = $tour['gallery'] ?? ( $tour['galleryImageUrls'] ?? null );
 		if ( is_array( $gallery_src ) ) {
@@ -290,15 +290,15 @@ class Sync {
 				}
 			}
 		}
-		update_post_meta( $post_id, 'kwt_gallery', $gallery );
-		update_post_meta( $post_id, 'kwt_synced_at', time() );
+		update_post_meta( $post_id, 'kwawingu_tours_gallery', $gallery );
+		update_post_meta( $post_id, 'kwawingu_tours_synced_at', time() );
 
 		if ( null !== $this->media ) {
 			$cover = (string) ( $tour['coverImageUrl'] ?? '' );
 			if ( '' !== $cover ) {
 				$this->media->ingest_cover( $post_id, $cover );
 			}
-			$gallery = get_post_meta( $post_id, 'kwt_gallery', true );
+			$gallery = get_post_meta( $post_id, 'kwawingu_tours_gallery', true );
 			if ( is_array( $gallery ) && ! empty( $gallery ) ) {
 				$this->media->ingest_gallery( $post_id, $gallery );
 			}
@@ -335,8 +335,8 @@ class Sync {
 
 		$count = 0;
 		foreach ( (array) $all as $post_id ) {
-			$kwt_id = (string) get_post_meta( (int) $post_id, self::META_ID, true );
-			if ( '' !== $kwt_id && ! in_array( $kwt_id, $seen_ids, true ) ) {
+			$kwawingu_tours_id = (string) get_post_meta( (int) $post_id, self::META_ID, true );
+			if ( '' !== $kwawingu_tours_id && ! in_array( $kwawingu_tours_id, $seen_ids, true ) ) {
 				wp_update_post(
 					array(
 						'ID'          => (int) $post_id,

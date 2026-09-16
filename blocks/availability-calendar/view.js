@@ -3,16 +3,16 @@
  */
 ( function () {
 	'use strict';
-	// English fallbacks; localized names come from window.kwtProxy.i18n at render time.
+	// English fallbacks; localized names come from window.kwawinguToursProxy.i18n at render time.
 	var MONTHS_EN = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
 	var DOW_EN = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
 
 	function months() {
-		var m = window.kwtProxy && window.kwtProxy.i18n && window.kwtProxy.i18n.months;
+		var m = window.kwawinguToursProxy && window.kwawinguToursProxy.i18n && window.kwawinguToursProxy.i18n.months;
 		return ( m && m.length === 12 ) ? m : MONTHS_EN;
 	}
 	function dow() {
-		var d = window.kwtProxy && window.kwtProxy.i18n && window.kwtProxy.i18n.dow;
+		var d = window.kwawinguToursProxy && window.kwawinguToursProxy.i18n && window.kwawinguToursProxy.i18n.dow;
 		return ( d && d.length === 7 ) ? d : DOW_EN;
 	}
 
@@ -25,7 +25,7 @@
 		var month = now.getUTCMonth();
 		var departures = [];
 
-		window.kwtProxy.get( '/departures', { tourSlug: tourSlug } ).then( function ( res ) {
+		window.kwawinguToursProxy.get( '/departures', { tourSlug: tourSlug } ).then( function ( res ) {
 			departures = ( res && res.data ) || [];
 			render();
 		} ).catch( function () { render(); } );
@@ -60,7 +60,7 @@
 		function render() {
 			header();
 			gridEl.textContent = '';
-			var grid = window.kwtBuildMonthGrid( departures, year, month );
+			var grid = window.kwawinguToursBuildMonthGrid( departures, year, month );
 			var table = document.createElement( 'table' );
 			table.className = 'kwt-availcal__table';
 			var headRow = document.createElement( 'tr' );
@@ -84,7 +84,7 @@
 							td.className = ( seats === 0 ) ? 'kwt-availcal__cell is-soldout' : 'kwt-availcal__cell is-open';
 							var tag = document.createElement( 'span' );
 							tag.className = 'kwt-availcal__seats';
-							tag.textContent = ( seats === 0 ) ? window.kwtProxy.i18n.soldOut : ( seats != null ? seats + '' : '•' );
+							tag.textContent = ( seats === 0 ) ? window.kwawinguToursProxy.i18n.soldOut : ( seats != null ? seats + '' : '•' );
 							td.appendChild( tag );
 						}
 					}

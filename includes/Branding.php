@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Branding {
 
-	const OPTION = 'kwt_brand';
+	const OPTION = 'kwawingu_tours_brand';
 
 	/**
 	 * API client instance.
@@ -34,17 +34,29 @@ class Branding {
 	}
 
 	/**
-	 * Hook into wp_head to output CSS custom properties.
+	 * Attach the brand CSS custom properties through the enqueue API.
+	 *
+	 * Runs after Assets (default priority 10) has registered the block stylesheet,
+	 * so the variables ride along as an inline addition to that handle instead of
+	 * a hand-printed <style> tag in wp_head.
 	 *
 	 * @return void
 	 */
 	public function register(): void {
-		add_action(
-			'wp_head',
-			function () {
-				echo $this->css_vars(); // phpcs:ignore WordPress.Security.EscapeOutput -- css_vars() builds an escaped <style> block.
-			}
-		);
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue' ), 20 );
+	}
+
+	/**
+	 * Add the brand CSS variables as an inline style on the block stylesheet handle.
+	 *
+	 * @return void
+	 */
+	public function enqueue(): void {
+		$css = $this->css_vars();
+		if ( '' === $css ) {
+			return;
+		}
+		wp_add_inline_style( Assets::STYLE_HANDLE, $css );
 	}
 
 	/**
@@ -70,9 +82,10 @@ class Branding {
 	}
 
 	/**
-	 * Build a <style> block containing CSS custom properties for the stored brand colours.
+	 * Build the CSS custom-property declarations for the stored brand colours.
 	 *
-	 * @return string Escaped <style> element, or empty string if no colours are stored.
+	 * @return string Raw CSS (no <style> wrapper — it is attached via wp_add_inline_style),
+	 *                or empty string if no colours are stored.
 	 */
 	public function css_vars(): string {
 		$brand   = get_option( self::OPTION, array() );
@@ -89,6 +102,6 @@ class Branding {
 			$css .= '--kwt-accent:' . $accent . ';';
 		}
 		$css .= '}';
-		return '<style id="kwt-brand">' . $css . '</style>';
+		return $css;
 	}
 }

@@ -19,7 +19,7 @@ class BookingFormRenderTest extends TestCase {
 
     public function test_renders_booking_form_with_fields(): void {
         $html = kwawingu_tours_render_booking_form( array(), '' );
-        $this->assertStringContainsString( 'id="kwt-book"', $html );
+        $this->assertStringContainsString( 'id="kwawingu-tours-book"', $html );
         $this->assertStringContainsString( 'name="firstName"', $html );
         $this->assertStringContainsString( 'name="lastName"', $html );
         $this->assertStringContainsString( 'name="email"', $html );

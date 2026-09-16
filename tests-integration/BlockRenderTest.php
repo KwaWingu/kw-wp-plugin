@@ -11,7 +11,7 @@
 /**
  * @group integration
  */
-class KWT_BlockRenderTest extends WP_UnitTestCase {
+class KWAWINGU_TOURS_BlockRenderTest extends WP_UnitTestCase {
 
 	/**
 	 * A synced tour renders inside the Tours Grid block with its title + price.
@@ -19,14 +19,14 @@ class KWT_BlockRenderTest extends WP_UnitTestCase {
 	public function test_tours_grid_block_renders_synced_tour() {
 		$post_id = self::factory()->post->create(
 			array(
-				'post_type'   => 'kwt_tour',
+				'post_type'   => 'kwawingu_tour',
 				'post_status' => 'publish',
 				'post_title'  => 'Serengeti Safari',
 			)
 		);
-		update_post_meta( $post_id, 'kwt_price', 450000 );
-		update_post_meta( $post_id, 'kwt_slug', 'serengeti' );
-		update_post_meta( $post_id, 'kwt_duration_days', 3 );
+		update_post_meta( $post_id, 'kwawingu_tours_price', 450000 );
+		update_post_meta( $post_id, 'kwawingu_tours_slug', 'serengeti' );
+		update_post_meta( $post_id, 'kwawingu_tours_duration_days', 3 );
 
 		$html = do_blocks( '<!-- wp:kwawingu/tours-grid {"limit":6} /-->' );
 
@@ -57,7 +57,7 @@ class KWT_BlockRenderTest extends WP_UnitTestCase {
 	public function test_gallery_block_empty_without_gallery() {
 		$post_id = self::factory()->post->create(
 			array(
-				'post_type'   => 'kwt_tour',
+				'post_type'   => 'kwawingu_tour',
 				'post_status' => 'publish',
 				'post_title'  => 'No Gallery Tour',
 			)

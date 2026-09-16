@@ -108,13 +108,16 @@ class Rest_Proxy {
 				'permission_callback' => $auth,
 			)
 		);
+		// Guest-scoped routes: the nonce is CSRF protection only, so these two also
+		// demand the per-booking portal token — the secret our API issued when the
+		// booking was created and validates server-side on every call.
 		register_rest_route(
 			self::NS,
 			'/payment-intent',
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'handle_payment_intent' ),
-				'permission_callback' => $auth,
+				'permission_callback' => array( $this, 'check_booking_access' ),
 			)
 		);
 		register_rest_route(
@@ -123,7 +126,7 @@ class Rest_Proxy {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'handle_booking_lookup' ),
-				'permission_callback' => $auth,
+				'permission_callback' => array( $this, 'check_booking_access' ),
 			)
 		);
 		register_rest_route(
@@ -173,7 +176,15 @@ class Rest_Proxy {
 	}
 
 	/**
-	 * Same-origin protection: validates the wp_rest nonce from the request header.
+	 * Same-origin (CSRF) check for routes that serve PUBLIC data.
+	 *
+	 * These routes are deliberately available to any site visitor — they proxy the
+	 * operator's public catalogue (search, availability, departures), public pricing
+	 * (quote, calculator estimate) and the public booking/inquiry submission forms.
+	 * The wp_rest nonce is NOT authentication here: it only proves the call came
+	 * from a page this site served (CSRF protection), and write routes are further
+	 * rate-limited per visitor. Routes that expose one guest's booking data use
+	 * {@see check_booking_access()} instead.
 	 *
 	 * @param mixed $request The REST request object.
 	 * @return bool
@@ -181,6 +192,32 @@ class Rest_Proxy {
 	public function check_nonce( $request ): bool {
 		$nonce = is_object( $request ) && method_exists( $request, 'get_header' ) ? (string) $request->get_header( 'X-WP-Nonce' ) : '';
 		return (bool) wp_verify_nonce( $nonce, 'wp_rest' );
+	}
+
+	/**
+	 * Permission for guest-scoped booking routes: nonce (CSRF) + portal token (authz).
+	 *
+	 * The portal token is the per-booking secret our API returns exactly once, when
+	 * the booking is created; the API validates it against the booking on every
+	 * forwarded call, so ownership is proven server-side, never by the nonce. A
+	 * request without a token is refused outright — there is no ref+email fallback.
+	 *
+	 * @param mixed $request The REST request object.
+	 * @return true|\WP_Error
+	 */
+	public function check_booking_access( $request ) {
+		if ( ! $this->check_nonce( $request ) ) {
+			return false;
+		}
+		$token = is_object( $request ) && is_callable( array( $request, 'get_header' ) ) ? trim( (string) $request->get_header( self::PORTAL_TOKEN_HEADER ) ) : '';
+		if ( '' === $token ) {
+			return new \WP_Error(
+				'portal_token_required',
+				__( 'This request needs your booking token. Use the "Manage your booking" link from your confirmation email or booking page.', 'kwawingu-tours' ),
+				array( 'status' => 403 )
+			);
+		}
+		return true;
 	}
 
 	/**
@@ -216,7 +253,7 @@ class Rest_Proxy {
 	 * schema has never had a `data` key — and a tour row carries a slug but no URL,
 	 * because the API does not know where this site publishes its tours. The block
 	 * reads `data[].url` / `data[].title`, so this resolves each hit to the synced
-	 * kwt_tour permalink (falling back to the hosted booking page for a tour that has
+	 * kwawingu_tour permalink (falling back to the hosted booking page for a tour that has
 	 * not been synced yet) and drops hits that resolve to nothing.
 	 *
 	 * @param array<string,mixed> $raw Decoded API response.
@@ -272,7 +309,7 @@ class Rest_Proxy {
 					'post_status'    => 'publish',
 					'posts_per_page' => 1,
 					'fields'         => 'ids',
-					'meta_key'       => 'kwt_slug', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+					'meta_key'       => 'kwawingu_tours_slug', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 					'meta_value'     => $slug, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 				)
 			);
@@ -363,6 +400,14 @@ class Rest_Proxy {
 			function () use ( $request ) {
 				$ref   = (string) $request->get_param( 'ref' );
 				$phone = (string) $request->get_param( 'phone' );
+				$token = trim( (string) $request->get_header( self::PORTAL_TOKEN_HEADER ) );
+				// The API's payment-intent call authenticates the operator (API key),
+				// not the guest — so before creating an intent, prove this caller owns
+				// this exact booking: a token-validated lookup of the same ref. A wrong
+				// or revoked token makes the lookup throw, and guard() surfaces the
+				// API's own refusal; no intent is ever created for a ref the caller
+				// could not read.
+				$this->api->get( '/bookings/' . rawurlencode( $ref ), array(), 15, array( self::PORTAL_TOKEN_HEADER => $token ) );
 				return $this->api->post( '/bookings/' . rawurlencode( $ref ) . '/payment-intent', array( 'phone' => $phone ), true );
 			}
 		);
@@ -372,11 +417,11 @@ class Rest_Proxy {
 	 * Proxies a booking lookup request to the KwaWingu API.
 	 *
 	 * The guest is identified by the `X-Portal-Token` header — the per-booking
-	 * secret returned as `portalToken` when the booking was created — and the
-	 * header is forwarded as a header, never as a query parameter, so it stays
-	 * out of access logs, CDN logs and Referer headers. The `?email=` lookup is
-	 * deprecated by the API (Sunset 2027-07-01) and is used only when the caller
-	 * has no token, e.g. a booking created before this version.
+	 * secret returned as `portalToken` when the booking was created — which the
+	 * API validates against the booking. It is forwarded as a header, never as a
+	 * query parameter, so it stays out of access logs, CDN logs and Referer
+	 * headers. There is no ref+email fallback: {@see check_booking_access()}
+	 * refuses tokenless callers before this handler runs.
 	 *
 	 * @param \WP_REST_Request $request The REST request object.
 	 * @return array<string,mixed>|\WP_Error
@@ -386,10 +431,7 @@ class Rest_Proxy {
 			function () use ( $request ) {
 				$ref   = (string) $request->get_param( 'ref' );
 				$token = trim( (string) $request->get_header( self::PORTAL_TOKEN_HEADER ) );
-				if ( '' !== $token ) {
-					return $this->api->get( '/bookings/' . rawurlencode( $ref ), array(), 15, array( self::PORTAL_TOKEN_HEADER => $token ) );
-				}
-				return $this->api->get( '/bookings/' . rawurlencode( $ref ), array( 'email' => (string) $request->get_param( 'email' ) ) );
+				return $this->api->get( '/bookings/' . rawurlencode( $ref ), array(), 15, array( self::PORTAL_TOKEN_HEADER => $token ) );
 			}
 		);
 	}
@@ -526,7 +568,7 @@ class Rest_Proxy {
 			return true;
 		}
 		$ip  = $this->client_ip();
-		$key = 'kwt_rl_' . $bucket . '_' . md5( $ip );
+		$key = 'kwawingu_tours_rl_' . $bucket . '_' . md5( $ip );
 		$n   = (int) get_transient( $key );
 		if ( $n >= 20 ) {
 			return false;

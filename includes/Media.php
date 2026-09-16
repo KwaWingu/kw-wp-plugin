@@ -15,13 +15,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Media {
 
-	const META_SRC = 'kwt_cover_src';
+	const META_SRC = 'kwawingu_tours_cover_src';
 
 	/** Meta key for the stored gallery attachment IDs. */
-	const META_GALLERY_IDS = 'kwt_gallery_ids';
+	const META_GALLERY_IDS = 'kwawingu_tours_gallery_ids';
 
 	/** Meta key for the stored gallery source URLs (dedup list). */
-	const META_GALLERY_SRC = 'kwt_gallery_src';
+	const META_GALLERY_SRC = 'kwawingu_tours_gallery_src';
 
 	/**
 	 * Plugin settings instance.
@@ -107,7 +107,7 @@ class Media {
 		$name = (string) wp_parse_url( $url, PHP_URL_PATH );
 		$name = sanitize_file_name( basename( $name ) );
 		if ( '' === $name || 'public' === $name || ! preg_match( '/\.' . $ext . '$/i', $name ) ) {
-			$name = 'kwt-' . substr( md5( $url ), 0, 12 ) . '.' . $ext;
+			$name = 'kwawingu-' . substr( md5( $url ), 0, 12 ) . '.' . $ext;
 		}
 		$attachment_id = media_handle_sideload(
 			array(
@@ -142,7 +142,7 @@ class Media {
 	 * Skips any URL already present in the stored source list (dedup). Each URL
 	 * is attempted individually; failures are swallowed (best-effort). In hotlink
 	 * mode or when $urls is empty, returns an empty array without importing
-	 * anything (the Gallery block falls back to the raw kwt_gallery URLs).
+	 * anything (the Gallery block falls back to the raw kwawingu_tours_gallery URLs).
 	 *
 	 * @param int              $post_id Tour post ID.
 	 * @param array<int,mixed> $urls    Remote image URLs to sideload.

@@ -39,8 +39,8 @@ class SyncControllerTest extends TestCase {
         $summary = $ctrl->run_and_store();
 
         $this->assertSame( 2, $summary['created'] );
-        $this->assertSame( 2, $stored['kwt_sync_status']['created'] );
-        $this->assertSame( 1000, $stored['kwt_sync_status']['ran_at'] );
+        $this->assertSame( 2, $stored['kwawingu_tours_sync_status']['created'] );
+        $this->assertSame( 1000, $stored['kwawingu_tours_sync_status']['ran_at'] );
     }
 
     public function test_register_schedules_cron_when_missing(): void {
@@ -56,13 +56,13 @@ class SyncControllerTest extends TestCase {
         $sync = Mockery::mock( Sync::class );
         ( new Sync_Controller( $sync, new Settings() ) )->register();
 
-        $this->assertSame( array( 'hourly', 'kwt_sync_cron' ), $scheduled[0] );
-        $this->assertNotFalse( has_action( 'kwt_sync_cron' ) );
-        $this->assertNotFalse( has_action( 'kwt_sync_push' ) );
-        $this->assertNotFalse( has_action( 'admin_post_kwt_sync_now' ) );
+        $this->assertSame( array( 'hourly', 'kwawingu_tours_sync_cron' ), $scheduled[0] );
+        $this->assertNotFalse( has_action( 'kwawingu_tours_sync_cron' ) );
+        $this->assertNotFalse( has_action( 'kwawingu_tours_sync_push' ) );
+        $this->assertNotFalse( has_action( 'admin_post_kwawingu_tours_sync_now' ) );
         // Without this hook, changing the interval in settings did nothing until the
         // plugin was deactivated and reactivated.
-        $this->assertNotFalse( has_action( 'update_option_kwt_settings' ) );
+        $this->assertNotFalse( has_action( 'update_option_kwawingu_tours_settings' ) );
     }
 
     public function test_changing_the_interval_reschedules_the_recurring_event(): void {
@@ -82,8 +82,8 @@ class SyncControllerTest extends TestCase {
         $ctrl = new Sync_Controller( Mockery::mock( Sync::class ), new Settings() );
         $ctrl->on_settings_saved( array( 'sync_interval' => 'hourly' ), array( 'sync_interval' => 'daily' ) );
 
-        $this->assertSame( array( 'kwt_sync_cron' ), $cleared );
-        $this->assertSame( array( 'daily', 'kwt_sync_cron' ), $scheduled[0] );
+        $this->assertSame( array( 'kwawingu_tours_sync_cron' ), $cleared );
+        $this->assertSame( array( 'daily', 'kwawingu_tours_sync_cron' ), $scheduled[0] );
     }
 
     public function test_saving_settings_without_an_interval_change_leaves_cron_alone(): void {
@@ -123,7 +123,7 @@ class SyncControllerTest extends TestCase {
         $ctrl = new Sync_Controller( Mockery::mock( Sync::class ), new Settings() );
 
         $this->assertTrue( $ctrl->schedule_immediate() );
-        $this->assertSame( array( array( 1234, 'kwt_sync_push' ) ), $single );
+        $this->assertSame( array( array( 1234, 'kwawingu_tours_sync_push' ) ), $single );
     }
 
     public function test_schedule_immediate_coalesces_when_a_run_is_already_pending(): void {

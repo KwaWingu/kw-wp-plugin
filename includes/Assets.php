@@ -15,8 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Assets {
 
-	const HANDLE       = 'kwt-proxy';
-	const STYLE_HANDLE = 'kwt-blocks';
+	const HANDLE       = 'kwawingu-tours-proxy';
+	const STYLE_HANDLE = 'kwawingu-tours-blocks';
 
 	/**
 	 * Registers the wp_enqueue_scripts action hook.
@@ -35,22 +35,22 @@ class Assets {
 	public function enqueue(): void {
 		wp_register_script(
 			self::HANDLE,
-			plugins_url( 'assets/js/kwt-proxy.js', KWT_PLUGIN_FILE ),
+			plugins_url( 'assets/js/kwawingu-tours-proxy.js', KWAWINGU_TOURS_PLUGIN_FILE ),
 			array(),
-			KWT_VERSION,
+			KWAWINGU_TOURS_VERSION,
 			true
 		);
 		wp_register_script(
-			'kwt-grid',
-			plugins_url( 'blocks/availability-calendar/grid.js', KWT_PLUGIN_FILE ),
+			'kwawingu-tours-grid',
+			plugins_url( 'blocks/availability-calendar/grid.js', KWAWINGU_TOURS_PLUGIN_FILE ),
 			array(),
-			KWT_VERSION,
+			KWAWINGU_TOURS_VERSION,
 			true
 		);
 		$settings = new Settings();
 		wp_localize_script(
 			self::HANDLE,
-			'kwtProxy',
+			'kwawinguToursProxy',
 			array(
 				'root'  => rest_url( Rest_Proxy::NS ),
 				'nonce' => wp_create_nonce( 'wp_rest' ),
@@ -93,9 +93,9 @@ class Assets {
 
 		wp_register_style(
 			self::STYLE_HANDLE,
-			plugins_url( 'assets/css/kwt-blocks.css', KWT_PLUGIN_FILE ),
+			plugins_url( 'assets/css/kwawingu-tours-blocks.css', KWAWINGU_TOURS_PLUGIN_FILE ),
 			array(),
-			KWT_VERSION
+			KWAWINGU_TOURS_VERSION
 		);
 		wp_enqueue_style( self::STYLE_HANDLE );
 	}

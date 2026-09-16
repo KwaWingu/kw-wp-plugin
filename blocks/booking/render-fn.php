@@ -17,10 +17,10 @@ if ( ! function_exists( 'kwawingu_tours_render_booking_form' ) ) {
 	 */
 	function kwawingu_tours_render_booking_form( array $attributes, string $content = '' ): string {
 		if ( function_exists( 'wp_enqueue_script' ) ) {
-			wp_enqueue_script( 'kwt-proxy' );
+			wp_enqueue_script( 'kwawingu-tours-proxy' );
 		}
 		$id        = (int) get_the_ID();
-		$tour_slug = ! empty( $attributes['tourSlug'] ) ? (string) $attributes['tourSlug'] : (string) get_post_meta( $id, 'kwt_slug', true );
+		$tour_slug = ! empty( $attributes['tourSlug'] ) ? (string) $attributes['tourSlug'] : (string) get_post_meta( $id, 'kwawingu_tours_slug', true );
 
 		$l_first  = esc_html__( 'First name', 'kwawingu-tours' );
 		$l_last   = esc_html__( 'Last name', 'kwawingu-tours' );
@@ -33,7 +33,7 @@ if ( ! function_exists( 'kwawingu_tours_render_booking_form' ) ) {
 		$l_infant = esc_html__( 'Infants', 'kwawingu-tours' );
 		$l_book   = esc_html__( 'Book & pay', 'kwawingu-tours' );
 
-		return '<form id="kwt-book" class="kwt-booking" data-tour="' . esc_attr( $tour_slug ) . '">'
+		return '<form id="kwawingu-tours-book" class="kwt-booking" data-tour="' . esc_attr( $tour_slug ) . '">'
 			. '<label>' . $l_dep . ' <select name="departure" class="kwt-booking__departure" required>'
 			. '<option value="">' . $l_dep_ph . '</option></select></label>'
 			. '<label>' . $l_first . ' <input type="text" name="firstName" required /></label>'
